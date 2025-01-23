@@ -1,0 +1,29 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks:
+    - name: Import MDT drivers
+      trippsc2.mdt.import_drivers:
+        source_paths:
+          - C:\Drivers
+        path: Out-of-Box Drivers\WinPE
+        mdt_directory_path: C:\MDTShare
+
+    - name: Import MDT drivers
+      trippsc2.mdt.import_drivers:
+        source_paths:
+          - C:\Drivers
+        path: Out-of-Box Drivers\Windows 10
+        mdt_directory_path: C:\MDTShare
+
+    - name: Import MDT drivers with duplicates
+      trippsc2.mdt.import_drivers:
+        source_paths:
+          - C:\Drivers
+        path: Out-of-Box Drivers\WinPE
+        import_duplicates: true
+        mdt_directory_path: C:\MDTShare
+      tags:
+        - always
+        - molecule-idempotence-notest

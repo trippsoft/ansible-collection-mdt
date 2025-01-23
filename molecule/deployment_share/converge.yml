@@ -1,0 +1,88 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks:
+    - name: Check existing share
+      check_mode: true
+      trippsc2.mdt.deployment_share:
+        installation_path: C:\Program Files\Microsoft Deployment Toolkit
+        path: C:\MDTShare1
+        description: MDT Deployment Share 1
+        share_name: MDTShare1
+        state: present
+
+    - name: Create existing share
+      trippsc2.mdt.deployment_share:
+        installation_path: C:\Program Files\Microsoft Deployment Toolkit
+        path: C:\MDTShare1
+        description: MDT Deployment Share 1
+        share_name: MDTShare1
+        state: present
+
+    - name: Check un-added share
+      check_mode: true
+      trippsc2.mdt.deployment_share:
+        installation_path: C:\Program Files\Microsoft Deployment Toolkit
+        path: C:\MDTShare2
+        description: MDT Deployment Share 2
+        share_name: MDTShare2
+        state: present
+
+    - name: Create un-added share
+      trippsc2.mdt.deployment_share:
+        installation_path: C:\Program Files\Microsoft Deployment Toolkit
+        path: C:\MDTShare2
+        description: MDT Deployment Share 2
+        share_name: MDTShare2
+        state: present
+
+    - name: Check existing share by path
+      check_mode: true
+      trippsc2.mdt.deployment_share:
+        installation_path: C:\Program Files\Microsoft Deployment Toolkit
+        path: C:\MDTShare3
+        state: absent
+
+    - name: Remove existing share by path
+      trippsc2.mdt.deployment_share:
+        installation_path: C:\Program Files\Microsoft Deployment Toolkit
+        path: C:\MDTShare3
+        state: absent
+
+    - name: Get existing share name
+      check_mode: true
+      trippsc2.mdt.deployment_share:
+        installation_path: C:\Program Files\Microsoft Deployment Toolkit
+        path: C:\MDTShare4
+        description: MDT Deployment Share 4
+        share_name: MDTShare4
+        state: present
+      register: _existing_share_4
+      changed_when: false
+
+    - name: Check existing share by name
+      check_mode: true
+      trippsc2.mdt.deployment_share:
+        installation_path: C:\Program Files\Microsoft Deployment Toolkit
+        name: "{{ _existing_share_4.name }}"
+        state: absent
+
+    - name: Remove existing share by name
+      trippsc2.mdt.deployment_share:
+        installation_path: C:\Program Files\Microsoft Deployment Toolkit
+        name: "{{ _existing_share_4.name }}"
+        state: absent
+
+    - name: Check non-existent share
+      check_mode: true
+      trippsc2.mdt.deployment_share:
+        installation_path: C:\Program Files\Microsoft Deployment Toolkit
+        path: C:\MDTShare5
+        state: absent
+
+    - name: Remove non-existent share
+      trippsc2.mdt.deployment_share:
+        installation_path: C:\Program Files\Microsoft Deployment Toolkit
+        path: C:\MDTShare5
+        state: absent

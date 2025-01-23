@@ -1,0 +1,35 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - mdt
+        state: present
+
+    - name: Pre-create MDT Deployment Share
+      loop:
+        - path: C:\MDTShare1
+          description: MDT Deployment Share 1
+          share_name: MDTShare1
+        - path: C:\MDTShare2
+          description: MDT Deployment Share 2
+          share_name: MDTShare2
+        - path: C:\MDTShare3
+          description: MDT Deployment Share 3
+          share_name: MDTShare3
+        - path: C:\MDTShare4
+          description: MDT Deployment Share 4
+          share_name: MDTShare4
+      trippsc2.mdt.deployment_share:
+        path: "{{ item.path }}"
+        description: "{{ item.description }}"
+        share_name: "{{ item.share_name }}"
+        state: present
+
+    - name: Remove MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        path: C:\MDTShare2
+        state: absent

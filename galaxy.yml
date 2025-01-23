@@ -1,0 +1,29 @@
+---
+namespace: trippsc2
+name: mdt
+version: 1.0.0
+readme: README.md
+authors:
+  - Jim Tarpley
+description: This collection contains modules and roles for configuring Microsoft Deployment Toolkit (MDT).
+
+license_file: 'LICENSE'
+
+tags:
+  - infrastructure
+  - tools
+  - windows
+
+dependencies: {}
+
+repository: https://github.com/trippsc2/ansible-collection-mdt.git
+
+manifest:
+  directives:
+    - recursive-include roles/* *.md
+    - recursive-include roles/*/files **
+    - exclude galaxy.yml galaxy.yaml MANIFEST.json FILES.json *.tar.gz
+    - recursive-exclude tests/output **
+    - recursive-exclude roles/*/molecule **
+    - recursive-exclude molecule **
+    - global-exclude /.* /__pycache__
