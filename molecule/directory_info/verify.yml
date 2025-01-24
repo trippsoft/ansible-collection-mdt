@@ -1,0 +1,72 @@
+---
+- name: Verify
+  hosts:
+    - subjects
+  tasks:
+    - name: Get Operating Systems directory info
+      trippsc2.mdt.directory_info:
+        path: Operating Systems
+        mdt_share_path: C:\MDTShare
+      register: _os_directory
+
+    - name: Verify Operating Systems directory
+      ansible.builtin.assert:
+        that:
+          - _os_directory.exists
+          - _os_directory.info.enabled
+          - _os_directory.info.is_directory
+          - _os_directory.info.name == 'Operating Systems'
+          - _os_directory.info.node_type == 'OperatingSystemFolder'
+          - _os_directory.info.children | length == 1
+        fail_msg: The Operating Systems directory is not valid.
+        success_msg: The Operating Systems directory is valid.
+
+    - name: Verify Windows 10 child directory
+      ansible.builtin.assert:
+        that:
+          - _os_directory.info.children[0].enabled
+          - _os_directory.info.children[0].is_directory
+          - _os_directory.info.children[0].name == 'Windows 10'
+          - _os_directory.info.children[0].node_type == 'OperatingSystemFolder'
+        fail_msg: The Windows 10 child directory is not valid.
+        success_msg: The Windows 10 child directory is valid.
+
+    - name: Get Out-of-Box Drivers directory info
+      trippsc2.mdt.directory_info:
+        path: Out-of-Box Drivers
+        mdt_share_path: C:\MDTShare
+      register: _drivers_directory
+
+    - name: Verify Out-of-Box Drivers directory
+      ansible.builtin.assert:
+        that:
+          - _drivers_directory.exists
+          - _drivers_directory.info.enabled
+          - _drivers_directory.info.is_directory
+          - _drivers_directory.info.name == 'Out-of-Box Drivers'
+          - _drivers_directory.info.node_type == 'DriverFolder'
+        fail_msg: The Out-of-Box Drivers directory is not valid.
+        success_msg: The Out-of-Box Drivers directory is valid.
+
+    - name: Select DriverFolder children
+      ansible.builtin.set_fact:
+        _driver_subdirectories: >-
+          {{ _drivers_directory.info.children |
+              selectattr('node_type', 'equalto', 'DriverFolder') |
+              list }}
+        _driver_children: >-
+          {{ _drivers_directory.info.children |
+              selectattr('node_type', 'equalto', 'Driver') |
+              list }}
+    
+    - name: Verify Out-of-Box Drivers children
+      ansible.builtin.assert:
+        that:
+          - _driver_subdirectories | length == 1
+          - _driver_subdirectories[0].enabled
+          - _driver_subdirectories[0].is_directory
+          - _driver_subdirectories[0].name == 'WinPE'
+          - _driver_subdirectories[0].node_type == 'DriverFolder'
+          - _driver_children | length == (_drivers_directory.info.children | length - 1)
+        fail_msg: The Out-of-Box Drivers children are not valid.
+        success_msg: The Out-of-Box Drivers children are valid.

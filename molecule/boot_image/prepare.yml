@@ -1,0 +1,55 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Create MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        path: "{{ dell_mdt_share_path }}"
+        description: MDT Deployment Share
+        share_name: MDTShare
+        state: present
+
+    - name: Add permissions to MDT Deployment Share
+      ansible.windows.win_acl:
+        path: "{{ dell_mdt_share_path }}"
+        user: vagrant
+        rights: FullControl
+        type: allow
+
+    - name: Disable x86 in MDT
+      community.windows.win_lineinfile:
+        path: "{{ dell_mdt_share_path }}\\Control\\Settings.xml"
+        regex: '(^\s*<SupportX86>).*(<\/SupportX86>$)'
+        line: '  <SupportX86>False</SupportX86>'
+
+    - name: Enable generating x64 LiteTouch ISO in MDT
+      community.windows.win_lineinfile:
+        path: "{{ dell_mdt_share_path }}\\Control\\Settings.xml"
+        regex: '(^\s*<Boot\.x64\.GenerateLiteTouchISO>).*(<\/Boot\.x64\.GenerateLiteTouchISO>$)'
+        line: '  <Boot.x64.GenerateLiteTouchISO>True</Boot.x64.GenerateLiteTouchISO>'
+
+    - name: Enable generating x64 generic WIM in MDT
+      community.windows.win_lineinfile:
+        path: "{{ dell_mdt_share_path }}\\Control\\Settings.xml"
+        regex: '(^\s*<Boot\.x64\.GenerateGenericWIM>).*(<\/Boot\.x64\.GenerateGenericWIM>$)'
+        line: '  <Boot.x64.GenerateGenericWIM>True</Boot.x64.GenerateGenericWIM>'
+
+    - name: Enable generating x64 generic ISO in MDT
+      community.windows.win_lineinfile:
+        path: "{{ dell_mdt_share_path }}\\Control\\Settings.xml"
+        regex: '(^\s*<Boot\.x64\.GenerateGenericISO>).*(<\/Boot\.x64\.GenerateGenericISO>$)'
+        line: '  <Boot.x64.GenerateGenericISO>True</Boot.x64.GenerateGenericISO>'
+
+    - name: Change selection profile for x64 in MDT (speeds up boot image creation)
+      community.windows.win_lineinfile:
+        path: "{{ dell_mdt_share_path }}\\Control\\Settings.xml"
+        regex: '(^\s*<Boot\.x64\.SelectionProfile>).*(<\/Boot\.x64\.SelectionProfile>$)'
+        line: '  <Boot.x64.SelectionProfile>Nothing</Boot.x64.SelectionProfile>'

@@ -53,7 +53,7 @@ $spec = @{
             required = $false
             default = $false
         }
-        mdt_directory_path = @{
+        mdt_share_path = @{
             type = 'str'
             required = $true
         }
@@ -68,11 +68,11 @@ Import-MDTModule -InstallationPath $module.Params.installation_path
 $sourcePaths = $module.Params.source_paths
 $path = $module.Params.path
 $importDuplicates = $module.Params.import_duplicates
-$mdtDirectoryPath = $module.Params.mdt_directory_path
+$mdtSharePath = $module.Params.mdt_share_path
 
-if (-not (Test-Path -Path $mdtDirectoryPath))
+if (-not (Test-Path -Path $mdtSharePath))
 {
-    $module.FailJson("MDT directory path '$mdtDirectoryPath' does not exist.")
+    $module.FailJson("MDT share path '$mdtSharePath' does not exist.")
 }
 
 foreach ($sourcePath in $sourcePaths)
@@ -83,11 +83,11 @@ foreach ($sourcePath in $sourcePaths)
     }
 }
 
-$mdtDrive = Get-MDTPSDrive -Path $mdtDirectoryPath
+$mdtDrive = Get-MDTPSDrive -Path $mdtSharePath
 
 if ($null -eq $mdtDrive)
 {
-    $module.FailJson("Failed to find or create MDT PowerShell drive for '$mdtDirectoryPath'.")
+    $module.FailJson("Failed to find or create MDT PowerShell drive for '$mdtSharePath'.")
 }
 
 if ($mdtDrive.ReadOnly)

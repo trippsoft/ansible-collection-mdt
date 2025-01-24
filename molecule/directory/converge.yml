@@ -6,59 +6,51 @@
     - name: Check MDT directory
       check_mode: true
       trippsc2.mdt.directory:
-        name: Windows 10
-        parent_directory: Operating Systems
-        mdt_directory_path: C:\MDTShare
+        path: Operating Systems\Windows 10
+        mdt_share_path: C:\MDTShare
         state: present
 
     - name: Create MDT directory
       trippsc2.mdt.directory:
-        name: Windows 10
-        parent_directory: Operating Systems
-        mdt_directory_path: C:\MDTShare
+        path: Operating Systems\Windows 10
+        mdt_share_path: C:\MDTShare
         state: present
 
     - name: Check MDT directory
       check_mode: true
       trippsc2.mdt.directory:
-        name: Windows 11
-        parent_directory: Operating Systems
-        mdt_directory_path: C:\MDTShare
+        path: Operating Systems\Windows 11
+        mdt_share_path: C:\MDTShare
         state: present
 
     - name: Create MDT directory
       trippsc2.mdt.directory:
-        name: Windows 11
-        parent_directory: Operating Systems
-        mdt_directory_path: C:\MDTShare
+        path: Operating Systems\Windows 11
+        mdt_share_path: C:\MDTShare
         state: present
 
     - name: Check MDT directory
       check_mode: true
       trippsc2.mdt.directory:
-        name: Windows 12
-        parent_directory: Operating Systems
-        mdt_directory_path: C:\MDTShare
+        path: Operating Systems\Windows 12
+        mdt_share_path: C:\MDTShare
         state: absent
 
     - name: Remove MDT directory
       trippsc2.mdt.directory:
-        name: Windows 12
-        parent_directory: Operating Systems
-        mdt_directory_path: C:\MDTShare
+        path: Operating Systems\Windows 12
+        mdt_share_path: C:\MDTShare
         state: absent
 
     - name: Check MDT directory
       check_mode: true
       trippsc2.mdt.directory:
-        name: WinPE
-        parent_directory: Out-of-Box Drivers
-        mdt_directory_path: C:\MDTShare
+        path: Out-of-Box Drivers\WinPE
+        mdt_share_path: C:\MDTShare
         state: absent
 
     - name: Remove MDT directory
       trippsc2.mdt.directory:
-        name: WinPE
-        parent_directory: Out-of-Box Drivers
-        mdt_directory_path: C:\MDTShare
+        path: Out-of-Box Drivers\WinPE
+        mdt_share_path: C:\MDTShare
         state: absent

@@ -43,8 +43,8 @@ options:
     default: false
     description:
       - Whether to import duplicate drivers.
-  mdt_directory_path:
-    type: str
+  mdt_share_path:
+    type: path
     required: true
     description:
       - The path to the MDT directory.
@@ -52,21 +52,21 @@ options:
 
 EXAMPLES = r"""
 - name: Import drivers
-  trippsc2.mdt.directory:
+  trippsc2.mdt.import_drivers:
     installation_path: C:\\Program Files\\Microsoft Deployment Toolkit
     source_paths:
       - C:\\Drivers1
       - C:\\Drivers2
     path: Out-of-Box Drivers
-    mdt_directory_path: C:\\MDTShare
+    mdt_share_path: C:\\MDTShare
 
 - name: Import drivers
-  trippsc2.mdt.directory:
+  trippsc2.mdt.import_drivers:
     installation_path: C:\\Program Files\\Microsoft Deployment Toolkit
     source_paths:
       - C:\\Drivers
     path: Out-of-Box Drivers\\WinPE
-    mdt_directory_path: C:\\MDTShare
+    mdt_share_path: C:\\MDTShare
 """
 
 RETURN = r"""

@@ -12,14 +12,6 @@
           - mdt
         state: present
 
-    - name: Create temporary directories
-      loop:
-        - C:\Drivers
-        - C:\temp
-      ansible.windows.win_file:
-        path: "{{ item }}"
-        state: directory
-
     - name: Create MDT Deployment Share
       trippsc2.mdt.deployment_share:
         path: C:\MDTShare
@@ -36,12 +28,21 @@
 
     - name: Pre-create MDT directories
       loop:
-        - Out-of-Box Drivers\Windows 10
+        - Operating Systems\Windows 10
         - Out-of-Box Drivers\WinPE
+        - Out-of-Box Drivers\WinPE\Dell
       trippsc2.mdt.directory:
         path: "{{ item }}"
         mdt_share_path: C:\MDTShare
         state: present
+
+    - name: Create download directories
+      loop:
+        - C:\temp
+        - C:\Drivers
+      ansible.windows.win_file:
+        path: "{{ item }}"
+        state: directory
 
     - name: Install PSCX module
       community.windows.win_psmodule:
@@ -65,3 +66,10 @@
         catalog_path: C:\temp\DriverPackCatalog.xml
         download_path: C:\Drivers
         os: winpe_11
+
+    - name: Import Dell drivers
+      trippsc2.mdt.import_drivers:
+        source_paths:
+          - C:\Drivers
+        path: Out-of-Box Drivers
+        mdt_share_path: C:\MDTShare

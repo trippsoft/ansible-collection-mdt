@@ -24,18 +24,14 @@ options:
     default: C:\\Program Files\\Microsoft Deployment Toolkit
     description:
       - The path to the MDT installation directory.
-  name:
+  path:
     type: str
     required: true
     description:
-      - The name of the deployment share directory.
-  parent_directory:
-    type: str
-    required: true
-    description:
-      - The parent directory of the deployment share directory.
-  mdt_directory_path:
-    type: str
+      - The path of the directory to manage within the MDT deployment share.
+      - This is relative to the root of the MDT deployment share.
+  mdt_share_path:
+    type: path
     required: true
     description:
       - The path to the MDT directory.
@@ -54,17 +50,15 @@ EXAMPLES = r"""
 - name: Create directory
   trippsc2.mdt.directory:
     installation_path: C:\\Program Files\\Microsoft Deployment Toolkit
-    name: Windows10
-    parent_directory: Operating Systems
-    mdt_directory_path: C:\\MDTShare
+    path: Operating Systems\\Windows10
+    mdt_share_path: C:\\MDTShare
     state: present
 
 - name: Remove directory
   trippsc2.mdt.directory:
     installation_path: C:\\Program Files\\Microsoft Deployment Toolkit
-    name: Windows10
-    parent_directory: Operating Systems
-    mdt_directory_path: C:\\MDTShare
+    path: Operating Systems\\Windows10
+    mdt_share_path: C:\\MDTShare
     state: absent
 """
 

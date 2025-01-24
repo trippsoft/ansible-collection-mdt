@@ -10,15 +10,11 @@ $spec = @{
             required = $false
             default = 'C:\Program Files\Microsoft Deployment Toolkit'
         }
-        name = @{
+        path = @{
             type = 'str'
             required = $true
         }
-        parent_directory = @{
-            type = 'str'
-            required = $true
-        }
-        mdt_directory_path = @{
+        mdt_share_path = @{
             type = 'str'
             required = $true
         }
@@ -39,21 +35,20 @@ $module = [Ansible.Basic.AnsibleModule]::Create($args, $spec)
 
 Import-MDTModule -InstallationPath $module.Params.installation_path
 
-$name = $module.Params.name
-$parentDirectory = $module.Params.parent_directory
-$mdtDirectoryPath = $module.Params.mdt_directory_path
+$path = $module.Params.path
+$mdtSharePath = $module.Params.mdt_share_path
 $state = $module.Params.state
 
-if (-not (Test-Path -Path $mdtDirectoryPath))
+if (-not (Test-Path -Path $mdtSharePath))
 {
-    $module.FailJson("MDT directory path '$mdtDirectoryPath' does not exist.")
+    $module.FailJson("MDT share path '$mdtSharePath' does not exist.")
 }
 
-$mdtDrive = Get-MDTPSDrive -Path $mdtDirectoryPath
+$mdtDrive = Get-MDTPSDrive -Path $mdtSharePath
 
 if ($null -eq $mdtDrive)
 {
-    $module.FailJson("Failed to find or create MDT PowerShell drive for '$mdtDirectoryPath'.")
+    $module.FailJson("Failed to find or create MDT PowerShell drive for '$mdtSharePath'.")
 }
 
 if ($mdtDrive.ReadOnly)
@@ -61,38 +56,42 @@ if ($mdtDrive.ReadOnly)
     $module.FailJson("MDT drive '$($mdtDrive.Name)' is read-only.")
 }
 
-$parentDirectory = $parentDirectory.TrimStart('\')
-
-$parentDirectoryPath = "$($mdtDrive.Name):\$($parentDirectory)"
-
-if (-not (Test-Path -Path $parentDirectoryPath))
-{
-    $module.FailJson("Parent directory '$parentDirectoryPath' does not exist.")
-}
-
-$fullPath = "$($parentDirectoryPath)\$($name)"
+$path = $path.TrimStart('\')
+$path = $path.TrimEnd('\')
+$path = $path.Replace('/', '\')
 
 $module.Result['changed'] = $false
 
 if ($state -eq 'present')
 {
-    if (-not (Test-Path -LiteralPath $fullPath))
+    $pathSegments = $path.Split('\')
+
+    $fullPath = "$($mdtDrive.Name):"
+
+    foreach ($segment in $pathSegments)
     {
-        $module.Result['changed'] = $true
+        $fullPath = "$($fullPath)\$($segment)"
 
-        if (-not $module.CheckMode)
+        if (-not (Test-Path -LiteralPath $fullPath))
         {
-            New-Item -Path $fullPath -ItemType Directory | Out-Null
-
-            if (-not (Test-Path -LiteralPath $fullPath))
+            $module.Result['changed'] = $true
+            
+            if (-not $module.CheckMode)
             {
-                $module.FailJson("Failed to create directory '$fullPath'.")
+                New-Item -Path $fullPath -ItemType Directory | Out-Null
+
+                if (-not (Test-Path -LiteralPath $fullPath))
+                {
+                    $module.FailJson("Failed to create directory '$fullPath'.")
+                }
             }
         }
     }
 }
 elseif ($state -eq 'absent')
 {
+    $fullPath = "$($mdtDrive.Name):\$path"
+
     if (Test-Path -LiteralPath $fullPath)
     {
         $module.Result['changed'] = $true

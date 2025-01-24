@@ -1,0 +1,5 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks: []
