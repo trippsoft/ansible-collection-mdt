@@ -20,12 +20,14 @@ platforms:
 provisioner:
   name: ansible
   inventory:
-    host_vars:
-      win:
+    group_vars:
+      windows:
         ansible_shell_type: powershell
         ansible_become_method: runas
         ansible_become_user: SYSTEM
         ansible_password: vagrant
+    host_vars:
+      win:
         ansible_ssh_common_args: '-o PreferredAuthentications=password -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o ControlMaster=auto -o ControlPersist=60s -o ForwardX11=no -o LogLevel=ERROR -o StrictHostKeyChecking=no'
 verifier:
   name: ansible

@@ -6,8 +6,3 @@
     - name: Generate Boot image
       trippsc2.mdt.boot_image:
         mdt_share_path: C:\MDTShare
-      register: _boot_image
-
-    - name: Debug
-      ansible.builtin.debug:
-        var: _boot_image
