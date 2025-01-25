@@ -13,7 +13,7 @@ platforms:
     memory: 2048
     cpus: 2
     provider_options:
-      default_prefix: dell_mdt_drivers_
+      default_prefix: mdt_boot_image_
     groups:
       - subjects
       - windows
@@ -40,8 +40,7 @@ provisioner:
             mdt_name: OptiPlex Micro 7020
           - catalog_name: XPS 17 9710
             mdt_name: XPS 17 9710
-    host_vars:
-      win:
+      windows:
         ansible_shell_type: powershell
         ansible_become_method: runas
         ansible_become_user: SYSTEM
