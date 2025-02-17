@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 ### *deployment_share* module plugin
 
 - Replaced `share_name` options with `unc_path` option that includes the entire UNC path.  This was done to allow DFS namespace usage.
+- Renamed `path` option to `mdt_share_path` to match other module plugins.
 - Added diff support and added support to change description and UNC path on existing shares.
 
 ## [1.1.0] - 2025-01-25
