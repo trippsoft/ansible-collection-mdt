@@ -1,0 +1,243 @@
+---
+- name: Verify
+  hosts:
+    - subjects
+  tasks:
+    - name: Attempt to not supply MDT share path
+      trippsc2.mdt.deployment_share_settings:
+        comments: Test
+      register: _no_mdt_share_path
+      ignore_errors: true
+
+    - name: Verify that MDT share path is required
+      ansible.builtin.assert:
+        that:
+          - _no_mdt_share_path is failed
+          - '_no_mdt_share_path.msg == "missing required arguments: mdt_share_path"'
+        fail_msg: MDT share path is required.
+        success_msg: MDT share path is required.
+
+    - name: Attempt to supply non-existent MDT share path
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\Test
+        comments: Test
+      register: _nonexistent_mdt_share_path
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_mdt_share_path is failed
+          - '_nonexistent_mdt_share_path.msg == "MDT share path ''C:\Test'' does not exist."'
+        fail_msg: The task should fail when the MDT share path does not exist.
+        success_msg: The task failed as expected when the MDT share path does not exist.
+
+    - name: Attempt to disable x86 and configure it
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare9
+        x86:
+          enabled: false
+          background_file: "%INSTALLDIR%\\Samples\\Background.bmp"
+      register: _disable_x86_and_configure
+      ignore_errors: true
+
+    - name: Verify that the module fails when x86 is disabled and configured
+      ansible.builtin.assert:
+        that:
+          - _disable_x86_and_configure is failed
+          - '_disable_x86_and_configure.msg == "The enabled parameter must be true if any other x86 parameters are specified."'
+        fail_msg: The module did not fail when x86 was disabled and configured.
+        success_msg: The module failed when x86 was disabled and configured, as expected.
+
+    - name: Attempt to disable x64 and configure it
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare9
+        x64:
+          enabled: false
+          background_file: "%INSTALLDIR%\\Samples\\Background.bmp"
+      register: _disable_x64_and_configure
+      ignore_errors: true
+
+    - name: Verify that the module fails when x64 is disabled and configured
+      ansible.builtin.assert:
+        that:
+          - _disable_x64_and_configure is failed
+          - '_disable_x64_and_configure.msg == "The enabled parameter must be true if any other x64 parameters are specified."'
+        fail_msg: The module did not fail when x64 was disabled and configured.
+        success_msg: The module failed when x64 was disabled and configured, as expected.
+
+    - name: Attempt to configure x86 selection profile to non-existent profile
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare9
+        x86:
+          selection_profile: Non-existent Profile
+      register: _nonexistent_x86_selection_profile
+      ignore_errors: true
+
+    - name: Verify that the module fails when x86 selection profile is set to a non-existent profile
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_x86_selection_profile is failed
+          - '_nonexistent_x86_selection_profile.msg == "The x86 selection profile ''Non-existent Profile'' does not exist."'
+        fail_msg: The module did not fail when x86 selection profile was set to a non-existent profile.
+        success_msg: The module failed when x86 selection profile was set to a non-existent profile, as expected.
+
+    - name: Attempt to configure x64 selection profile to non-existent profile
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare9
+        x64:
+          selection_profile: Non-existent Profile
+      register: _nonexistent_x64_selection_profile
+      ignore_errors: true
+
+    - name: Verify that the module fails when x64 selection profile is set to a non-existent profile
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_x64_selection_profile is failed
+          - '_nonexistent_x64_selection_profile.msg == "The x64 selection profile ''Non-existent Profile'' does not exist."'
+        fail_msg: The module did not fail when x64 selection profile was set to a non-existent profile.
+        success_msg: The module failed when x64 selection profile was set to a non-existent profile, as expected.
+
+    - name: Attempt to configure x86 generic ISO when disabled
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare9
+        x86:
+          generic_iso:
+            enabled: false
+            name: Test.iso
+      register: _enable_x86_generic_iso_when_disabled
+      ignore_errors: true
+
+    - name: Verify that the module fails when x86 generic ISO is enabled when x86 is disabled
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_generic_iso_when_disabled is failed
+          - '_enable_x86_generic_iso_when_disabled.msg == "The enabled parameter must be true if the name parameter is specified for the generic_iso parameter."'
+        fail_msg: The module did not fail when x86 generic ISO was enabled when x86 was disabled.
+        success_msg: The module failed when x86 generic ISO was enabled when x86 was disabled, as expected.
+
+    - name: Attempt to configure x64 generic ISO when disabled
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare9
+        x64:
+          generic_iso:
+            enabled: false
+            name: Test.iso
+      register: _enable_x64_generic_iso_when_disabled
+      ignore_errors: true
+
+    - name: Verify that the module fails when x64 generic ISO is enabled when x64 is disabled
+      ansible.builtin.assert:
+        that:
+          - _enable_x64_generic_iso_when_disabled is failed
+          - '_enable_x64_generic_iso_when_disabled.msg == "The enabled parameter must be true if the name parameter is specified for the generic_iso parameter."'
+        fail_msg: The module did not fail when x64 generic ISO was enabled when x64 was disabled.
+        success_msg: The module failed when x64 generic ISO was enabled when x64 was disabled, as expected.
+
+    - name: Attempt to configure x86 generic WIM when disabled
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare9
+        x86:
+          generic_wim:
+            enabled: false
+            description: Test
+      register: _enable_x86_generic_wim_when_disabled
+      ignore_errors: true
+
+    - name: Verify that the module fails when x86 generic WIM is enabled when x86 is disabled
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_generic_wim_when_disabled is failed
+          - '_enable_x86_generic_wim_when_disabled.msg == "The enabled parameter must be true if the description parameter is specified for the generic_wim parameter."'
+        fail_msg: The module did not fail when x86 generic WIM was enabled when x86 was disabled.
+        success_msg: The module failed when x86 generic WIM was enabled when x86 was disabled, as expected.
+
+    - name: Attempt to configure x64 generic WIM when disabled
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare9
+        x64:
+          generic_wim:
+            enabled: false
+            description: Test
+      register: _enable_x64_generic_wim_when_disabled
+      ignore_errors: true
+
+    - name: Verify that the module fails when x64 generic WIM is enabled when x64 is disabled
+      ansible.builtin.assert:
+        that:
+          - _enable_x64_generic_wim_when_disabled is failed
+          - '_enable_x64_generic_wim_when_disabled.msg == "The enabled parameter must be true if the description parameter is specified for the generic_wim parameter."'
+        fail_msg: The module did not fail when x64 generic WIM was enabled when x64 was disabled.
+        success_msg: The module failed when x64 generic WIM was enabled when x64 was disabled, as expected.
+
+    - name: Attempt to configure x86 LiteTouch ISO when disabled
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare9
+        x86:
+          litetouch_iso:
+            enabled: false
+            name: Test.iso
+      register: _enable_x86_litetouch_iso_when_disabled
+      ignore_errors: true
+
+    - name: Verify that the module fails when x86 LiteTouch ISO is enabled when x86 is disabled
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_litetouch_iso_when_disabled is failed
+          - '_enable_x86_litetouch_iso_when_disabled.msg == "The enabled parameter must be true if the name parameter is specified for the litetouch_iso parameter."'
+        fail_msg: The module did not fail when x86 LiteTouch ISO was enabled when x86 was disabled.
+        success_msg: The module failed when x86 LiteTouch ISO was enabled when x86 was disabled, as expected.
+
+    - name: Attempt to configure x64 LiteTouch ISO when disabled
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare9
+        x64:
+          litetouch_iso:
+            enabled: false
+            name: Test.iso
+      register: _enable_x64_litetouch_iso_when_disabled
+      ignore_errors: true
+
+    - name: Verify that the module fails when x64 LiteTouch ISO is enabled when x64 is disabled
+      ansible.builtin.assert:
+        that:
+          - _enable_x64_litetouch_iso_when_disabled is failed
+          - '_enable_x64_litetouch_iso_when_disabled.msg == "The enabled parameter must be true if the name parameter is specified for the litetouch_iso parameter."'
+        fail_msg: The module did not fail when x64 LiteTouch ISO was enabled when x64 was disabled.
+        success_msg: The module failed when x64 LiteTouch ISO was enabled when x64 was disabled, as expected.
+
+    - name: Attempt to configure x86 include drivers as all and another type
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare9
+        x86:
+          include_drivers:
+            - all
+            - network
+      register: _include_all_and_another_type
+      ignore_errors: true
+
+    - name: Verify that the module fails when x86 include drivers is set to all and another type
+      ansible.builtin.assert:
+        that:
+          - _include_all_and_another_type is failed
+          - '_include_all_and_another_type.msg == "The all parameter cannot be specified with other include_drivers parameters."'
+        fail_msg: The module did not fail when x86 include drivers was set to all and another type.
+        success_msg: The module failed when x86 include drivers was set to all and another type, as expected.
+
+    - name: Attempt to configure x64 include drivers as all and another type
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare9
+        x64:
+          include_drivers:
+            - all
+            - network
+      register: _include_all_and_another_type
+      ignore_errors: true
+
+    - name: Verify that the module fails when x64 include drivers is set to all and another type
+      ansible.builtin.assert:
+        that:
+          - _include_all_and_another_type is failed
+          - '_include_all_and_another_type.msg == "The all parameter cannot be specified with other include_drivers parameters."'
+        fail_msg: The module did not fail when x64 include drivers was set to all and another type.
+        success_msg: The module failed when x64 include drivers was set to all and another type, as expected.

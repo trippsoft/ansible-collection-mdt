@@ -1,0 +1,1004 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks:
+    - name: Create Selection Profile (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: New
+        definition_paths:
+          set: []
+        state: present
+      register: _new_check
+
+    - name: Verify New previous output # noqa no-handler
+      when:
+        - _new_check is changed
+      ansible.builtin.assert:
+        that:
+          - _new_check.diff.before == None
+        fail_msg: New selection profile should not have a previous output.
+        success_msg: New selection profile does not have a previous output.
+
+    - name: Verify New output
+      ansible.builtin.assert:
+        that:
+          - _new_check.selection_profile.name == 'New'
+          - _new_check.selection_profile.definition | length == 0
+          - _new_check.selection_profile.comments == ''
+          - _new_check.selection_profile.enabled
+          - not _new_check.selection_profile.hidden
+        fail_msg: New selection profile does not match expected output.
+        success_msg: New selection profile matches expected output.
+
+    - name: Create Selection Profile
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: New
+        definition_paths:
+          set: []
+        state: present
+      register: _new
+
+    - name: Verify New previous output # noqa no-handler
+      when:
+        - _new is changed
+      ansible.builtin.assert:
+        that:
+          - _new.diff.before == None
+        fail_msg: New selection profile should not have a previous output.
+        success_msg: New selection profile does not have a previous output.
+
+    - name: Verify New output
+      ansible.builtin.assert:
+        that:
+          - _new.selection_profile.name == 'New'
+          - _new.selection_profile.definition | length == 0
+          - _new.selection_profile.comments == ''
+          - _new.selection_profile.enabled
+          - not _new.selection_profile.hidden
+        fail_msg: New selection profile does not match expected output.
+        success_msg: New selection profile matches expected output.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _new_check.changed == _new.changed
+        fail_msg: Check mode should not change anything.
+        success_msg: Check mode did not change anything.
+
+    - name: Add paths to selection profile (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Add Paths
+        definition_paths:
+          add:
+            - Applications
+        state: present
+      register: _add_paths_check
+
+    - name: Verify Add Paths previous output # noqa no-handler
+      when:
+        - _add_paths_check is changed
+      ansible.builtin.assert:
+        that:
+          - _add_paths_check.diff.before != None
+          - _add_paths_check.diff.before.name == 'Add Paths'
+          - _add_paths_check.diff.before.definition | length == 0
+          - _add_paths_check.diff.before.comments == ''
+          - _add_paths_check.diff.before.enabled
+          - not _add_paths_check.diff.before.hidden
+        fail_msg: Add Paths should not have a previous output.
+        success_msg: Add Paths does not have a previous output.
+
+    - name: Verify Add Paths output
+      ansible.builtin.assert:
+        that:
+          - _add_paths_check.selection_profile.name == 'Add Paths'
+          - _add_paths_check.selection_profile.definition | length == 1
+          - _add_paths_check.selection_profile.definition[0] == 'Applications'
+          - _add_paths_check.selection_profile.comments == ''
+          - _add_paths_check.selection_profile.enabled
+          - not _add_paths_check.selection_profile.hidden
+        fail_msg: Add Paths does not match expected output.
+        success_msg: Add Paths matches expected output.
+
+    - name: Add paths to selection profile
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Add Paths
+        definition_paths:
+          add:
+            - Applications
+        state: present
+      register: _add_paths
+
+    - name: Verify Add Paths previous output # noqa no-handler
+      when:
+        - _add_paths is changed
+      ansible.builtin.assert:
+        that:
+          - _add_paths.diff.before != None
+          - _add_paths.diff.before.name == 'Add Paths'
+          - _add_paths.diff.before.definition | length == 0
+          - _add_paths.diff.before.comments == ''
+          - _add_paths.diff.before.enabled
+          - not _add_paths.diff.before.hidden
+        fail_msg: Add Paths should not have a previous output.
+        success_msg: Add Paths does not have a previous output.
+
+    - name: Verify Add Paths output
+      ansible.builtin.assert:
+        that:
+          - _add_paths.selection_profile.name == 'Add Paths'
+          - _add_paths.selection_profile.definition | length == 1
+          - _add_paths.selection_profile.definition[0] == 'Applications'
+          - _add_paths.selection_profile.comments == ''
+          - _add_paths.selection_profile.enabled
+          - not _add_paths.selection_profile.hidden
+        fail_msg: Add Paths does not match expected output.
+        success_msg: Add Paths matches expected output.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _add_paths_check.changed == _add_paths.changed
+        fail_msg: Check mode should not change anything.
+        success_msg: Check mode did not change anything.
+
+    - name: Remove paths from selection profile (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Remove Paths
+        definition_paths:
+          remove:
+            - Operating Systems
+        state: present
+      register: _remove_paths_check
+
+    - name: Verify Remove Paths previous output # noqa no-handler
+      when:
+        - _remove_paths_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_paths_check.diff.before != None
+          - _remove_paths_check.diff.before.name == 'Remove Paths'
+          - _remove_paths_check.diff.before.definition | length == 1
+          - _remove_paths_check.diff.before.definition[0] == 'Operating Systems'
+          - _remove_paths_check.diff.before.comments == ''
+          - _remove_paths_check.diff.before.enabled
+          - not _remove_paths_check.diff.before.hidden
+        fail_msg: Remove Paths should not have a previous output.
+        success_msg: Remove Paths does not have a previous output.
+
+    - name: Verify Remove Paths output
+      ansible.builtin.assert:
+        that:
+          - _remove_paths_check.selection_profile.name == 'Remove Paths'
+          - _remove_paths_check.selection_profile.definition | length == 0
+          - _remove_paths_check.selection_profile.comments == ''
+          - _remove_paths_check.selection_profile.enabled
+          - not _remove_paths_check.selection_profile.hidden
+        fail_msg: Remove Paths does not match expected output.
+        success_msg: Remove Paths matches expected output.
+
+    - name: Remove paths from selection profile
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Remove Paths
+        definition_paths:
+          remove:
+            - Operating Systems
+        state: present
+      register: _remove_paths
+
+    - name: Verify Remove Paths previous output # noqa no-handler
+      when:
+        - _remove_paths is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_paths.diff.before != None
+          - _remove_paths.diff.before.name == 'Remove Paths'
+          - _remove_paths.diff.before.definition | length == 1
+          - _remove_paths.diff.before.definition[0] == 'Operating Systems'
+          - _remove_paths.diff.before.comments == ''
+          - _remove_paths.diff.before.enabled
+          - not _remove_paths.diff.before.hidden
+        fail_msg: Remove Paths should not have a previous output.
+        success_msg: Remove Paths does not have a previous output.
+
+    - name: Verify Remove Paths output
+      ansible.builtin.assert:
+        that:
+          - _remove_paths.selection_profile.name == 'Remove Paths'
+          - _remove_paths.selection_profile.definition | length == 0
+          - _remove_paths.selection_profile.comments == ''
+          - _remove_paths.selection_profile.enabled
+          - not _remove_paths.selection_profile.hidden
+        fail_msg: Remove Paths does not match expected output.
+        success_msg: Remove Paths matches expected output.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _remove_paths_check.changed == _remove_paths.changed
+        fail_msg: Check mode should not change anything.
+        success_msg: Check mode did not change anything.
+
+    - name: Add and remove paths from selection profile (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Add And Remove Paths
+        definition_paths:
+          add:
+            - Operating Systems
+          remove:
+            - Applications
+        state: present
+      register: _add_remove_paths_check
+
+    - name: Verify Add And Remove Paths previous output # noqa no-handler
+      when:
+        - _add_remove_paths_check is changed
+      ansible.builtin.assert:
+        that:
+          - _add_remove_paths_check.diff.before != None
+          - _add_remove_paths_check.diff.before.name == 'Add And Remove Paths'
+          - _add_remove_paths_check.diff.before.definition | length == 1
+          - _add_remove_paths_check.diff.before.definition[0] == 'Applications'
+          - _add_remove_paths_check.diff.before.comments == ''
+          - _add_remove_paths_check.diff.before.enabled
+          - not _add_remove_paths_check.diff.before.hidden
+        fail_msg: Add And Remove Paths should not have a previous output.
+        success_msg: Add And Remove Paths does not have a previous output.
+
+    - name: Verify Add And Remove Paths output
+      ansible.builtin.assert:
+        that:
+          - _add_remove_paths_check.selection_profile.name == 'Add And Remove Paths'
+          - _add_remove_paths_check.selection_profile.definition | length == 1
+          - _add_remove_paths_check.selection_profile.definition[0] == 'Operating Systems'
+          - _add_remove_paths_check.selection_profile.comments == ''
+          - _add_remove_paths_check.selection_profile.enabled
+          - not _add_remove_paths_check.selection_profile.hidden
+        fail_msg: Add And Remove Paths does not match expected output.
+        success_msg: Add And Remove Paths matches expected output.
+
+    - name: Add and remove paths from selection profile
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Add And Remove Paths
+        definition_paths:
+          add:
+            - Operating Systems
+          remove:
+            - Applications
+        state: present
+      register: _add_remove_paths
+
+    - name: Verify Add And Remove Paths previous output # noqa no-handler
+      when:
+        - _add_remove_paths is changed
+      ansible.builtin.assert:
+        that:
+          - _add_remove_paths.diff.before != None
+          - _add_remove_paths.diff.before.name == 'Add And Remove Paths'
+          - _add_remove_paths.diff.before.definition | length == 1
+          - _add_remove_paths.diff.before.definition[0] == 'Applications'
+          - _add_remove_paths.diff.before.comments == ''
+          - _add_remove_paths.diff.before.enabled
+          - not _add_remove_paths.diff.before.hidden
+        fail_msg: Add And Remove Paths should not have a previous output.
+        success_msg: Add And Remove Paths does not have a previous output.
+
+    - name: Verify Add And Remove Paths output
+      ansible.builtin.assert:
+        that:
+          - _add_remove_paths.selection_profile.name == 'Add And Remove Paths'
+          - _add_remove_paths.selection_profile.definition | length == 1
+          - _add_remove_paths.selection_profile.definition[0] == 'Operating Systems'
+          - _add_remove_paths.selection_profile.comments == ''
+          - _add_remove_paths.selection_profile.enabled
+          - not _add_remove_paths.selection_profile.hidden
+        fail_msg: Add And Remove Paths does not match expected output.
+        success_msg: Add And Remove Paths matches expected output.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _add_remove_paths_check.changed == _add_remove_paths.changed
+        fail_msg: Check mode should not change anything.
+        success_msg: Check mode did not change anything.
+
+    - name: Set empty definition paths (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Set Empty
+        definition_paths:
+          set: []
+        state: present
+      register: _set_empty_check
+
+    - name: Verify Set Empty previous output # noqa no-handler
+      when:
+        - _set_empty_check is changed
+      ansible.builtin.assert:
+        that:
+          - _set_empty_check.diff.before != None
+          - _set_empty_check.diff.before.name == 'Set Empty'
+          - _set_empty_check.diff.before.definition | length == 1
+          - _set_empty_check.diff.before.definition[0] == 'Applications'
+          - _set_empty_check.diff.before.comments == ''
+          - _set_empty_check.diff.before.enabled
+          - not _set_empty_check.diff.before.hidden
+        fail_msg: Set Empty should not have a previous output.
+        success_msg: Set Empty does not have a previous output.
+
+    - name: Verify Set Empty output
+      ansible.builtin.assert:
+        that:
+          - _set_empty_check.selection_profile.name == 'Set Empty'
+          - _set_empty_check.selection_profile.definition | length == 0
+          - _set_empty_check.selection_profile.comments == ''
+          - _set_empty_check.selection_profile.enabled
+          - not _set_empty_check.selection_profile.hidden
+        fail_msg: Set Empty does not match expected output.
+        success_msg: Set Empty matches expected output.
+
+    - name: Set empty definition paths
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Set Empty
+        definition_paths:
+          set: []
+        state: present
+      register: _set_empty
+
+    - name: Verify Set Empty previous output # noqa no-handler
+      when:
+        - _set_empty is changed
+      ansible.builtin.assert:
+        that:
+          - _set_empty.diff.before != None
+          - _set_empty.diff.before.name == 'Set Empty'
+          - _set_empty.diff.before.definition | length == 1
+          - _set_empty.diff.before.definition[0] == 'Applications'
+          - _set_empty.diff.before.comments == ''
+          - _set_empty.diff.before.enabled
+          - not _set_empty.diff.before.hidden
+        fail_msg: Set Empty should not have a previous output.
+        success_msg: Set Empty does not have a previous output.
+
+    - name: Verify Set Empty output
+      ansible.builtin.assert:
+        that:
+          - _set_empty.selection_profile.name == 'Set Empty'
+          - _set_empty.selection_profile.definition | length == 0
+          - _set_empty.selection_profile.comments == ''
+          - _set_empty.selection_profile.enabled
+          - not _set_empty.selection_profile.hidden
+        fail_msg: Set Empty does not match expected output.
+        success_msg: Set Empty matches expected output.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _set_empty_check.changed == _set_empty.changed
+        fail_msg: Check mode should not change anything.
+        success_msg: Check mode did not change anything.
+
+    - name: Set definition paths (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Set Paths
+        definition_paths:
+          set:
+            - Applications
+      register: _set_paths_check
+
+    - name: Verify Set Paths previous output # noqa no-handler
+      when:
+        - _set_paths_check is changed
+      ansible.builtin.assert:
+        that:
+          - _set_paths_check.diff.before != None
+          - _set_paths_check.diff.before.name == 'Set Paths'
+          - _set_paths_check.diff.before.definition | length == 1
+          - _set_paths_check.diff.before.definition[0] == 'Operating Systems'
+          - _set_paths_check.diff.before.comments == ''
+          - _set_paths_check.diff.before.enabled
+          - not _set_paths_check.diff.before.hidden
+        fail_msg: Set Paths should not have a previous output.
+        success_msg: Set Paths does not have a previous output.
+
+    - name: Verify Set Paths output
+      ansible.builtin.assert:
+        that:
+          - _set_paths_check.selection_profile.name == 'Set Paths'
+          - _set_paths_check.selection_profile.definition | length == 1
+          - _set_paths_check.selection_profile.definition[0] == 'Applications'
+          - _set_paths_check.selection_profile.comments == ''
+          - _set_paths_check.selection_profile.enabled
+          - not _set_paths_check.selection_profile.hidden
+        fail_msg: Set Paths does not match expected output.
+        success_msg: Set Paths matches expected output.
+
+    - name: Set definition paths
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Set Paths
+        definition_paths:
+          set:
+            - Applications
+      register: _set_paths
+
+    - name: Verify Set Paths previous output # noqa no-handler
+      when:
+        - _set_paths is changed
+      ansible.builtin.assert:
+        that:
+          - _set_paths.diff.before != None
+          - _set_paths.diff.before.name == 'Set Paths'
+          - _set_paths.diff.before.definition | length == 1
+          - _set_paths.diff.before.definition[0] == 'Operating Systems'
+          - _set_paths.diff.before.comments == ''
+          - _set_paths.diff.before.enabled
+          - not _set_paths.diff.before.hidden
+        fail_msg: Set Paths should not have a previous output.
+        success_msg: Set Paths does not have a previous output.
+
+    - name: Verify Set Paths output
+      ansible.builtin.assert:
+        that:
+          - _set_paths.selection_profile.name == 'Set Paths'
+          - _set_paths.selection_profile.definition | length == 1
+          - _set_paths.selection_profile.definition[0] == 'Applications'
+          - _set_paths.selection_profile.comments == ''
+          - _set_paths.selection_profile.enabled
+          - not _set_paths.selection_profile.hidden
+        fail_msg: Set Paths does not match expected output.
+        success_msg: Set Paths matches expected output.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _set_paths_check.changed == _set_paths.changed
+        fail_msg: Check mode should not change anything.
+        success_msg: Check mode did not change anything.
+
+    - name: Change comments (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Change Comments
+        definition_paths:
+          set: []
+        comments: New Comments
+        state: present
+      register: _change_comments_check
+
+    - name: Verify Change Comments previous output # noqa no-handler
+      when:
+        - _change_comments_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_comments_check.diff.before != None
+          - _change_comments_check.diff.before.name == 'Change Comments'
+          - _change_comments_check.diff.before.definition | length == 0
+          - _change_comments_check.diff.before.comments == 'Old Comments'
+          - _change_comments_check.diff.before.enabled
+          - not _change_comments_check.diff.before.hidden
+        fail_msg: Change Comments should not have a previous output.
+        success_msg: Change Comments does not have a previous output.
+
+    - name: Verify Change Comments output
+      ansible.builtin.assert:
+        that:
+          - _change_comments_check.selection_profile.name == 'Change Comments'
+          - _change_comments_check.selection_profile.definition | length == 0
+          - _change_comments_check.selection_profile.comments == 'New Comments'
+          - _change_comments_check.selection_profile.enabled
+          - not _change_comments_check.selection_profile.hidden
+        fail_msg: Change Comments does not match expected output.
+        success_msg: Change Comments matches expected output.
+
+    - name: Change comments
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Change Comments
+        definition_paths:
+          set: []
+        comments: New Comments
+        state: present
+      register: _change_comments
+
+    - name: Verify Change Comments previous output # noqa no-handler
+      when:
+        - _change_comments is changed
+      ansible.builtin.assert:
+        that:
+          - _change_comments.diff.before != None
+          - _change_comments.diff.before.name == 'Change Comments'
+          - _change_comments.diff.before.definition | length == 0
+          - _change_comments.diff.before.comments == 'Old Comments'
+          - _change_comments.diff.before.enabled
+          - not _change_comments.diff.before.hidden
+        fail_msg: Change Comments should not have a previous output.
+        success_msg: Change Comments does not have a previous output.
+
+    - name: Verify Change Comments output
+      ansible.builtin.assert:
+        that:
+          - _change_comments.selection_profile.name == 'Change Comments'
+          - _change_comments.selection_profile.definition | length == 0
+          - _change_comments.selection_profile.comments == 'New Comments'
+          - _change_comments.selection_profile.enabled
+          - not _change_comments.selection_profile.hidden
+        fail_msg: Change Comments does not match expected output.
+        success_msg: Change Comments matches expected output.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _change_comments_check.changed == _change_comments.changed
+        fail_msg: Check mode should not change anything.
+        success_msg: Check mode did not change anything.
+
+    - name: Change enabled (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Change Enabled
+        definition_paths:
+          set: []
+        enabled: true
+        state: present
+      register: _change_enabled_check
+
+    - name: Verify Change Enabled previous output # noqa no-handler
+      when:
+        - _change_enabled_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_enabled_check.diff.before != None
+          - _change_enabled_check.diff.before.name == 'Change Enabled'
+          - _change_enabled_check.diff.before.definition | length == 0
+          - _change_enabled_check.diff.before.comments == ''
+          - not _change_enabled_check.diff.before.enabled
+          - not _change_enabled_check.diff.before.hidden
+        fail_msg: Change Enabled should not have a previous output.
+        success_msg: Change Enabled does not have a previous output.
+
+    - name: Verify Change Enabled output
+      ansible.builtin.assert:
+        that:
+          - _change_enabled_check.selection_profile.name == 'Change Enabled'
+          - _change_enabled_check.selection_profile.definition | length == 0
+          - _change_enabled_check.selection_profile.comments == ''
+          - _change_enabled_check.selection_profile.enabled
+          - not _change_enabled_check.selection_profile.hidden
+        fail_msg: Change Enabled does not match expected output.
+        success_msg: Change Enabled matches expected output.
+
+    - name: Change enabled
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Change Enabled
+        definition_paths:
+          set: []
+        enabled: true
+        state: present
+      register: _change_enabled
+
+    - name: Verify Change Enabled previous output # noqa no-handler
+      when:
+        - _change_enabled is changed
+      ansible.builtin.assert:
+        that:
+          - _change_enabled.diff.before != None
+          - _change_enabled.diff.before.name == 'Change Enabled'
+          - _change_enabled.diff.before.definition | length == 0
+          - _change_enabled.diff.before.comments == ''
+          - not _change_enabled.diff.before.enabled
+          - not _change_enabled.diff.before.hidden
+        fail_msg: Change Enabled should not have a previous output.
+        success_msg: Change Enabled does not have a previous output.
+
+    - name: Verify Change Enabled output
+      ansible.builtin.assert:
+        that:
+          - _change_enabled.selection_profile.name == 'Change Enabled'
+          - _change_enabled.selection_profile.definition | length == 0
+          - _change_enabled.selection_profile.comments == ''
+          - _change_enabled.selection_profile.enabled
+          - not _change_enabled.selection_profile.hidden
+        fail_msg: Change Enabled does not match expected output.
+        success_msg: Change Enabled matches expected output.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _change_enabled_check.changed == _change_enabled.changed
+        fail_msg: Check mode should not change anything.
+        success_msg: Check mode did not change anything.
+
+    - name: Change hidden (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Change Hidden
+        definition_paths:
+          set: []
+        hidden: false
+        state: present
+      register: _change_hidden_check
+
+    - name: Verify Change Hidden previous output # noqa no-handler
+      when:
+        - _change_hidden_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_hidden_check.diff.before != None
+          - _change_hidden_check.diff.before.name == 'Change Hidden'
+          - _change_hidden_check.diff.before.definition | length == 0
+          - _change_hidden_check.diff.before.comments == ''
+          - _change_hidden_check.diff.before.enabled
+          - _change_hidden_check.diff.before.hidden
+        fail_msg: Change Hidden should not have a previous output.
+        success_msg: Change Hidden does not have a previous output.
+
+    - name: Verify Change Hidden output
+      ansible.builtin.assert:
+        that:
+          - _change_hidden_check.selection_profile.name == 'Change Hidden'
+          - _change_hidden_check.selection_profile.definition | length == 0
+          - _change_hidden_check.selection_profile.comments == ''
+          - _change_hidden_check.selection_profile.enabled
+          - not _change_hidden_check.selection_profile.hidden
+        fail_msg: Change Hidden does not match expected output.
+        success_msg: Change Hidden matches expected output.
+
+    - name: Change hidden
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Change Hidden
+        definition_paths:
+          set: []
+        hidden: false
+        state: present
+      register: _change_hidden
+
+    - name: Verify Change Hidden previous output # noqa no-handler
+      when:
+        - _change_hidden is changed
+      ansible.builtin.assert:
+        that:
+          - _change_hidden.diff.before != None
+          - _change_hidden.diff.before.name == 'Change Hidden'
+          - _change_hidden.diff.before.definition | length == 0
+          - _change_hidden.diff.before.comments == ''
+          - _change_hidden.diff.before.enabled
+          - _change_hidden.diff.before.hidden
+        fail_msg: Change Hidden should not have a previous output.
+        success_msg: Change Hidden does not have a previous output.
+
+    - name: Verify Change Hidden output
+      ansible.builtin.assert:
+        that:
+          - _change_hidden.selection_profile.name == 'Change Hidden'
+          - _change_hidden.selection_profile.definition | length == 0
+          - _change_hidden.selection_profile.comments == ''
+          - _change_hidden.selection_profile.enabled
+          - not _change_hidden.selection_profile.hidden
+        fail_msg: Change Hidden does not match expected output.
+        success_msg: Change Hidden matches expected output.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _change_hidden_check.changed == _change_hidden.changed
+        fail_msg: Check mode should not change anything.
+        success_msg: Check mode did not change anything.
+
+    - name: Rename selection profile (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ 'Rename' | to_uuid }}"
+        name: New Name
+        definition_paths:
+          set: []
+        state: present
+      register: _rename_check
+
+    - name: Verify Rename previous output # noqa no-handler
+      when:
+        - _rename_check is changed
+      ansible.builtin.assert:
+        that:
+          - _rename_check.diff.before != None
+          - _rename_check.diff.before.name == 'Rename'
+          - _rename_check.diff.before.definition | length == 0
+          - _rename_check.diff.before.comments == ''
+          - _rename_check.diff.before.enabled
+          - not _rename_check.diff.before.hidden
+        fail_msg: Rename should not have a previous output.
+        success_msg: Rename does not have a previous output.
+
+    - name: Verify Rename output
+      ansible.builtin.assert:
+        that:
+          - _rename_check.selection_profile.name == 'New Name'
+          - _rename_check.selection_profile.definition | length == 0
+          - _rename_check.selection_profile.comments == ''
+          - _rename_check.selection_profile.enabled
+          - not _rename_check.selection_profile.hidden
+        fail_msg: Rename does not match expected output.
+        success_msg: Rename matches expected output.
+
+    - name: Rename selection profile
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ 'Rename' | to_uuid }}"
+        name: New Name
+        definition_paths:
+          set: []
+        state: present
+      register: _rename
+
+    - name: Verify Rename previous output # noqa no-handler
+      when:
+        - _rename is changed
+      ansible.builtin.assert:
+        that:
+          - _rename.diff.before != None
+          - _rename.diff.before.name == 'Rename'
+          - _rename.diff.before.definition | length == 0
+          - _rename.diff.before.comments == ''
+          - _rename.diff.before.enabled
+          - not _rename.diff.before.hidden
+        fail_msg: Rename should not have a previous output.
+        success_msg: Rename does not have a previous output.
+
+    - name: Verify Rename output
+      ansible.builtin.assert:
+        that:
+          - _rename.selection_profile.name == 'New Name'
+          - _rename.selection_profile.definition | length == 0
+          - _rename.selection_profile.comments == ''
+          - _rename.selection_profile.enabled
+          - not _rename.selection_profile.hidden
+        fail_msg: Rename does not match expected output.
+        success_msg: Rename matches expected output.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _rename_check.changed == _rename.changed
+        fail_msg: Check mode should not change anything.
+        success_msg: Check mode did not change anything.
+
+    - name: Remove selection profile by name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Remove By Name
+        state: absent
+      register: _remove_by_name_check
+
+    - name: Verify Delete Name previous output # noqa no-handler
+      when:
+        - _remove_by_name_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_check.diff.before != None
+          - _remove_by_name_check.diff.before.name == 'Remove By Name'
+          - _remove_by_name_check.diff.before.definition | length == 0
+          - _remove_by_name_check.diff.before.comments == ''
+          - _remove_by_name_check.diff.before.enabled
+          - not _remove_by_name_check.diff.before.hidden
+        fail_msg: Remove By Name should not have a previous output.
+        success_msg: Remove By Name does not have a previous output.
+
+    - name: Verify Remove By Name output
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_check.selection_profile is not defined
+        fail_msg: Remove By Name does not match expected output.
+        success_msg: Remove By Name matches expected output.
+
+    - name: Remove selection profile by name
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Remove By Name
+        state: absent
+      register: _remove_by_name
+
+    - name: Verify Delete Name previous output # noqa no-handler
+      when:
+        - _remove_by_name is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name.diff.before != None
+          - _remove_by_name.diff.before.name == 'Remove By Name'
+          - _remove_by_name.diff.before.definition | length == 0
+          - _remove_by_name.diff.before.comments == ''
+          - _remove_by_name.diff.before.enabled
+          - not _remove_by_name.diff.before.hidden
+        fail_msg: Remove By Name should not have a previous output.
+        success_msg: Remove By Name does not have a previous output.
+
+    - name: Verify Remove By Name output
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name.selection_profile is not defined
+        fail_msg: Remove By Name does not match expected output.
+        success_msg: Remove By Name matches expected output.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_check.changed == _remove_by_name.changed
+        fail_msg: Check mode should not change anything.
+        success_msg: Check mode did not change anything.
+
+    - name: Remove selection profile by guid (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ 'Remove By GUID' | to_uuid }}"
+        state: absent
+      register: _remove_by_guid_check
+
+    - name: Verify Delete GUID previous output # noqa no-handler
+      when:
+        - _remove_by_guid_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid_check.diff.before != None
+          - _remove_by_guid_check.diff.before.name == 'Remove By GUID'
+          - _remove_by_guid_check.diff.before.definition | length == 0
+          - _remove_by_guid_check.diff.before.comments == ''
+          - _remove_by_guid_check.diff.before.enabled
+          - not _remove_by_guid_check.diff.before.hidden
+        fail_msg: Remove By GUID should not have a previous output.
+        success_msg: Remove By GUID does not have a previous output.
+
+    - name: Verify Remove By GUID output
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid_check.selection_profile is not defined
+        fail_msg: Remove By GUID does not match expected output.
+        success_msg: Remove By GUID matches expected output.
+
+    - name: Remove selection profile by guid
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ 'Remove By GUID' | to_uuid }}"
+        state: absent
+      register: _remove_by_guid
+
+    - name: Verify Delete GUID previous output # noqa no-handler
+      when:
+        - _remove_by_guid is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid.diff.before != None
+          - _remove_by_guid.diff.before.name == 'Remove By GUID'
+          - _remove_by_guid.diff.before.definition | length == 0
+          - _remove_by_guid.diff.before.comments == ''
+          - _remove_by_guid.diff.before.enabled
+          - not _remove_by_guid.diff.before.hidden
+        fail_msg: Remove By GUID should not have a previous output.
+        success_msg: Remove By GUID does not have a previous output.
+
+    - name: Verify Remove By GUID output
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid.selection_profile is not defined
+        fail_msg: Remove By GUID does not match expected output.
+        success_msg: Remove By GUID matches expected output.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid_check.changed == _remove_by_guid.changed
+        fail_msg: Check mode should not change anything.
+        success_msg: Check mode did not change anything.
+
+    - name: Remove selection profile by name (not found) (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Not Found
+        state: absent
+      register: _remove_not_found_check
+
+    - name: Verify Delete Not Found output
+      ansible.builtin.assert:
+        that:
+          - _remove_not_found_check is not changed
+          - _remove_not_found_check.selection_profile is not defined
+        fail_msg: Delete Not Found does not match expected output.
+        success_msg: Delete Not Found matches expected output.
+
+    - name: Remove selection profile by name (not found)
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        name: Not Found
+        state: absent
+      register: _remove_not_found
+
+    - name: Verify Delete Not Found output
+      ansible.builtin.assert:
+        that:
+          - _remove_not_found is not changed
+          - _remove_not_found.selection_profile is not defined
+        fail_msg: Delete Not Found does not match expected output.
+        success_msg: Delete Not Found matches expected output.
+
+    - name: Remove selection profile by GUID (not found) (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ 'Not Found' | to_uuid }}"
+        state: absent
+      register: _remove_guid_not_found_check
+
+    - name: Verify Delete GUID Not Found output
+      ansible.builtin.assert:
+        that:
+          - _remove_guid_not_found_check is not changed
+          - _remove_guid_not_found_check.selection_profile is not defined
+        fail_msg: Delete GUID Not Found does not match expected output.
+        success_msg: Delete GUID Not Found matches expected output.
+
+    - name: Remove selection profile by GUID (not found)
+      diff: true
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ 'Not Found' | to_uuid }}"
+        state: absent
+      register: _remove_guid_not_found
+
+    - name: Verify Delete GUID Not Found output
+      ansible.builtin.assert:
+        that:
+          - _remove_guid_not_found is not changed
+          - _remove_guid_not_found.selection_profile is not defined
+        fail_msg: Delete GUID Not Found does not match expected output.
+        success_msg: Delete GUID Not Found matches expected output.

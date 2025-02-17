@@ -1,0 +1,32 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Pre-create MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        mdt_share_path: C:\MDTShare
+        description: MDT Deployment Share
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare$"
+        state: present
+
+    - name: Create SMB share
+      ansible.windows.win_share:
+        name: MDTShare$
+        path: C:\MDTShare
+        full: Everyone
+        caching_mode: None
+
+    - name: Add permissions to MDT Deployment Share
+      ansible.windows.win_acl:
+        path: C:\MDTShare
+        user: vagrant
+        rights: FullControl
+        type: allow

@@ -1,0 +1,101 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Create MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        mdt_share_path: C:\MDTShare
+        description: MDT Deployment Share
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare$"
+        state: present
+
+    - name: Create SMB share
+      ansible.windows.win_share:
+        name: MDTShare$
+        path: C:\MDTShare
+        full: Everyone
+        caching_mode: None
+
+    - name: Add permissions to MDT Deployment Share
+      ansible.windows.win_acl:
+        path: C:\MDTShare
+        user: vagrant
+        rights: FullControl
+        type: allow
+
+    - name: Create temporary folder
+      ansible.windows.win_file:
+        path: C:\temp\source
+        state: directory
+
+    - name: Copy Windows ISO files to temporary directory
+      ansible.windows.win_copy:
+        src: ../files/operating_system/source/
+        dest: C:\temp\source
+
+    - name: Copy WIM files to temporary directory
+      ansible.windows.win_copy:
+        src: ../files/operating_system/install.wim
+        dest: C:\temp\source\sources\install.wim
+
+    - name: Pre-create MDT Operating System
+      trippsc2.mdt.operating_system:
+        mdt_share_path: C:\MDTShare
+        name: Windows 11 Enterprise
+        type: source
+        source_path: C:\temp\source
+        destination_folder: Windows 11
+        image_index: 6
+        state: present
+
+    - name: Pre-create MDT Task Sequence
+      loop:
+        - id: NONE-NO-ADMIN
+          name: No product key
+          product_key_type: none
+        - id: MAK-NO-ADMIN
+          name: MAK product key
+          product_key_type: mak
+          product_key: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+        - id: RETAIL-NO-ADMIN
+          name: Retail product key
+          product_key_type: retail
+          product_key: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+        - id: NONE-ADMIN
+          name: No product key with admin password
+          product_key_type: none
+          admin_password: Password123!
+          version: '1.1'
+        - id: MAK-ADMIN
+          name: MAK product key with admin password
+          product_key_type: mak
+          product_key: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+          admin_password: Password123!
+          version: '1.1'
+        - id: RETAIL-ADMIN
+          name: Retail product key with admin password
+          product_key_type: retail
+          product_key: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+          admin_password: Password123!
+          version: '1.1'
+      trippsc2.mdt.task_sequence:
+        mdt_share_path: C:\MDTShare
+        id: "{{ item.id }}"
+        name: "{{ item.name }}"
+        template: Client.xml
+        product_key_type: "{{ item.product_key_type }}"
+        product_key: "{{ item.product_key | default(omit) }}"
+        admin_password: "{{ item.admin_password | default(omit) }}"
+        operating_system_name: Windows 11 Enterprise
+        full_name: Test User
+        organization: Test Organization
+        version: "{{ item.version | default(omit) }}"
+        state: present

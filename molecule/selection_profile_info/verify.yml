@@ -1,0 +1,63 @@
+---
+- name: Verify
+  hosts:
+    - subjects
+  tasks:
+    - name: Attempt to not supply MDT share path
+      trippsc2.mdt.selection_profile_info:
+        name: Test
+      register: _no_mdt_share_path
+      ignore_errors: true
+
+    - name: Verify that MDT share path is required
+      ansible.builtin.assert:
+        that:
+          - _no_mdt_share_path is failed
+          - '_no_mdt_share_path.msg == "missing required arguments: mdt_share_path"'
+        fail_msg: MDT share path is required.
+        success_msg: MDT share path is required.
+
+    - name: Attempt to supply non-existent MDT share path
+      trippsc2.mdt.selection_profile_info:
+        mdt_share_path: C:\Test
+        name: Test
+      register: _nonexistent_mdt_share_path
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_mdt_share_path is failed
+          - '_nonexistent_mdt_share_path.msg == "MDT share path ''C:\Test'' does not exist."'
+        fail_msg: The task should fail when the MDT share path does not exist.
+        success_msg: The task failed as expected when the MDT share path does not exist.
+
+    - name: Attempt to supply no name or GUID
+      trippsc2.mdt.selection_profile_info:
+        mdt_share_path: C:\MDTShare
+      register: _no_name
+      ignore_errors: true
+
+    - name: Verify that the module fails when no name or GUID is supplied
+      ansible.builtin.assert:
+        that:
+          - _no_name is failed
+          - '_no_name.msg == "one of the following is required: name, guid"'
+        fail_msg: The module did not fail when no name or GUID was supplied.
+        success_msg: The module failed when no name or GUID was supplied, as expected.
+
+    - name: Attempt to supply both name and GUID
+      trippsc2.mdt.selection_profile_info:
+        mdt_share_path: C:\MDTShare
+        name: Test
+        guid: '{12345678-1234-1234-1234-123456789012}'
+      register: _both_name_and_guid
+      ignore_errors: true
+
+    - name: Verify that the module fails when both name and GUID are supplied
+      ansible.builtin.assert:
+        that:
+          - _both_name_and_guid is failed
+          - '_both_name_and_guid.msg == "parameters are mutually exclusive: name, guid"'
+        fail_msg: The module did not fail when both name and GUID were supplied.
+        success_msg: The module failed when both name and GUID were supplied, as expected.

@@ -1,0 +1,2474 @@
+---
+- name: Converge # noqa complexity[play]
+  hosts:
+    - subjects
+  tasks:
+    - name: Create MDT source operating system by index (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Source By Index
+        type: source
+        source_path: C:\temp\source
+        destination_folder: Windows Source
+        image_index: 6
+        state: present
+      register: _source_by_index_check
+
+    - name: Verify Source By Index previous output # noqa no-handler
+      when:
+        - _source_by_index_check is changed
+      ansible.builtin.assert:
+        that:
+          - _source_by_index_check.diff.before == None
+        fail_msg: Previous output is not empty.
+        success_msg: Previous output is empty.
+
+    - name: Verify Source Operating system output
+      ansible.builtin.assert:
+        that:
+          - _source_by_index_check.operating_system is defined
+          - _source_by_index_check.operating_system.name == 'Source By Index'
+          - _source_by_index_check.operating_system.type == 'source'
+          - _source_by_index_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Windows Source'
+          - _source_by_index_check.operating_system.build == '10.0.22631.2861'
+          - _source_by_index_check.operating_system.description == 'Windows 11 Enterprise'
+          - _source_by_index_check.operating_system.flags == 'Enterprise'
+          - _source_by_index_check.operating_system.hal == ''
+          - _source_by_index_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _source_by_index_check.operating_system.image_file == '.\Operating Systems\Windows Source\sources\install.wim'
+          - _source_by_index_check.operating_system.image_index == 6
+          - _source_by_index_check.operating_system.languages | length == 1
+          - _source_by_index_check.operating_system.languages[0] == 'en-US'
+          - _source_by_index_check.operating_system.os_type == 'Windows IBS'
+          - _source_by_index_check.operating_system.platform == 'x64'
+          - _source_by_index_check.operating_system.size == 18606
+          - _source_by_index_check.operating_system.comments == ''
+          - _source_by_index_check.operating_system.enabled
+          - not _source_by_index_check.operating_system.hidden
+          - _source_by_index_check.operating_system.files is defined
+          - _source_by_index_check.operating_system.files | length > 1
+          - _source_by_index_check.operating_system.paths is defined
+          - _source_by_index_check.operating_system.paths | length == 1
+          - _source_by_index_check.operating_system.paths[0] == ''
+        fail_msg: Source By Index output is not as expected.
+        success_msg: Source By Index output is as expected.
+
+    - name: Create MDT source operating system by index
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Source By Index
+        type: source
+        source_path: C:\temp\source
+        destination_folder: Windows Source
+        image_index: 6
+        state: present
+      register: _source_by_index
+
+    - name: Verify Source By Index previous output # noqa no-handler
+      when:
+        - _source_by_index is changed
+      ansible.builtin.assert:
+        that:
+          - _source_by_index.diff.before == None
+        fail_msg: Previous output is not empty.
+        success_msg: Previous output is empty.
+
+    - name: Verify Source Operating system output
+      ansible.builtin.assert:
+        that:
+          - _source_by_index.operating_system is defined
+          - _source_by_index.operating_system.name == 'Source By Index'
+          - _source_by_index.operating_system.type == 'source'
+          - _source_by_index.operating_system.files_path == 'D:\MDTShare\Operating Systems\Windows Source'
+          - _source_by_index.operating_system.build == '10.0.22631.2861'
+          - _source_by_index.operating_system.description == 'Windows 11 Enterprise'
+          - _source_by_index.operating_system.flags == 'Enterprise'
+          - _source_by_index.operating_system.hal == ''
+          - _source_by_index.operating_system.image_name == 'Windows 11 Enterprise'
+          - _source_by_index.operating_system.image_file == '.\Operating Systems\Windows Source\sources\install.wim'
+          - _source_by_index.operating_system.image_index == 6
+          - _source_by_index.operating_system.languages | length == 1
+          - _source_by_index.operating_system.languages[0] == 'en-US'
+          - _source_by_index.operating_system.os_type == 'Windows IBS'
+          - _source_by_index.operating_system.platform == 'x64'
+          - _source_by_index.operating_system.size == 18606
+          - _source_by_index.operating_system.comments == ''
+          - _source_by_index.operating_system.enabled
+          - not _source_by_index.operating_system.hidden
+          - _source_by_index.operating_system.files is defined
+          - _source_by_index.operating_system.files | length > 1
+          - _source_by_index.operating_system.paths is defined
+          - _source_by_index.operating_system.paths | length == 1
+          - _source_by_index.operating_system.paths[0] == ''
+        fail_msg: Source By Index output is not as expected.
+        success_msg: Source By Index output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _source_by_index_check.changed == _source_by_index.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT source operating system by name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Source By Name
+        type: source
+        source_path: C:\temp\source
+        destination_folder: Windows Source
+        image_name: Windows 11 Pro
+        state: present
+      register: _source_by_name_check
+
+    - name: Verify Source By Name previous output # noqa no-handler
+      when:
+        - _source_by_name_check is changed
+      ansible.builtin.assert:
+        that:
+          - _source_by_name_check.diff.before == None
+        fail_msg: Previous output is not empty.
+        success_msg: Previous output is empty.
+
+    - name: Verify Source Operating system output
+      ansible.builtin.assert:
+        that:
+          - _source_by_name_check.operating_system is defined
+          - _source_by_name_check.operating_system.name == 'Source By Name'
+          - _source_by_name_check.operating_system.type == 'source'
+          - _source_by_name_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Windows Source'
+          - _source_by_name_check.operating_system.build == '10.0.22631.2861'
+          - _source_by_name_check.operating_system.description == 'Windows 11 Pro'
+          - _source_by_name_check.operating_system.flags == 'Professional'
+          - _source_by_name_check.operating_system.hal == ''
+          - _source_by_name_check.operating_system.image_name == 'Windows 11 Pro'
+          - _source_by_name_check.operating_system.image_file == '.\Operating Systems\Windows Source\sources\install.wim'
+          - _source_by_name_check.operating_system.image_index == 5
+          - _source_by_name_check.operating_system.languages | length == 1
+          - _source_by_name_check.operating_system.languages[0] == 'en-US'
+          - _source_by_name_check.operating_system.os_type == 'Windows IBS'
+          - _source_by_name_check.operating_system.platform == 'x64'
+          - _source_by_name_check.operating_system.size == 18606
+          - _source_by_name_check.operating_system.comments == ''
+          - _source_by_name_check.operating_system.enabled
+          - not _source_by_name_check.operating_system.hidden
+          - _source_by_name_check.operating_system.files is defined
+          - _source_by_name_check.operating_system.files | length > 1
+          - _source_by_name_check.operating_system.paths is defined
+          - _source_by_name_check.operating_system.paths | length == 1
+          - _source_by_name_check.operating_system.paths[0] == ''
+        fail_msg: Source By Name output is not as expected.
+        success_msg: Source By Name output is as expected.
+
+    - name: Create MDT source operating system by name
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Source By Name
+        type: source
+        source_path: C:\temp\source
+        destination_folder: Windows Source
+        image_name: Windows 11 Pro
+        state: present
+      register: _source_by_name
+
+    - name: Verify Source By Name previous output # noqa no-handler
+      when:
+        - _source_by_name is changed
+      ansible.builtin.assert:
+        that:
+          - _source_by_name.diff.before == None
+        fail_msg: Previous output is not empty.
+        success_msg: Previous output is empty.
+
+    - name: Verify Source Operating system output
+      ansible.builtin.assert:
+        that:
+          - _source_by_name.operating_system is defined
+          - _source_by_name.operating_system.name == 'Source By Name'
+          - _source_by_name.operating_system.type == 'source'
+          - _source_by_name.operating_system.files_path == 'D:\MDTShare\Operating Systems\Windows Source'
+          - _source_by_name.operating_system.build == '10.0.22631.2861'
+          - _source_by_name.operating_system.description == 'Windows 11 Pro'
+          - _source_by_name.operating_system.flags == 'Professional'
+          - _source_by_name.operating_system.hal == ''
+          - _source_by_name.operating_system.image_name == 'Windows 11 Pro'
+          - _source_by_name.operating_system.image_file == '.\Operating Systems\Windows Source\sources\install.wim'
+          - _source_by_name.operating_system.image_index == 5
+          - _source_by_name.operating_system.languages | length == 1
+          - _source_by_name.operating_system.languages[0] == 'en-US'
+          - _source_by_name.operating_system.os_type == 'Windows IBS'
+          - _source_by_name.operating_system.platform == 'x64'
+          - _source_by_name.operating_system.size == 18606
+          - _source_by_name.operating_system.comments == ''
+          - _source_by_name.operating_system.enabled
+          - not _source_by_name.operating_system.hidden
+          - _source_by_name.operating_system.files is defined
+          - _source_by_name.operating_system.files | length > 1
+          - _source_by_name.operating_system.paths is defined
+          - _source_by_name.operating_system.paths | length == 1
+          - _source_by_name.operating_system.paths[0] == ''
+        fail_msg: Source By Name output is not as expected.
+        success_msg: Source By Name output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _source_by_name_check.changed == _source_by_name.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT source operating system by edition ID (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Source By Edition ID
+        type: source
+        source_path: C:\temp\source
+        destination_folder: Windows Source
+        image_edition_id: Enterprise
+        state: present
+      register: _source_by_edition_id_check
+
+    - name: Verify Source By Edition ID previous output # noqa no-handler
+      when:
+        - _source_by_edition_id_check is changed
+      ansible.builtin.assert:
+        that:
+          - _source_by_edition_id_check.diff.before == None
+        fail_msg: Previous output is not empty.
+        success_msg: Previous output is empty.
+
+    - name: Verify Source Operating system output
+      ansible.builtin.assert:
+        that:
+          - _source_by_edition_id_check.operating_system is defined
+          - _source_by_edition_id_check.operating_system.name == 'Source By Edition ID'
+          - _source_by_edition_id_check.operating_system.type == 'source'
+          - _source_by_edition_id_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Windows Source'
+          - _source_by_edition_id_check.operating_system.build == '10.0.22631.2861'
+          - _source_by_edition_id_check.operating_system.description == 'Windows 11 Enterprise'
+          - _source_by_edition_id_check.operating_system.flags == 'Enterprise'
+          - _source_by_edition_id_check.operating_system.hal == ''
+          - _source_by_edition_id_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _source_by_edition_id_check.operating_system.image_file == '.\Operating Systems\Windows Source\sources\install.wim'
+          - _source_by_edition_id_check.operating_system.image_index == 6
+          - _source_by_edition_id_check.operating_system.languages | length == 1
+          - _source_by_edition_id_check.operating_system.languages[0] == 'en-US'
+          - _source_by_edition_id_check.operating_system.os_type == 'Windows IBS'
+          - _source_by_edition_id_check.operating_system.platform == 'x64'
+          - _source_by_edition_id_check.operating_system.size == 18606
+          - _source_by_edition_id_check.operating_system.comments == ''
+          - _source_by_edition_id_check.operating_system.enabled
+          - not _source_by_edition_id_check.operating_system.hidden
+          - _source_by_edition_id_check.operating_system.files is defined
+          - _source_by_edition_id_check.operating_system.files | length > 1
+          - _source_by_edition_id_check.operating_system.paths is defined
+          - _source_by_edition_id_check.operating_system.paths | length == 1
+          - _source_by_edition_id_check.operating_system.paths[0] == ''
+        fail_msg: Source By Edition ID output is not as expected.
+        success_msg: Source By Edition ID output is as expected.
+
+    - name: Create MDT source operating system by edition ID
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Source By Edition ID
+        type: source
+        source_path: C:\temp\source
+        destination_folder: Windows Source
+        image_edition_id: Enterprise
+        state: present
+      register: _source_by_edition_id
+
+    - name: Verify Source By Edition ID previous output # noqa no-handler
+      when:
+        - _source_by_edition_id is changed
+      ansible.builtin.assert:
+        that:
+          - _source_by_edition_id.diff.before == None
+        fail_msg: Previous output is not empty.
+        success_msg: Previous output is empty.
+
+    - name: Verify Source Operating system output
+      ansible.builtin.assert:
+        that:
+          - _source_by_edition_id.operating_system is defined
+          - _source_by_edition_id.operating_system.name == 'Source By Edition ID'
+          - _source_by_edition_id.operating_system.type == 'source'
+          - _source_by_edition_id.operating_system.files_path == 'D:\MDTShare\Operating Systems\Windows Source'
+          - _source_by_edition_id.operating_system.build == '10.0.22631.2861'
+          - _source_by_edition_id.operating_system.description == 'Windows 11 Enterprise'
+          - _source_by_edition_id.operating_system.flags == 'Enterprise'
+          - _source_by_edition_id.operating_system.hal == ''
+          - _source_by_edition_id.operating_system.image_name == 'Windows 11 Enterprise'
+          - _source_by_edition_id.operating_system.image_file == '.\Operating Systems\Windows Source\sources\install.wim'
+          - _source_by_edition_id.operating_system.image_index == 6
+          - _source_by_edition_id.operating_system.languages | length == 1
+          - _source_by_edition_id.operating_system.languages[0] == 'en-US'
+          - _source_by_edition_id.operating_system.os_type == 'Windows IBS'
+          - _source_by_edition_id.operating_system.platform == 'x64'
+          - _source_by_edition_id.operating_system.size == 18606
+          - _source_by_edition_id.operating_system.comments == ''
+          - _source_by_edition_id.operating_system.enabled
+          - not _source_by_edition_id.operating_system.hidden
+          - _source_by_edition_id.operating_system.files is defined
+          - _source_by_edition_id.operating_system.files | length > 1
+          - _source_by_edition_id.operating_system.paths is defined
+          - _source_by_edition_id.operating_system.paths | length == 1
+          - _source_by_edition_id.operating_system.paths[0] == ''
+        fail_msg: Source By Edition ID output is not as expected.
+        success_msg: Source By Edition ID output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _source_by_edition_id_check.changed == _source_by_edition_id.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT WIM operating system by index (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: WIM By Index
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Windows WIM
+        image_index: 6
+        state: present
+      register: _source_by_index_check
+
+    - name: Verify WIM By Index previous output # noqa no-handler
+      when:
+        - _source_by_index_check is changed
+      ansible.builtin.assert:
+        that:
+          - _source_by_index_check.diff.before == None
+        fail_msg: Previous output is not empty.
+        success_msg: Previous output is empty.
+
+    - name: Verify WIM Operating system output
+      ansible.builtin.assert:
+        that:
+          - _source_by_index_check.operating_system is defined
+          - _source_by_index_check.operating_system.name == 'WIM By Index'
+          - _source_by_index_check.operating_system.type == 'wim'
+          - _source_by_index_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Windows WIM'
+          - _source_by_index_check.operating_system.build == '10.0.22631.2861'
+          - _source_by_index_check.operating_system.description == 'Windows 11 Enterprise'
+          - _source_by_index_check.operating_system.flags == 'Enterprise'
+          - _source_by_index_check.operating_system.hal == ''
+          - _source_by_index_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _source_by_index_check.operating_system.image_file == '.\Operating Systems\Windows WIM\install.wim'
+          - _source_by_index_check.operating_system.image_index == 6
+          - _source_by_index_check.operating_system.languages | length == 1
+          - _source_by_index_check.operating_system.languages[0] == 'en-US'
+          - _source_by_index_check.operating_system.os_type == 'Windows IBS'
+          - _source_by_index_check.operating_system.platform == 'x64'
+          - _source_by_index_check.operating_system.size == 18606
+          - _source_by_index_check.operating_system.comments == ''
+          - _source_by_index_check.operating_system.enabled
+          - not _source_by_index_check.operating_system.hidden
+          - _source_by_index_check.operating_system.files is defined
+          - _source_by_index_check.operating_system.files | length == 1
+          - _source_by_index_check.operating_system.paths is defined
+          - _source_by_index_check.operating_system.paths | length == 1
+          - _source_by_index_check.operating_system.paths[0] == ''
+        fail_msg: Source By Index output is not as expected.
+        success_msg: Source By Index output is as expected.
+
+    - name: Create MDT WIM operating system by index
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: WIM By Index
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Windows WIM
+        image_index: 6
+        state: present
+      register: _source_by_index
+
+    - name: Verify WIM By Index previous output # noqa no-handler
+      when:
+        - _source_by_index is changed
+      ansible.builtin.assert:
+        that:
+          - _source_by_index.diff.before == None
+        fail_msg: Previous output is not empty.
+        success_msg: Previous output is empty.
+
+    - name: Verify WIM Operating system output
+      ansible.builtin.assert:
+        that:
+          - _source_by_index.operating_system is defined
+          - _source_by_index.operating_system.name == 'WIM By Index'
+          - _source_by_index.operating_system.type == 'wim'
+          - _source_by_index.operating_system.files_path == 'D:\MDTShare\Operating Systems\Windows WIM'
+          - _source_by_index.operating_system.build == '10.0.22631.2861'
+          - _source_by_index.operating_system.description == 'Windows 11 Enterprise'
+          - _source_by_index.operating_system.flags == 'Enterprise'
+          - _source_by_index.operating_system.hal == ''
+          - _source_by_index.operating_system.image_name == 'Windows 11 Enterprise'
+          - _source_by_index.operating_system.image_file == '.\Operating Systems\Windows WIM\install.wim'
+          - _source_by_index.operating_system.image_index == 6
+          - _source_by_index.operating_system.languages | length == 1
+          - _source_by_index.operating_system.languages[0] == 'en-US'
+          - _source_by_index.operating_system.os_type == 'Windows IBS'
+          - _source_by_index.operating_system.platform == 'x64'
+          - _source_by_index.operating_system.size == 18606
+          - _source_by_index.operating_system.comments == ''
+          - _source_by_index.operating_system.enabled
+          - not _source_by_index.operating_system.hidden
+          - _source_by_index.operating_system.files is defined
+          - _source_by_index.operating_system.files | length == 1
+          - _source_by_index.operating_system.paths is defined
+          - _source_by_index.operating_system.paths | length == 1
+          - _source_by_index.operating_system.paths[0] == ''
+        fail_msg: Source By Index output is not as expected.
+        success_msg: Source By Index output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _source_by_index_check.changed == _source_by_index.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT WIM operating system by name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: WIM By Name
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Windows WIM
+        image_name: Windows 11 Pro
+        state: present
+      register: _source_by_name_check
+
+    - name: Verify WIM By Name previous output # noqa no-handler
+      when:
+        - _source_by_name_check is changed
+      ansible.builtin.assert:
+        that:
+          - _source_by_name_check.diff.before == None
+        fail_msg: Previous output is not empty.
+        success_msg: Previous output is empty.
+
+    - name: Verify WIM Operating system output
+      ansible.builtin.assert:
+        that:
+          - _source_by_name_check.operating_system is defined
+          - _source_by_name_check.operating_system.name == 'WIM By Name'
+          - _source_by_name_check.operating_system.type == 'wim'
+          - _source_by_name_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Windows WIM'
+          - _source_by_name_check.operating_system.build == '10.0.22631.2861'
+          - _source_by_name_check.operating_system.description == 'Windows 11 Pro'
+          - _source_by_name_check.operating_system.flags == 'Professional'
+          - _source_by_name_check.operating_system.hal == ''
+          - _source_by_name_check.operating_system.image_name == 'Windows 11 Pro'
+          - _source_by_name_check.operating_system.image_file == '.\Operating Systems\Windows WIM\install.wim'
+          - _source_by_name_check.operating_system.image_index == 5
+          - _source_by_name_check.operating_system.languages | length == 1
+          - _source_by_name_check.operating_system.languages[0] == 'en-US'
+          - _source_by_name_check.operating_system.os_type == 'Windows IBS'
+          - _source_by_name_check.operating_system.platform == 'x64'
+          - _source_by_name_check.operating_system.size == 18606
+          - _source_by_name_check.operating_system.comments == ''
+          - _source_by_name_check.operating_system.enabled
+          - not _source_by_name_check.operating_system.hidden
+          - _source_by_name_check.operating_system.files is defined
+          - _source_by_name_check.operating_system.files | length == 1
+          - _source_by_name_check.operating_system.paths is defined
+          - _source_by_name_check.operating_system.paths | length == 1
+          - _source_by_name_check.operating_system.paths[0] == ''
+        fail_msg: Source By Name output is not as expected.
+        success_msg: Source By Name output is as expected.
+
+    - name: Create MDT WIM operating system by name
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: WIM By Name
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Windows WIM
+        image_name: Windows 11 Pro
+        state: present
+      register: _source_by_name
+
+    - name: Verify WIM By Name previous output # noqa no-handler
+      when:
+        - _source_by_name is changed
+      ansible.builtin.assert:
+        that:
+          - _source_by_name.diff.before == None
+        fail_msg: Previous output is not empty.
+        success_msg: Previous output is empty.
+
+    - name: Verify WIM Operating system output
+      ansible.builtin.assert:
+        that:
+          - _source_by_name.operating_system is defined
+          - _source_by_name.operating_system.name == 'WIM By Name'
+          - _source_by_name.operating_system.type == 'wim'
+          - _source_by_name.operating_system.files_path == 'D:\MDTShare\Operating Systems\Windows WIM'
+          - _source_by_name.operating_system.build == '10.0.22631.2861'
+          - _source_by_name.operating_system.description == 'Windows 11 Pro'
+          - _source_by_name.operating_system.flags == 'Professional'
+          - _source_by_name.operating_system.hal == ''
+          - _source_by_name.operating_system.image_name == 'Windows 11 Pro'
+          - _source_by_name.operating_system.image_file == '.\Operating Systems\Windows WIM\install.wim'
+          - _source_by_name.operating_system.image_index == 5
+          - _source_by_name.operating_system.languages | length == 1
+          - _source_by_name.operating_system.languages[0] == 'en-US'
+          - _source_by_name.operating_system.os_type == 'Windows IBS'
+          - _source_by_name.operating_system.platform == 'x64'
+          - _source_by_name.operating_system.size == 18606
+          - _source_by_name.operating_system.comments == ''
+          - _source_by_name.operating_system.enabled
+          - not _source_by_name.operating_system.hidden
+          - _source_by_name.operating_system.files is defined
+          - _source_by_name.operating_system.files | length == 1
+          - _source_by_name.operating_system.paths is defined
+          - _source_by_name.operating_system.paths | length == 1
+          - _source_by_name.operating_system.paths[0] == ''
+        fail_msg: Source By Name output is not as expected.
+        success_msg: Source By Name output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _source_by_name_check.changed == _source_by_name.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT WIM operating system by edition ID (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: WIM By Edition ID
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Windows WIM
+        image_edition_id: Enterprise
+        state: present
+      register: _source_by_edition_id_check
+
+    - name: Verify WIM By Edition ID previous output # noqa no-handler
+      when:
+        - _source_by_edition_id_check is changed
+      ansible.builtin.assert:
+        that:
+          - _source_by_edition_id_check.diff.before == None
+        fail_msg: Previous output is not empty.
+        success_msg: Previous output is empty.
+
+    - name: Verify WIM Operating system output
+      ansible.builtin.assert:
+        that:
+          - _source_by_edition_id_check.operating_system is defined
+          - _source_by_edition_id_check.operating_system.name == 'WIM By Edition ID'
+          - _source_by_edition_id_check.operating_system.type == 'wim'
+          - _source_by_edition_id_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Windows WIM'
+          - _source_by_edition_id_check.operating_system.build == '10.0.22631.2861'
+          - _source_by_edition_id_check.operating_system.description == 'Windows 11 Enterprise'
+          - _source_by_edition_id_check.operating_system.flags == 'Enterprise'
+          - _source_by_edition_id_check.operating_system.hal == ''
+          - _source_by_edition_id_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _source_by_edition_id_check.operating_system.image_file == '.\Operating Systems\Windows WIM\install.wim'
+          - _source_by_edition_id_check.operating_system.image_index == 6
+          - _source_by_edition_id_check.operating_system.languages | length == 1
+          - _source_by_edition_id_check.operating_system.languages[0] == 'en-US'
+          - _source_by_edition_id_check.operating_system.os_type == 'Windows IBS'
+          - _source_by_edition_id_check.operating_system.platform == 'x64'
+          - _source_by_edition_id_check.operating_system.size == 18606
+          - _source_by_edition_id_check.operating_system.comments == ''
+          - _source_by_edition_id_check.operating_system.enabled
+          - not _source_by_edition_id_check.operating_system.hidden
+          - _source_by_edition_id_check.operating_system.files is defined
+          - _source_by_edition_id_check.operating_system.files | length == 1
+          - _source_by_edition_id_check.operating_system.paths is defined
+          - _source_by_edition_id_check.operating_system.paths | length == 1
+          - _source_by_edition_id_check.operating_system.paths[0] == ''
+        fail_msg: Source By Edition ID output is not as expected.
+        success_msg: Source By Edition ID output is as expected.
+
+    - name: Create MDT WIM operating system by edition ID
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: WIM By Edition ID
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Windows WIM
+        image_edition_id: Enterprise
+        state: present
+      register: _source_by_edition_id
+
+    - name: Verify WIM By Edition ID previous output # noqa no-handler
+      when:
+        - _source_by_edition_id is changed
+      ansible.builtin.assert:
+        that:
+          - _source_by_edition_id.diff.before == None
+        fail_msg: Previous output is not empty.
+        success_msg: Previous output is empty.
+
+    - name: Verify WIM Operating system output
+      ansible.builtin.assert:
+        that:
+          - _source_by_edition_id.operating_system is defined
+          - _source_by_edition_id.operating_system.name == 'WIM By Edition ID'
+          - _source_by_edition_id.operating_system.type == 'wim'
+          - _source_by_edition_id.operating_system.files_path == 'D:\MDTShare\Operating Systems\Windows WIM'
+          - _source_by_edition_id.operating_system.build == '10.0.22631.2861'
+          - _source_by_edition_id.operating_system.description == 'Windows 11 Enterprise'
+          - _source_by_edition_id.operating_system.flags == 'Enterprise'
+          - _source_by_edition_id.operating_system.hal == ''
+          - _source_by_edition_id.operating_system.image_name == 'Windows 11 Enterprise'
+          - _source_by_edition_id.operating_system.image_file == '.\Operating Systems\Windows WIM\install.wim'
+          - _source_by_edition_id.operating_system.image_index == 6
+          - _source_by_edition_id.operating_system.languages | length == 1
+          - _source_by_edition_id.operating_system.languages[0] == 'en-US'
+          - _source_by_edition_id.operating_system.os_type == 'Windows IBS'
+          - _source_by_edition_id.operating_system.platform == 'x64'
+          - _source_by_edition_id.operating_system.size == 18606
+          - _source_by_edition_id.operating_system.comments == ''
+          - _source_by_edition_id.operating_system.enabled
+          - not _source_by_edition_id.operating_system.hidden
+          - _source_by_edition_id.operating_system.files is defined
+          - _source_by_edition_id.operating_system.files | length == 1
+          - _source_by_edition_id.operating_system.paths is defined
+          - _source_by_edition_id.operating_system.paths | length == 1
+          - _source_by_edition_id.operating_system.paths[0] == ''
+        fail_msg: Source By Edition ID output is not as expected.
+        success_msg: Source By Edition ID output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _source_by_edition_id_check.changed == _source_by_edition_id.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT WIM operating system with added paths (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Add Paths
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Add Paths
+        image_index: 6
+        paths:
+          add:
+            - 'Subdirectory'
+        state: present
+      register: _add_paths_check
+
+    - name: Verify Add Paths previous output # noqa no-handler
+      when:
+        - _add_paths_check is changed
+      ansible.builtin.assert:
+        that:
+          - _add_paths_check.diff.before.name == 'Add Paths'
+          - _add_paths_check.diff.before.type == 'wim'
+          - _add_paths_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Add Paths'
+          - _add_paths_check.diff.before.build == '10.0.22631.2861'
+          - _add_paths_check.diff.before.description == 'Windows 11 Enterprise'
+          - _add_paths_check.diff.before.flags == 'Enterprise'
+          - _add_paths_check.diff.before.hal == ''
+          - _add_paths_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _add_paths_check.diff.before.image_file == '.\Operating Systems\Add Paths\install.wim'
+          - _add_paths_check.diff.before.image_index == 6
+          - _add_paths_check.diff.before.languages | length == 1
+          - _add_paths_check.diff.before.languages[0] == 'en-US'
+          - _add_paths_check.diff.before.os_type == 'Windows IBS'
+          - _add_paths_check.diff.before.platform == 'x64'
+          - _add_paths_check.diff.before.size == 18606
+          - _add_paths_check.diff.before.comments == ''
+          - _add_paths_check.diff.before.enabled
+          - not _add_paths_check.diff.before.hidden
+          - _add_paths_check.diff.before.files is defined
+          - _add_paths_check.diff.before.files | length == 1
+          - _add_paths_check.diff.before.paths is defined
+          - _add_paths_check.diff.before.paths | length == 1
+          - _add_paths_check.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Add Paths output
+      ansible.builtin.assert:
+        that:
+          - _add_paths_check.operating_system.name == 'Add Paths'
+          - _add_paths_check.operating_system.type == 'wim'
+          - _add_paths_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Add Paths'
+          - _add_paths_check.operating_system.build == '10.0.22631.2861'
+          - _add_paths_check.operating_system.description == 'Windows 11 Enterprise'
+          - _add_paths_check.operating_system.flags == 'Enterprise'
+          - _add_paths_check.operating_system.hal == ''
+          - _add_paths_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _add_paths_check.operating_system.image_file == '.\Operating Systems\Add Paths\install.wim'
+          - _add_paths_check.operating_system.image_index == 6
+          - _add_paths_check.operating_system.languages | length == 1
+          - _add_paths_check.operating_system.languages[0] == 'en-US'
+          - _add_paths_check.operating_system.os_type == 'Windows IBS'
+          - _add_paths_check.operating_system.platform == 'x64'
+          - _add_paths_check.operating_system.size == 18606
+          - _add_paths_check.operating_system.comments == ''
+          - _add_paths_check.operating_system.enabled
+          - not _add_paths_check.operating_system.hidden
+          - _add_paths_check.operating_system.files is defined
+          - _add_paths_check.operating_system.files | length == 1
+          - _add_paths_check.operating_system.paths is defined
+          - _add_paths_check.operating_system.paths | length == 2
+          - ('' in _add_paths_check.operating_system.paths)
+          - ('Subdirectory' in _add_paths_check.operating_system.paths)
+        fail_msg: Add Paths output is not as expected.
+        success_msg: Add Paths output is as expected.
+
+    - name: Create MDT WIM operating system with added paths
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Add Paths
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Add Paths
+        image_index: 6
+        paths:
+          add:
+            - 'Subdirectory'
+        state: present
+      register: _add_paths
+
+    - name: Verify Add Paths previous output # noqa no-handler
+      when:
+        - _add_paths is changed
+      ansible.builtin.assert:
+        that:
+          - _add_paths.diff.before.name == 'Add Paths'
+          - _add_paths.diff.before.type == 'wim'
+          - _add_paths.diff.before.files_path == 'D:\MDTShare\Operating Systems\Add Paths'
+          - _add_paths.diff.before.build == '10.0.22631.2861'
+          - _add_paths.diff.before.description == 'Windows 11 Enterprise'
+          - _add_paths.diff.before.flags == 'Enterprise'
+          - _add_paths.diff.before.hal == ''
+          - _add_paths.diff.before.image_name == 'Windows 11 Enterprise'
+          - _add_paths.diff.before.image_file == '.\Operating Systems\Add Paths\install.wim'
+          - _add_paths.diff.before.image_index == 6
+          - _add_paths.diff.before.languages | length == 1
+          - _add_paths.diff.before.languages[0] == 'en-US'
+          - _add_paths.diff.before.os_type == 'Windows IBS'
+          - _add_paths.diff.before.platform == 'x64'
+          - _add_paths.diff.before.size == 18606
+          - _add_paths.diff.before.comments == ''
+          - _add_paths.diff.before.enabled
+          - not _add_paths.diff.before.hidden
+          - _add_paths.diff.before.files is defined
+          - _add_paths.diff.before.files | length == 1
+          - _add_paths.diff.before.paths is defined
+          - _add_paths.diff.before.paths | length == 1
+          - _add_paths.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Add Paths output
+      ansible.builtin.assert:
+        that:
+          - _add_paths.operating_system.name == 'Add Paths'
+          - _add_paths.operating_system.type == 'wim'
+          - _add_paths.operating_system.files_path == 'D:\MDTShare\Operating Systems\Add Paths'
+          - _add_paths.operating_system.build == '10.0.22631.2861'
+          - _add_paths.operating_system.description == 'Windows 11 Enterprise'
+          - _add_paths.operating_system.flags == 'Enterprise'
+          - _add_paths.operating_system.hal == ''
+          - _add_paths.operating_system.image_name == 'Windows 11 Enterprise'
+          - _add_paths.operating_system.image_file == '.\Operating Systems\Add Paths\install.wim'
+          - _add_paths.operating_system.image_index == 6
+          - _add_paths.operating_system.languages | length == 1
+          - _add_paths.operating_system.languages[0] == 'en-US'
+          - _add_paths.operating_system.os_type == 'Windows IBS'
+          - _add_paths.operating_system.platform == 'x64'
+          - _add_paths.operating_system.size == 18606
+          - _add_paths.operating_system.comments == ''
+          - _add_paths.operating_system.enabled
+          - not _add_paths.operating_system.hidden
+          - _add_paths.operating_system.files is defined
+          - _add_paths.operating_system.files | length == 1
+          - _add_paths.operating_system.paths is defined
+          - _add_paths.operating_system.paths | length == 2
+          - ('' in _add_paths.operating_system.paths)
+          - ('Subdirectory' in _add_paths.operating_system.paths)
+        fail_msg: Add Paths output is not as expected.
+        success_msg: Add Paths output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _add_paths_check.changed == _add_paths.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT WIM operating system with removed paths (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Remove Paths
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Remove Paths
+        image_index: 6
+        paths:
+          remove:
+            - ''
+        state: present
+      register: _remove_paths_check
+
+    - name: Verify Remove Paths previous output # noqa no-handler
+      when:
+        - _remove_paths_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_paths_check.diff.before.name == 'Remove Paths'
+          - _remove_paths_check.diff.before.type == 'wim'
+          - _remove_paths_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Remove Paths'
+          - _remove_paths_check.diff.before.build == '10.0.22631.2861'
+          - _remove_paths_check.diff.before.description == 'Windows 11 Enterprise'
+          - _remove_paths_check.diff.before.flags == 'Enterprise'
+          - _remove_paths_check.diff.before.hal == ''
+          - _remove_paths_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _remove_paths_check.diff.before.image_file == '.\Operating Systems\Remove Paths\install.wim'
+          - _remove_paths_check.diff.before.image_index == 6
+          - _remove_paths_check.diff.before.languages | length == 1
+          - _remove_paths_check.diff.before.languages[0] == 'en-US'
+          - _remove_paths_check.diff.before.os_type == 'Windows IBS'
+          - _remove_paths_check.diff.before.platform == 'x64'
+          - _remove_paths_check.diff.before.size == 18606
+          - _remove_paths_check.diff.before.comments == ''
+          - _remove_paths_check.diff.before.enabled
+          - not _remove_paths_check.diff.before.hidden
+          - _remove_paths_check.diff.before.files is defined
+          - _remove_paths_check.diff.before.files | length == 1
+          - _remove_paths_check.diff.before.paths is defined
+          - _remove_paths_check.diff.before.paths | length == 2
+          - ('Subdirectory' in _remove_paths_check.diff.before.paths)
+          - ('' in _remove_paths_check.diff.before.paths)
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Remove Paths output
+      ansible.builtin.assert:
+        that:
+          - _remove_paths_check.operating_system.name == 'Remove Paths'
+          - _remove_paths_check.operating_system.type == 'wim'
+          - _remove_paths_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Remove Paths'
+          - _remove_paths_check.operating_system.build == '10.0.22631.2861'
+          - _remove_paths_check.operating_system.description == 'Windows 11 Enterprise'
+          - _remove_paths_check.operating_system.flags == 'Enterprise'
+          - _remove_paths_check.operating_system.hal == ''
+          - _remove_paths_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _remove_paths_check.operating_system.image_file == '.\Operating Systems\Remove Paths\install.wim'
+          - _remove_paths_check.operating_system.image_index == 6
+          - _remove_paths_check.operating_system.languages | length == 1
+          - _remove_paths_check.operating_system.languages[0] == 'en-US'
+          - _remove_paths_check.operating_system.os_type == 'Windows IBS'
+          - _remove_paths_check.operating_system.platform == 'x64'
+          - _remove_paths_check.operating_system.size == 18606
+          - _remove_paths_check.operating_system.comments == ''
+          - _remove_paths_check.operating_system.enabled
+          - not _remove_paths_check.operating_system.hidden
+          - _remove_paths_check.operating_system.files is defined
+          - _remove_paths_check.operating_system.files | length == 1
+          - _remove_paths_check.operating_system.paths is defined
+          - _remove_paths_check.operating_system.paths | length == 1
+          - _remove_paths_check.operating_system.paths[0] == 'Subdirectory'
+        fail_msg: Remove Paths output is not as expected.
+        success_msg: Remove Paths output is as expected.
+
+    - name: Create MDT WIM operating system with removed paths
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Remove Paths
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Remove Paths
+        image_index: 6
+        paths:
+          remove:
+            - ''
+        state: present
+      register: _remove_paths
+
+    - name: Verify Remove Paths previous output # noqa no-handler
+      when:
+        - _remove_paths is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_paths.diff.before.name == 'Remove Paths'
+          - _remove_paths.diff.before.type == 'wim'
+          - _remove_paths.diff.before.files_path == 'D:\MDTShare\Operating Systems\Remove Paths'
+          - _remove_paths.diff.before.build == '10.0.22631.2861'
+          - _remove_paths.diff.before.description == 'Windows 11 Enterprise'
+          - _remove_paths.diff.before.flags == 'Enterprise'
+          - _remove_paths.diff.before.hal == ''
+          - _remove_paths.diff.before.image_name == 'Windows 11 Enterprise'
+          - _remove_paths.diff.before.image_file == '.\Operating Systems\Remove Paths\install.wim'
+          - _remove_paths.diff.before.image_index == 6
+          - _remove_paths.diff.before.languages | length == 1
+          - _remove_paths.diff.before.languages[0] == 'en-US'
+          - _remove_paths.diff.before.os_type == 'Windows IBS'
+          - _remove_paths.diff.before.platform == 'x64'
+          - _remove_paths.diff.before.size == 18606
+          - _remove_paths.diff.before.comments == ''
+          - _remove_paths.diff.before.enabled
+          - not _remove_paths.diff.before.hidden
+          - _remove_paths.diff.before.files is defined
+          - _remove_paths.diff.before.files | length == 1
+          - _remove_paths.diff.before.paths is defined
+          - _remove_paths.diff.before.paths | length == 2
+          - ('Subdirectory' in _remove_paths.diff.before.paths)
+          - ('' in _remove_paths.diff.before.paths)
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Remove Paths output
+      ansible.builtin.assert:
+        that:
+          - _remove_paths.operating_system.name == 'Remove Paths'
+          - _remove_paths.operating_system.type == 'wim'
+          - _remove_paths.operating_system.files_path == 'D:\MDTShare\Operating Systems\Remove Paths'
+          - _remove_paths.operating_system.build == '10.0.22631.2861'
+          - _remove_paths.operating_system.description == 'Windows 11 Enterprise'
+          - _remove_paths.operating_system.flags == 'Enterprise'
+          - _remove_paths.operating_system.hal == ''
+          - _remove_paths.operating_system.image_name == 'Windows 11 Enterprise'
+          - _remove_paths.operating_system.image_file == '.\Operating Systems\Remove Paths\install.wim'
+          - _remove_paths.operating_system.image_index == 6
+          - _remove_paths.operating_system.languages | length == 1
+          - _remove_paths.operating_system.languages[0] == 'en-US'
+          - _remove_paths.operating_system.os_type == 'Windows IBS'
+          - _remove_paths.operating_system.platform == 'x64'
+          - _remove_paths.operating_system.size == 18606
+          - _remove_paths.operating_system.comments == ''
+          - _remove_paths.operating_system.enabled
+          - not _remove_paths.operating_system.hidden
+          - _remove_paths.operating_system.files is defined
+          - _remove_paths.operating_system.files | length == 1
+          - _remove_paths.operating_system.paths is defined
+          - _remove_paths.operating_system.paths | length == 1
+          - _remove_paths.operating_system.paths[0] == 'Subdirectory'
+        fail_msg: Remove Paths output is not as expected.
+        success_msg: Remove Paths output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _remove_paths_check.changed == _remove_paths.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT WIM operating system with added and removed paths (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Add And Remove Paths
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Add And Remove Paths
+        image_index: 6
+        paths:
+          add:
+            - 'Subdirectory'
+          remove:
+            - ''
+        state: present
+      register: _add_remove_paths_check
+
+    - name: Verify Add And Remove Paths previous output # noqa no-handler
+      when:
+        - _add_remove_paths_check is changed
+      ansible.builtin.assert:
+        that:
+          - _add_remove_paths_check.diff.before.name == 'Add And Remove Paths'
+          - _add_remove_paths_check.diff.before.type == 'wim'
+          - _add_remove_paths_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Add And Remove Paths'
+          - _add_remove_paths_check.diff.before.build == '10.0.22631.2861'
+          - _add_remove_paths_check.diff.before.description == 'Windows 11 Enterprise'
+          - _add_remove_paths_check.diff.before.flags == 'Enterprise'
+          - _add_remove_paths_check.diff.before.hal == ''
+          - _add_remove_paths_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _add_remove_paths_check.diff.before.image_file == '.\Operating Systems\Add And Remove Paths\install.wim'
+          - _add_remove_paths_check.diff.before.image_index == 6
+          - _add_remove_paths_check.diff.before.languages | length == 1
+          - _add_remove_paths_check.diff.before.languages[0] == 'en-US'
+          - _add_remove_paths_check.diff.before.os_type == 'Windows IBS'
+          - _add_remove_paths_check.diff.before.platform == 'x64'
+          - _add_remove_paths_check.diff.before.size == 18606
+          - _add_remove_paths_check.diff.before.comments == ''
+          - _add_remove_paths_check.diff.before.enabled
+          - not _add_remove_paths_check.diff.before.hidden
+          - _add_remove_paths_check.diff.before.files is defined
+          - _add_remove_paths_check.diff.before.files | length == 1
+          - _add_remove_paths_check.diff.before.paths is defined
+          - _add_remove_paths_check.diff.before.paths | length == 1
+          - _add_remove_paths_check.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Add And Remove Paths output
+      ansible.builtin.assert:
+        that:
+          - _add_remove_paths_check.operating_system.name == 'Add And Remove Paths'
+          - _add_remove_paths_check.operating_system.type == 'wim'
+          - _add_remove_paths_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Add And Remove Paths'
+          - _add_remove_paths_check.operating_system.build == '10.0.22631.2861'
+          - _add_remove_paths_check.operating_system.description == 'Windows 11 Enterprise'
+          - _add_remove_paths_check.operating_system.flags == 'Enterprise'
+          - _add_remove_paths_check.operating_system.hal == ''
+          - _add_remove_paths_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _add_remove_paths_check.operating_system.image_file == '.\Operating Systems\Add And Remove Paths\install.wim'
+          - _add_remove_paths_check.operating_system.image_index == 6
+          - _add_remove_paths_check.operating_system.languages | length == 1
+          - _add_remove_paths_check.operating_system.languages[0] == 'en-US'
+          - _add_remove_paths_check.operating_system.os_type == 'Windows IBS'
+          - _add_remove_paths_check.operating_system.platform == 'x64'
+          - _add_remove_paths_check.operating_system.size == 18606
+          - _add_remove_paths_check.operating_system.comments == ''
+          - _add_remove_paths_check.operating_system.enabled
+          - not _add_remove_paths_check.operating_system.hidden
+          - _add_remove_paths_check.operating_system.files is defined
+          - _add_remove_paths_check.operating_system.files | length == 1
+          - _add_remove_paths_check.operating_system.paths is defined
+          - _add_remove_paths_check.operating_system.paths | length == 1
+          - _add_remove_paths_check.operating_system.paths[0] == 'Subdirectory'
+        fail_msg: Add And Remove Paths output is not as expected.
+        success_msg: Add And Remove Paths output is as expected.
+
+    - name: Create MDT WIM operating system with added and removed paths
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Add And Remove Paths
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Add And Remove Paths
+        image_index: 6
+        paths:
+          add:
+            - 'Subdirectory'
+          remove:
+            - ''
+        state: present
+      register: _add_remove_paths
+
+    - name: Verify Add And Remove Paths previous output # noqa no-handler
+      when:
+        - _add_remove_paths is changed
+      ansible.builtin.assert:
+        that:
+          - _add_remove_paths.diff.before.name == 'Add And Remove Paths'
+          - _add_remove_paths.diff.before.type == 'wim'
+          - _add_remove_paths.diff.before.files_path == 'D:\MDTShare\Operating Systems\Add And Remove Paths'
+          - _add_remove_paths.diff.before.build == '10.0.22631.2861'
+          - _add_remove_paths.diff.before.description == 'Windows 11 Enterprise'
+          - _add_remove_paths.diff.before.flags == 'Enterprise'
+          - _add_remove_paths.diff.before.hal == ''
+          - _add_remove_paths.diff.before.image_name == 'Windows 11 Enterprise'
+          - _add_remove_paths.diff.before.image_file == '.\Operating Systems\Add And Remove Paths\install.wim'
+          - _add_remove_paths.diff.before.image_index == 6
+          - _add_remove_paths.diff.before.languages | length == 1
+          - _add_remove_paths.diff.before.languages[0] == 'en-US'
+          - _add_remove_paths.diff.before.os_type == 'Windows IBS'
+          - _add_remove_paths.diff.before.platform == 'x64'
+          - _add_remove_paths.diff.before.size == 18606
+          - _add_remove_paths.diff.before.comments == ''
+          - _add_remove_paths.diff.before.enabled
+          - not _add_remove_paths.diff.before.hidden
+          - _add_remove_paths.diff.before.files is defined
+          - _add_remove_paths.diff.before.files | length == 1
+          - _add_remove_paths.diff.before.paths is defined
+          - _add_remove_paths.diff.before.paths | length == 1
+          - _add_remove_paths.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Add And Remove Paths output
+      ansible.builtin.assert:
+        that:
+          - _add_remove_paths.operating_system.name == 'Add And Remove Paths'
+          - _add_remove_paths.operating_system.type == 'wim'
+          - _add_remove_paths.operating_system.files_path == 'D:\MDTShare\Operating Systems\Add And Remove Paths'
+          - _add_remove_paths.operating_system.build == '10.0.22631.2861'
+          - _add_remove_paths.operating_system.description == 'Windows 11 Enterprise'
+          - _add_remove_paths.operating_system.flags == 'Enterprise'
+          - _add_remove_paths.operating_system.hal == ''
+          - _add_remove_paths.operating_system.image_name == 'Windows 11 Enterprise'
+          - _add_remove_paths.operating_system.image_file == '.\Operating Systems\Add And Remove Paths\install.wim'
+          - _add_remove_paths.operating_system.image_index == 6
+          - _add_remove_paths.operating_system.languages | length == 1
+          - _add_remove_paths.operating_system.languages[0] == 'en-US'
+          - _add_remove_paths.operating_system.os_type == 'Windows IBS'
+          - _add_remove_paths.operating_system.platform == 'x64'
+          - _add_remove_paths.operating_system.size == 18606
+          - _add_remove_paths.operating_system.comments == ''
+          - _add_remove_paths.operating_system.enabled
+          - not _add_remove_paths.operating_system.hidden
+          - _add_remove_paths.operating_system.files is defined
+          - _add_remove_paths.operating_system.files | length == 1
+          - _add_remove_paths.operating_system.paths is defined
+          - _add_remove_paths.operating_system.paths | length == 1
+          - _add_remove_paths.operating_system.paths[0] == 'Subdirectory'
+        fail_msg: Add And Remove Paths output is not as expected.
+        success_msg: Add And Remove Paths output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _add_remove_paths_check.changed == _add_remove_paths.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT WIM operating system with set paths (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Set Paths
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Set Paths
+        image_index: 6
+        paths:
+          set:
+            - 'Subdirectory'
+        state: present
+      register: _set_paths_check
+
+    - name: Verify Set Paths previous output # noqa no-handler
+      when:
+        - _set_paths_check is changed
+      ansible.builtin.assert:
+        that:
+          - _set_paths_check.diff.before.name == 'Set Paths'
+          - _set_paths_check.diff.before.type == 'wim'
+          - _set_paths_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Set Paths'
+          - _set_paths_check.diff.before.build == '10.0.22631.2861'
+          - _set_paths_check.diff.before.description == 'Windows 11 Enterprise'
+          - _set_paths_check.diff.before.flags == 'Enterprise'
+          - _set_paths_check.diff.before.hal == ''
+          - _set_paths_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _set_paths_check.diff.before.image_file == '.\Operating Systems\Set Paths\install.wim'
+          - _set_paths_check.diff.before.image_index == 6
+          - _set_paths_check.diff.before.languages | length == 1
+          - _set_paths_check.diff.before.languages[0] == 'en-US'
+          - _set_paths_check.diff.before.os_type == 'Windows IBS'
+          - _set_paths_check.diff.before.platform == 'x64'
+          - _set_paths_check.diff.before.size == 18606
+          - _set_paths_check.diff.before.comments == ''
+          - _set_paths_check.diff.before.enabled
+          - not _set_paths_check.diff.before.hidden
+          - _set_paths_check.diff.before.files is defined
+          - _set_paths_check.diff.before.files | length == 1
+          - _set_paths_check.diff.before.paths is defined
+          - _set_paths_check.diff.before.paths | length == 1
+          - _set_paths_check.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Set Paths output
+      ansible.builtin.assert:
+        that:
+          - _set_paths_check.operating_system.name == 'Set Paths'
+          - _set_paths_check.operating_system.type == 'wim'
+          - _set_paths_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Set Paths'
+          - _set_paths_check.operating_system.build == '10.0.22631.2861'
+          - _set_paths_check.operating_system.description == 'Windows 11 Enterprise'
+          - _set_paths_check.operating_system.flags == 'Enterprise'
+          - _set_paths_check.operating_system.hal == ''
+          - _set_paths_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _set_paths_check.operating_system.image_file == '.\Operating Systems\Set Paths\install.wim'
+          - _set_paths_check.operating_system.image_index == 6
+          - _set_paths_check.operating_system.languages | length == 1
+          - _set_paths_check.operating_system.languages[0] == 'en-US'
+          - _set_paths_check.operating_system.os_type == 'Windows IBS'
+          - _set_paths_check.operating_system.platform == 'x64'
+          - _set_paths_check.operating_system.size == 18606
+          - _set_paths_check.operating_system.comments == ''
+          - _set_paths_check.operating_system.enabled
+          - not _set_paths_check.operating_system.hidden
+          - _set_paths_check.operating_system.files is defined
+          - _set_paths_check.operating_system.files | length == 1
+          - _set_paths_check.operating_system.paths is defined
+          - _set_paths_check.operating_system.paths | length == 1
+          - _set_paths_check.operating_system.paths[0] == 'Subdirectory'
+        fail_msg: Set Paths output is not as expected.
+        success_msg: Set Paths output is as expected.
+
+    - name: Create MDT WIM operating system with set paths
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Set Paths
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Set Paths
+        image_index: 6
+        paths:
+          set:
+            - 'Subdirectory'
+        state: present
+      register: _set_paths
+
+    - name: Verify Set Paths previous output # noqa no-handler
+      when:
+        - _set_paths is changed
+      ansible.builtin.assert:
+        that:
+          - _set_paths.diff.before.name == 'Set Paths'
+          - _set_paths.diff.before.type == 'wim'
+          - _set_paths.diff.before.files_path == 'D:\MDTShare\Operating Systems\Set Paths'
+          - _set_paths.diff.before.build == '10.0.22631.2861'
+          - _set_paths.diff.before.description == 'Windows 11 Enterprise'
+          - _set_paths.diff.before.flags == 'Enterprise'
+          - _set_paths.diff.before.hal == ''
+          - _set_paths.diff.before.image_name == 'Windows 11 Enterprise'
+          - _set_paths.diff.before.image_file == '.\Operating Systems\Set Paths\install.wim'
+          - _set_paths.diff.before.image_index == 6
+          - _set_paths.diff.before.languages | length == 1
+          - _set_paths.diff.before.languages[0] == 'en-US'
+          - _set_paths.diff.before.os_type == 'Windows IBS'
+          - _set_paths.diff.before.platform == 'x64'
+          - _set_paths.diff.before.size == 18606
+          - _set_paths.diff.before.comments == ''
+          - _set_paths.diff.before.enabled
+          - not _set_paths.diff.before.hidden
+          - _set_paths.diff.before.files is defined
+          - _set_paths.diff.before.files | length == 1
+          - _set_paths.diff.before.paths is defined
+          - _set_paths.diff.before.paths | length == 1
+          - _set_paths.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Set Paths output
+      ansible.builtin.assert:
+        that:
+          - _set_paths.operating_system.name == 'Set Paths'
+          - _set_paths.operating_system.type == 'wim'
+          - _set_paths.operating_system.files_path == 'D:\MDTShare\Operating Systems\Set Paths'
+          - _set_paths.operating_system.build == '10.0.22631.2861'
+          - _set_paths.operating_system.description == 'Windows 11 Enterprise'
+          - _set_paths.operating_system.flags == 'Enterprise'
+          - _set_paths.operating_system.hal == ''
+          - _set_paths.operating_system.image_name == 'Windows 11 Enterprise'
+          - _set_paths.operating_system.image_file == '.\Operating Systems\Set Paths\install.wim'
+          - _set_paths.operating_system.image_index == 6
+          - _set_paths.operating_system.languages | length == 1
+          - _set_paths.operating_system.languages[0] == 'en-US'
+          - _set_paths.operating_system.os_type == 'Windows IBS'
+          - _set_paths.operating_system.platform == 'x64'
+          - _set_paths.operating_system.size == 18606
+          - _set_paths.operating_system.comments == ''
+          - _set_paths.operating_system.enabled
+          - not _set_paths.operating_system.hidden
+          - _set_paths.operating_system.files is defined
+          - _set_paths.operating_system.files | length == 1
+          - _set_paths.operating_system.paths is defined
+          - _set_paths.operating_system.paths | length == 1
+          - _set_paths.operating_system.paths[0] == 'Subdirectory'
+        fail_msg: Set Paths output is not as expected.
+        success_msg: Set Paths output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _set_paths_check.changed == _set_paths.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT WIM operating system with changed comments (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Change Comments
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Change Comments
+        image_index: 6
+        comments: New Comments
+        state: present
+      register: _change_comments_check
+
+    - name: Verify Change Comments previous output # noqa no-handler
+      when:
+        - _change_comments_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_comments_check.diff.before.name == 'Change Comments'
+          - _change_comments_check.diff.before.type == 'wim'
+          - _change_comments_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Change Comments'
+          - _change_comments_check.diff.before.build == '10.0.22631.2861'
+          - _change_comments_check.diff.before.description == 'Windows 11 Enterprise'
+          - _change_comments_check.diff.before.flags == 'Enterprise'
+          - _change_comments_check.diff.before.hal == ''
+          - _change_comments_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _change_comments_check.diff.before.image_file == '.\Operating Systems\Change Comments\install.wim'
+          - _change_comments_check.diff.before.image_index == 6
+          - _change_comments_check.diff.before.languages | length == 1
+          - _change_comments_check.diff.before.languages[0] == 'en-US'
+          - _change_comments_check.diff.before.os_type == 'Windows IBS'
+          - _change_comments_check.diff.before.platform == 'x64'
+          - _change_comments_check.diff.before.size == 18606
+          - _change_comments_check.diff.before.comments == ''
+          - _change_comments_check.diff.before.enabled
+          - not _change_comments_check.diff.before.hidden
+          - _change_comments_check.diff.before.files is defined
+          - _change_comments_check.diff.before.files | length == 1
+          - _change_comments_check.diff.before.paths is defined
+          - _change_comments_check.diff.before.paths | length == 1
+          - _change_comments_check.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Change Comments output
+      ansible.builtin.assert:
+        that:
+          - _change_comments_check.operating_system.name == 'Change Comments'
+          - _change_comments_check.operating_system.type == 'wim'
+          - _change_comments_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Change Comments'
+          - _change_comments_check.operating_system.build == '10.0.22631.2861'
+          - _change_comments_check.operating_system.description == 'Windows 11 Enterprise'
+          - _change_comments_check.operating_system.flags == 'Enterprise'
+          - _change_comments_check.operating_system.hal == ''
+          - _change_comments_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _change_comments_check.operating_system.image_file == '.\Operating Systems\Change Comments\install.wim'
+          - _change_comments_check.operating_system.image_index == 6
+          - _change_comments_check.operating_system.languages | length == 1
+          - _change_comments_check.operating_system.languages[0] == 'en-US'
+          - _change_comments_check.operating_system.os_type == 'Windows IBS'
+          - _change_comments_check.operating_system.platform == 'x64'
+          - _change_comments_check.operating_system.size == 18606
+          - _change_comments_check.operating_system.comments == 'New Comments'
+          - _change_comments_check.operating_system.enabled
+          - not _change_comments_check.operating_system.hidden
+          - _change_comments_check.operating_system.files is defined
+          - _change_comments_check.operating_system.files | length == 1
+          - _change_comments_check.operating_system.paths is defined
+          - _change_comments_check.operating_system.paths | length == 1
+          - _change_comments_check.operating_system.paths[0] == ''
+        fail_msg: Change Comments output is not as expected.
+        success_msg: Change Comments output is as expected.
+
+    - name: Create MDT WIM operating system with changed comments
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Change Comments
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Change Comments
+        image_index: 6
+        comments: New Comments
+        state: present
+      register: _change_comments
+
+    - name: Verify Change Comments previous output # noqa no-handler
+      when:
+        - _change_comments is changed
+      ansible.builtin.assert:
+        that:
+          - _change_comments.diff.before.name == 'Change Comments'
+          - _change_comments.diff.before.type == 'wim'
+          - _change_comments.diff.before.files_path == 'D:\MDTShare\Operating Systems\Change Comments'
+          - _change_comments.diff.before.build == '10.0.22631.2861'
+          - _change_comments.diff.before.description == 'Windows 11 Enterprise'
+          - _change_comments.diff.before.flags == 'Enterprise'
+          - _change_comments.diff.before.hal == ''
+          - _change_comments.diff.before.image_name == 'Windows 11 Enterprise'
+          - _change_comments.diff.before.image_file == '.\Operating Systems\Change Comments\install.wim'
+          - _change_comments.diff.before.image_index == 6
+          - _change_comments.diff.before.languages | length == 1
+          - _change_comments.diff.before.languages[0] == 'en-US'
+          - _change_comments.diff.before.os_type == 'Windows IBS'
+          - _change_comments.diff.before.platform == 'x64'
+          - _change_comments.diff.before.size == 18606
+          - _change_comments.diff.before.comments == ''
+          - _change_comments.diff.before.enabled
+          - not _change_comments.diff.before.hidden
+          - _change_comments.diff.before.files is defined
+          - _change_comments.diff.before.files | length == 1
+          - _change_comments.diff.before.paths is defined
+          - _change_comments.diff.before.paths | length == 1
+          - _change_comments.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Change Comments output
+      ansible.builtin.assert:
+        that:
+          - _change_comments.operating_system.name == 'Change Comments'
+          - _change_comments.operating_system.type == 'wim'
+          - _change_comments.operating_system.files_path == 'D:\MDTShare\Operating Systems\Change Comments'
+          - _change_comments.operating_system.build == '10.0.22631.2861'
+          - _change_comments.operating_system.description == 'Windows 11 Enterprise'
+          - _change_comments.operating_system.flags == 'Enterprise'
+          - _change_comments.operating_system.hal == ''
+          - _change_comments.operating_system.image_name == 'Windows 11 Enterprise'
+          - _change_comments.operating_system.image_file == '.\Operating Systems\Change Comments\install.wim'
+          - _change_comments.operating_system.image_index == 6
+          - _change_comments.operating_system.languages | length == 1
+          - _change_comments.operating_system.languages[0] == 'en-US'
+          - _change_comments.operating_system.os_type == 'Windows IBS'
+          - _change_comments.operating_system.platform == 'x64'
+          - _change_comments.operating_system.size == 18606
+          - _change_comments.operating_system.comments == 'New Comments'
+          - _change_comments.operating_system.enabled
+          - not _change_comments.operating_system.hidden
+          - _change_comments.operating_system.files is defined
+          - _change_comments.operating_system.files | length == 1
+          - _change_comments.operating_system.paths is defined
+          - _change_comments.operating_system.paths | length == 1
+          - _change_comments.operating_system.paths[0] == ''
+        fail_msg: Change Comments output is not as expected.
+        success_msg: Change Comments output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_comments_check.changed == _change_comments.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT WIM operating system with changed enabled (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Change Enabled
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Change Enabled
+        image_index: 6
+        enabled: true
+        state: present
+      register: _change_enabled_check
+
+    - name: Verify Change Enabled previous output # noqa no-handler
+      when:
+        - _change_enabled_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_enabled_check.diff.before.name == 'Change Enabled'
+          - _change_enabled_check.diff.before.type == 'wim'
+          - _change_enabled_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Change Enabled'
+          - _change_enabled_check.diff.before.build == '10.0.22631.2861'
+          - _change_enabled_check.diff.before.description == 'Windows 11 Enterprise'
+          - _change_enabled_check.diff.before.flags == 'Enterprise'
+          - _change_enabled_check.diff.before.hal == ''
+          - _change_enabled_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _change_enabled_check.diff.before.image_file == '.\Operating Systems\Change Enabled\install.wim'
+          - _change_enabled_check.diff.before.image_index == 6
+          - _change_enabled_check.diff.before.languages | length == 1
+          - _change_enabled_check.diff.before.languages[0] == 'en-US'
+          - _change_enabled_check.diff.before.os_type == 'Windows IBS'
+          - _change_enabled_check.diff.before.platform == 'x64'
+          - _change_enabled_check.diff.before.size == 18606
+          - _change_enabled_check.diff.before.comments == ''
+          - not _change_enabled_check.diff.before.enabled
+          - not _change_enabled_check.diff.before.hidden
+          - _change_enabled_check.diff.before.files is defined
+          - _change_enabled_check.diff.before.files | length == 1
+          - _change_enabled_check.diff.before.paths is defined
+          - _change_enabled_check.diff.before.paths | length == 1
+          - _change_enabled_check.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Change Enabled output
+      ansible.builtin.assert:
+        that:
+          - _change_enabled_check.operating_system.name == 'Change Enabled'
+          - _change_enabled_check.operating_system.type == 'wim'
+          - _change_enabled_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Change Enabled'
+          - _change_enabled_check.operating_system.build == '10.0.22631.2861'
+          - _change_enabled_check.operating_system.description == 'Windows 11 Enterprise'
+          - _change_enabled_check.operating_system.flags == 'Enterprise'
+          - _change_enabled_check.operating_system.hal == ''
+          - _change_enabled_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _change_enabled_check.operating_system.image_file == '.\Operating Systems\Change Enabled\install.wim'
+          - _change_enabled_check.operating_system.image_index == 6
+          - _change_enabled_check.operating_system.languages | length == 1
+          - _change_enabled_check.operating_system.languages[0] == 'en-US'
+          - _change_enabled_check.operating_system.os_type == 'Windows IBS'
+          - _change_enabled_check.operating_system.platform == 'x64'
+          - _change_enabled_check.operating_system.size == 18606
+          - _change_enabled_check.operating_system.comments == ''
+          - _change_enabled_check.operating_system.enabled
+          - not _change_enabled_check.operating_system.hidden
+          - _change_enabled_check.operating_system.files is defined
+          - _change_enabled_check.operating_system.files | length == 1
+          - _change_enabled_check.operating_system.paths is defined
+          - _change_enabled_check.operating_system.paths | length == 1
+          - _change_enabled_check.operating_system.paths[0] == ''
+        fail_msg: Change Enabled output is not as expected.
+        success_msg: Change Enabled output is as expected.
+
+    - name: Create MDT WIM operating system with changed enabled
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Change Enabled
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Change Enabled
+        image_index: 6
+        enabled: true
+        state: present
+      register: _change_enabled
+
+    - name: Verify Change Enabled previous output # noqa no-handler
+      when:
+        - _change_enabled is changed
+      ansible.builtin.assert:
+        that:
+          - _change_enabled.diff.before.name == 'Change Enabled'
+          - _change_enabled.diff.before.type == 'wim'
+          - _change_enabled.diff.before.files_path == 'D:\MDTShare\Operating Systems\Change Enabled'
+          - _change_enabled.diff.before.build == '10.0.22631.2861'
+          - _change_enabled.diff.before.description == 'Windows 11 Enterprise'
+          - _change_enabled.diff.before.flags == 'Enterprise'
+          - _change_enabled.diff.before.hal == ''
+          - _change_enabled.diff.before.image_name == 'Windows 11 Enterprise'
+          - _change_enabled.diff.before.image_file == '.\Operating Systems\Change Enabled\install.wim'
+          - _change_enabled.diff.before.image_index == 6
+          - _change_enabled.diff.before.languages | length == 1
+          - _change_enabled.diff.before.languages[0] == 'en-US'
+          - _change_enabled.diff.before.os_type == 'Windows IBS'
+          - _change_enabled.diff.before.platform == 'x64'
+          - _change_enabled.diff.before.size == 18606
+          - _change_enabled.diff.before.comments == ''
+          - not _change_enabled.diff.before.enabled
+          - not _change_enabled.diff.before.hidden
+          - _change_enabled.diff.before.files is defined
+          - _change_enabled.diff.before.files | length == 1
+          - _change_enabled.diff.before.paths is defined
+          - _change_enabled.diff.before.paths | length == 1
+          - _change_enabled.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Change Enabled output
+      ansible.builtin.assert:
+        that:
+          - _change_enabled.operating_system.name == 'Change Enabled'
+          - _change_enabled.operating_system.type == 'wim'
+          - _change_enabled.operating_system.files_path == 'D:\MDTShare\Operating Systems\Change Enabled'
+          - _change_enabled.operating_system.build == '10.0.22631.2861'
+          - _change_enabled.operating_system.description == 'Windows 11 Enterprise'
+          - _change_enabled.operating_system.flags == 'Enterprise'
+          - _change_enabled.operating_system.hal == ''
+          - _change_enabled.operating_system.image_name == 'Windows 11 Enterprise'
+          - _change_enabled.operating_system.image_file == '.\Operating Systems\Change Enabled\install.wim'
+          - _change_enabled.operating_system.image_index == 6
+          - _change_enabled.operating_system.languages | length == 1
+          - _change_enabled.operating_system.languages[0] == 'en-US'
+          - _change_enabled.operating_system.os_type == 'Windows IBS'
+          - _change_enabled.operating_system.platform == 'x64'
+          - _change_enabled.operating_system.size == 18606
+          - _change_enabled.operating_system.comments == ''
+          - _change_enabled.operating_system.enabled
+          - not _change_enabled.operating_system.hidden
+          - _change_enabled.operating_system.files is defined
+          - _change_enabled.operating_system.files | length == 1
+          - _change_enabled.operating_system.paths is defined
+          - _change_enabled.operating_system.paths | length == 1
+          - _change_enabled.operating_system.paths[0] == ''
+        fail_msg: Change Enabled output is not as expected.
+        success_msg: Change Enabled output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_enabled_check.changed == _change_enabled.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT WIM operating system with changed hidden (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Change Hidden
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Change Hidden
+        image_index: 6
+        hidden: false
+        state: present
+      register: _change_hidden_check
+
+    - name: Verify Change Hidden previous output # noqa no-handler
+      when:
+        - _change_hidden_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_hidden_check.diff.before.name == 'Change Hidden'
+          - _change_hidden_check.diff.before.type == 'wim'
+          - _change_hidden_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Change Hidden'
+          - _change_hidden_check.diff.before.build == '10.0.22631.2861'
+          - _change_hidden_check.diff.before.description == 'Windows 11 Enterprise'
+          - _change_hidden_check.diff.before.flags == 'Enterprise'
+          - _change_hidden_check.diff.before.hal == ''
+          - _change_hidden_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _change_hidden_check.diff.before.image_file == '.\Operating Systems\Change Hidden\install.wim'
+          - _change_hidden_check.diff.before.image_index == 6
+          - _change_hidden_check.diff.before.languages | length == 1
+          - _change_hidden_check.diff.before.languages[0] == 'en-US'
+          - _change_hidden_check.diff.before.os_type == 'Windows IBS'
+          - _change_hidden_check.diff.before.platform == 'x64'
+          - _change_hidden_check.diff.before.size == 18606
+          - _change_hidden_check.diff.before.comments == ''
+          - _change_hidden_check.diff.before.enabled
+          - _change_hidden_check.diff.before.hidden
+          - _change_hidden_check.diff.before.files is defined
+          - _change_hidden_check.diff.before.files | length == 1
+          - _change_hidden_check.diff.before.paths is defined
+          - _change_hidden_check.diff.before.paths | length == 1
+          - _change_hidden_check.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Change Hidden output
+      ansible.builtin.assert:
+        that:
+          - _change_hidden_check.operating_system.name == 'Change Hidden'
+          - _change_hidden_check.operating_system.type == 'wim'
+          - _change_hidden_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Change Hidden'
+          - _change_hidden_check.operating_system.build == '10.0.22631.2861'
+          - _change_hidden_check.operating_system.description == 'Windows 11 Enterprise'
+          - _change_hidden_check.operating_system.flags == 'Enterprise'
+          - _change_hidden_check.operating_system.hal == ''
+          - _change_hidden_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _change_hidden_check.operating_system.image_file == '.\Operating Systems\Change Hidden\install.wim'
+          - _change_hidden_check.operating_system.image_index == 6
+          - _change_hidden_check.operating_system.languages | length == 1
+          - _change_hidden_check.operating_system.languages[0] == 'en-US'
+          - _change_hidden_check.operating_system.os_type == 'Windows IBS'
+          - _change_hidden_check.operating_system.platform == 'x64'
+          - _change_hidden_check.operating_system.size == 18606
+          - _change_hidden_check.operating_system.comments == ''
+          - _change_hidden_check.operating_system.enabled
+          - not _change_hidden_check.operating_system.hidden
+          - _change_hidden_check.operating_system.files is defined
+          - _change_hidden_check.operating_system.files | length == 1
+          - _change_hidden_check.operating_system.paths is defined
+          - _change_hidden_check.operating_system.paths | length == 1
+          - _change_hidden_check.operating_system.paths[0] == ''
+        fail_msg: Change Hidden output is not as expected.
+        success_msg: Change Hidden output is as expected.
+
+    - name: Create MDT WIM operating system with changed hidden
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Change Hidden
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Change Hidden
+        image_index: 6
+        hidden: false
+        state: present
+      register: _change_hidden
+
+    - name: Verify Change Hidden previous output # noqa no-handler
+      when:
+        - _change_hidden is changed
+      ansible.builtin.assert:
+        that:
+          - _change_hidden.diff.before.name == 'Change Hidden'
+          - _change_hidden.diff.before.type == 'wim'
+          - _change_hidden.diff.before.files_path == 'D:\MDTShare\Operating Systems\Change Hidden'
+          - _change_hidden.diff.before.build == '10.0.22631.2861'
+          - _change_hidden.diff.before.description == 'Windows 11 Enterprise'
+          - _change_hidden.diff.before.flags == 'Enterprise'
+          - _change_hidden.diff.before.hal == ''
+          - _change_hidden.diff.before.image_name == 'Windows 11 Enterprise'
+          - _change_hidden.diff.before.image_file == '.\Operating Systems\Change Hidden\install.wim'
+          - _change_hidden.diff.before.image_index == 6
+          - _change_hidden.diff.before.languages | length == 1
+          - _change_hidden.diff.before.languages[0] == 'en-US'
+          - _change_hidden.diff.before.os_type == 'Windows IBS'
+          - _change_hidden.diff.before.platform == 'x64'
+          - _change_hidden.diff.before.size == 18606
+          - _change_hidden.diff.before.comments == ''
+          - _change_hidden.diff.before.enabled
+          - _change_hidden.diff.before.hidden
+          - _change_hidden.diff.before.files is defined
+          - _change_hidden.diff.before.files | length == 1
+          - _change_hidden.diff.before.paths is defined
+          - _change_hidden.diff.before.paths | length == 1
+          - _change_hidden.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Change Hidden output
+      ansible.builtin.assert:
+        that:
+          - _change_hidden.operating_system.name == 'Change Hidden'
+          - _change_hidden.operating_system.type == 'wim'
+          - _change_hidden.operating_system.files_path == 'D:\MDTShare\Operating Systems\Change Hidden'
+          - _change_hidden.operating_system.build == '10.0.22631.2861'
+          - _change_hidden.operating_system.description == 'Windows 11 Enterprise'
+          - _change_hidden.operating_system.flags == 'Enterprise'
+          - _change_hidden.operating_system.hal == ''
+          - _change_hidden.operating_system.image_name == 'Windows 11 Enterprise'
+          - _change_hidden.operating_system.image_file == '.\Operating Systems\Change Hidden\install.wim'
+          - _change_hidden.operating_system.image_index == 6
+          - _change_hidden.operating_system.languages | length == 1
+          - _change_hidden.operating_system.languages[0] == 'en-US'
+          - _change_hidden.operating_system.os_type == 'Windows IBS'
+          - _change_hidden.operating_system.platform == 'x64'
+          - _change_hidden.operating_system.size == 18606
+          - _change_hidden.operating_system.comments == ''
+          - _change_hidden.operating_system.enabled
+          - not _change_hidden.operating_system.hidden
+          - _change_hidden.operating_system.files is defined
+          - _change_hidden.operating_system.files | length == 1
+          - _change_hidden.operating_system.paths is defined
+          - _change_hidden.operating_system.paths | length == 1
+          - _change_hidden.operating_system.paths[0] == ''
+        fail_msg: Change Hidden output is not as expected.
+        success_msg: Change Hidden output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_hidden_check.changed == _change_hidden.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT source operating system with changed name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        guid: "{{ 'Rename Source' | to_uuid }}"
+        name: New Source Name
+        type: source
+        source_path: C:\temp\source
+        destination_folder: Rename Source
+        image_index: 6
+        state: present
+      register: _rename_source_check
+
+    - name: Verify Rename Source previous output # noqa no-handler
+      when:
+        - _rename_source_check is changed
+      ansible.builtin.assert:
+        that:
+          - _rename_source_check.diff.before.name == 'Rename Source'
+          - _rename_source_check.diff.before.type == 'source'
+          - _rename_source_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Rename Source'
+          - _rename_source_check.diff.before.build == '10.0.22631.2861'
+          - _rename_source_check.diff.before.description == 'Windows 11 Enterprise'
+          - _rename_source_check.diff.before.flags == 'Enterprise'
+          - _rename_source_check.diff.before.hal == ''
+          - _rename_source_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _rename_source_check.diff.before.image_file == '.\Operating Systems\Rename Source\sources\install.wim'
+          - _rename_source_check.diff.before.image_index == 6
+          - _rename_source_check.diff.before.languages | length == 1
+          - _rename_source_check.diff.before.languages[0] == 'en-US'
+          - _rename_source_check.diff.before.os_type == 'Windows IBS'
+          - _rename_source_check.diff.before.platform == 'x64'
+          - _rename_source_check.diff.before.size == 18606
+          - _rename_source_check.diff.before.comments == ''
+          - _rename_source_check.diff.before.enabled
+          - not _rename_source_check.diff.before.hidden
+          - _rename_source_check.diff.before.files is defined
+          - _rename_source_check.diff.before.files | length > 1
+          - _rename_source_check.diff.before.paths is defined
+          - _rename_source_check.diff.before.paths | length == 1
+          - _rename_source_check.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Rename Source output
+      ansible.builtin.assert:
+        that:
+          - _rename_source_check.operating_system.name == 'New Source Name'
+          - _rename_source_check.operating_system.type == 'source'
+          - _rename_source_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Rename Source'
+          - _rename_source_check.operating_system.build == '10.0.22631.2861'
+          - _rename_source_check.operating_system.description == 'Windows 11 Enterprise'
+          - _rename_source_check.operating_system.flags == 'Enterprise'
+          - _rename_source_check.operating_system.hal == ''
+          - _rename_source_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _rename_source_check.operating_system.image_file == '.\Operating Systems\Rename Source\sources\install.wim'
+          - _rename_source_check.operating_system.image_index == 6
+          - _rename_source_check.operating_system.languages | length == 1
+          - _rename_source_check.operating_system.languages[0] == 'en-US'
+          - _rename_source_check.operating_system.os_type == 'Windows IBS'
+          - _rename_source_check.operating_system.platform == 'x64'
+          - _rename_source_check.operating_system.size == 18606
+          - _rename_source_check.operating_system.comments == ''
+          - _rename_source_check.operating_system.enabled
+          - not _rename_source_check.operating_system.hidden
+          - _rename_source_check.operating_system.files is defined
+          - _rename_source_check.operating_system.files | length > 1
+          - _rename_source_check.operating_system.paths is defined
+          - _rename_source_check.operating_system.paths | length == 1
+          - _rename_source_check.operating_system.paths[0] == ''
+        fail_msg: Rename Source output is not as expected.
+        success_msg: Rename Source output is as expected.
+
+    - name: Create MDT source operating system with changed name
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        guid: "{{ 'Rename Source' | to_uuid }}"
+        name: New Source Name
+        type: source
+        source_path: C:\temp\source
+        destination_folder: Rename Source
+        image_index: 6
+        state: present
+      register: _rename_source
+
+    - name: Verify Rename Source previous output # noqa no-handler
+      when:
+        - _rename_source is changed
+      ansible.builtin.assert:
+        that:
+          - _rename_source.diff.before.name == 'Rename Source'
+          - _rename_source.diff.before.type == 'source'
+          - _rename_source.diff.before.files_path == 'D:\MDTShare\Operating Systems\Rename Source'
+          - _rename_source.diff.before.build == '10.0.22631.2861'
+          - _rename_source.diff.before.description == 'Windows 11 Enterprise'
+          - _rename_source.diff.before.flags == 'Enterprise'
+          - _rename_source.diff.before.hal == ''
+          - _rename_source.diff.before.image_name == 'Windows 11 Enterprise'
+          - _rename_source.diff.before.image_file == '.\Operating Systems\Rename Source\sources\install.wim'
+          - _rename_source.diff.before.image_index == 6
+          - _rename_source.diff.before.languages | length == 1
+          - _rename_source.diff.before.languages[0] == 'en-US'
+          - _rename_source.diff.before.os_type == 'Windows IBS'
+          - _rename_source.diff.before.platform == 'x64'
+          - _rename_source.diff.before.size == 18606
+          - _rename_source.diff.before.comments == ''
+          - _rename_source.diff.before.enabled
+          - not _rename_source.diff.before.hidden
+          - _rename_source.diff.before.files is defined
+          - _rename_source.diff.before.files | length > 1
+          - _rename_source.diff.before.paths is defined
+          - _rename_source.diff.before.paths | length == 1
+          - _rename_source.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Rename Source output
+      ansible.builtin.assert:
+        that:
+          - _rename_source.operating_system.name == 'New Source Name'
+          - _rename_source.operating_system.type == 'source'
+          - _rename_source.operating_system.files_path == 'D:\MDTShare\Operating Systems\Rename Source'
+          - _rename_source.operating_system.build == '10.0.22631.2861'
+          - _rename_source.operating_system.description == 'Windows 11 Enterprise'
+          - _rename_source.operating_system.flags == 'Enterprise'
+          - _rename_source.operating_system.hal == ''
+          - _rename_source.operating_system.image_name == 'Windows 11 Enterprise'
+          - _rename_source.operating_system.image_file == '.\Operating Systems\Rename Source\sources\install.wim'
+          - _rename_source.operating_system.image_index == 6
+          - _rename_source.operating_system.languages | length == 1
+          - _rename_source.operating_system.languages[0] == 'en-US'
+          - _rename_source.operating_system.os_type == 'Windows IBS'
+          - _rename_source.operating_system.platform == 'x64'
+          - _rename_source.operating_system.size == 18606
+          - _rename_source.operating_system.comments == ''
+          - _rename_source.operating_system.enabled
+          - not _rename_source.operating_system.hidden
+          - _rename_source.operating_system.files is defined
+          - _rename_source.operating_system.files | length > 1
+          - _rename_source.operating_system.paths is defined
+          - _rename_source.operating_system.paths | length == 1
+          - _rename_source.operating_system.paths[0] == ''
+        fail_msg: Rename Source output is not as expected.
+        success_msg: Rename Source output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _rename_source_check.changed == _rename_source.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT WIM operating system with changed name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        guid: "{{ 'Rename WIM' | to_uuid }}"
+        name: New WIM Name
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Rename WIM
+        image_index: 6
+        state: present
+      register: _rename_wim_check
+
+    - name: Verify Rename WIM previous output # noqa no-handler
+      when:
+        - _rename_wim_check is changed
+      ansible.builtin.assert:
+        that:
+          - _rename_wim_check.diff.before.name == 'Rename WIM'
+          - _rename_wim_check.diff.before.type == 'wim'
+          - _rename_wim_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Rename WIM'
+          - _rename_wim_check.diff.before.build == '10.0.22631.2861'
+          - _rename_wim_check.diff.before.description == 'Windows 11 Enterprise'
+          - _rename_wim_check.diff.before.flags == 'Enterprise'
+          - _rename_wim_check.diff.before.hal == ''
+          - _rename_wim_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _rename_wim_check.diff.before.image_file == '.\Operating Systems\Rename WIM\install.wim'
+          - _rename_wim_check.diff.before.image_index == 6
+          - _rename_wim_check.diff.before.languages | length == 1
+          - _rename_wim_check.diff.before.languages[0] == 'en-US'
+          - _rename_wim_check.diff.before.os_type == 'Windows IBS'
+          - _rename_wim_check.diff.before.platform == 'x64'
+          - _rename_wim_check.diff.before.size == 18606
+          - _rename_wim_check.diff.before.comments == ''
+          - _rename_wim_check.diff.before.enabled
+          - not _rename_wim_check.diff.before.hidden
+          - _rename_wim_check.diff.before.files is defined
+          - _rename_wim_check.diff.before.files | length == 1
+          - _rename_wim_check.diff.before.paths is defined
+          - _rename_wim_check.diff.before.paths | length == 1
+          - _rename_wim_check.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Rename WIM output
+      ansible.builtin.assert:
+        that:
+          - _rename_wim_check.operating_system.name == 'New WIM Name'
+          - _rename_wim_check.operating_system.type == 'wim'
+          - _rename_wim_check.operating_system.files_path == 'D:\MDTShare\Operating Systems\Rename WIM'
+          - _rename_wim_check.operating_system.build == '10.0.22631.2861'
+          - _rename_wim_check.operating_system.description == 'Windows 11 Enterprise'
+          - _rename_wim_check.operating_system.flags == 'Enterprise'
+          - _rename_wim_check.operating_system.hal == ''
+          - _rename_wim_check.operating_system.image_name == 'Windows 11 Enterprise'
+          - _rename_wim_check.operating_system.image_file == '.\Operating Systems\Rename WIM\install.wim'
+          - _rename_wim_check.operating_system.image_index == 6
+          - _rename_wim_check.operating_system.languages | length == 1
+          - _rename_wim_check.operating_system.languages[0] == 'en-US'
+          - _rename_wim_check.operating_system.os_type == 'Windows IBS'
+          - _rename_wim_check.operating_system.platform == 'x64'
+          - _rename_wim_check.operating_system.size == 18606
+          - _rename_wim_check.operating_system.comments == ''
+          - _rename_wim_check.operating_system.enabled
+          - not _rename_wim_check.operating_system.hidden
+          - _rename_wim_check.operating_system.files is defined
+          - _rename_wim_check.operating_system.files | length == 1
+          - _rename_wim_check.operating_system.paths is defined
+          - _rename_wim_check.operating_system.paths | length == 1
+          - _rename_wim_check.operating_system.paths[0] == ''
+        fail_msg: Rename WIM output is not as expected.
+        success_msg: Rename WIM output is as expected.
+
+    - name: Create MDT WIM operating system with changed name
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        guid: "{{ 'Rename WIM' | to_uuid }}"
+        name: New WIM Name
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Rename WIM
+        image_index: 6
+        state: present
+      register: _rename_wim
+
+    - name: Verify Rename WIM previous output # noqa no-handler
+      when:
+        - _rename_wim is changed
+      ansible.builtin.assert:
+        that:
+          - _rename_wim.diff.before.name == 'Rename WIM'
+          - _rename_wim.diff.before.type == 'wim'
+          - _rename_wim.diff.before.files_path == 'D:\MDTShare\Operating Systems\Rename WIM'
+          - _rename_wim.diff.before.build == '10.0.22631.2861'
+          - _rename_wim.diff.before.description == 'Windows 11 Enterprise'
+          - _rename_wim.diff.before.flags == 'Enterprise'
+          - _rename_wim.diff.before.hal == ''
+          - _rename_wim.diff.before.image_name == 'Windows 11 Enterprise'
+          - _rename_wim.diff.before.image_file == '.\Operating Systems\Rename WIM\install.wim'
+          - _rename_wim.diff.before.image_index == 6
+          - _rename_wim.diff.before.languages | length == 1
+          - _rename_wim.diff.before.languages[0] == 'en-US'
+          - _rename_wim.diff.before.os_type == 'Windows IBS'
+          - _rename_wim.diff.before.platform == 'x64'
+          - _rename_wim.diff.before.size == 18606
+          - _rename_wim.diff.before.comments == ''
+          - _rename_wim.diff.before.enabled
+          - not _rename_wim.diff.before.hidden
+          - _rename_wim.diff.before.files is defined
+          - _rename_wim.diff.before.files | length == 1
+          - _rename_wim.diff.before.paths is defined
+          - _rename_wim.diff.before.paths | length == 1
+          - _rename_wim.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Rename WIM output
+      ansible.builtin.assert:
+        that:
+          - _rename_wim.operating_system.name == 'New WIM Name'
+          - _rename_wim.operating_system.type == 'wim'
+          - _rename_wim.operating_system.files_path == 'D:\MDTShare\Operating Systems\Rename WIM'
+          - _rename_wim.operating_system.build == '10.0.22631.2861'
+          - _rename_wim.operating_system.description == 'Windows 11 Enterprise'
+          - _rename_wim.operating_system.flags == 'Enterprise'
+          - _rename_wim.operating_system.hal == ''
+          - _rename_wim.operating_system.image_name == 'Windows 11 Enterprise'
+          - _rename_wim.operating_system.image_file == '.\Operating Systems\Rename WIM\install.wim'
+          - _rename_wim.operating_system.image_index == 6
+          - _rename_wim.operating_system.languages | length == 1
+          - _rename_wim.operating_system.languages[0] == 'en-US'
+          - _rename_wim.operating_system.os_type == 'Windows IBS'
+          - _rename_wim.operating_system.platform == 'x64'
+          - _rename_wim.operating_system.size == 18606
+          - _rename_wim.operating_system.comments == ''
+          - _rename_wim.operating_system.enabled
+          - not _rename_wim.operating_system.hidden
+          - _rename_wim.operating_system.files is defined
+          - _rename_wim.operating_system.files | length == 1
+          - _rename_wim.operating_system.paths is defined
+          - _rename_wim.operating_system.paths | length == 1
+          - _rename_wim.operating_system.paths[0] == ''
+        fail_msg: Rename WIM output is not as expected.
+        success_msg: Rename WIM output is as expected.
+
+    - name: Verify that check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _rename_wim_check.changed == _rename_wim.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Remove MDT source operating system by name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Remove Source By Name
+        state: absent
+      register: _remove_source_by_name_check
+
+    - name: Verify Remove Source By Name previous output # noqa no-handler
+      when:
+        - _remove_source_by_name_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_source_by_name_check.diff.before.name == 'Remove Source By Name'
+          - _remove_source_by_name_check.diff.before.type == 'source'
+          - _remove_source_by_name_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Remove Source By Name'
+          - _remove_source_by_name_check.diff.before.build == '10.0.22631.2861'
+          - _remove_source_by_name_check.diff.before.description == 'Windows 11 Enterprise'
+          - _remove_source_by_name_check.diff.before.flags == 'Enterprise'
+          - _remove_source_by_name_check.diff.before.hal == ''
+          - _remove_source_by_name_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _remove_source_by_name_check.diff.before.image_file == '.\Operating Systems\Remove Source By Name\sources\install.wim'
+          - _remove_source_by_name_check.diff.before.image_index == 6
+          - _remove_source_by_name_check.diff.before.languages | length == 1
+          - _remove_source_by_name_check.diff.before.languages[0] == 'en-US'
+          - _remove_source_by_name_check.diff.before.os_type == 'Windows IBS'
+          - _remove_source_by_name_check.diff.before.platform == 'x64'
+          - _remove_source_by_name_check.diff.before.size == 18606
+          - _remove_source_by_name_check.diff.before.comments == ''
+          - _remove_source_by_name_check.diff.before.enabled
+          - not _remove_source_by_name_check.diff.before.hidden
+          - _remove_source_by_name_check.diff.before.files is defined
+          - _remove_source_by_name_check.diff.before.files | length > 1
+          - _remove_source_by_name_check.diff.before.paths is defined
+          - _remove_source_by_name_check.diff.before.paths | length == 1
+          - _remove_source_by_name_check.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Remove Source By Name output
+      ansible.builtin.assert:
+        that:
+          - _remove_source_by_name_check.operating_system is not defined
+        fail_msg: Remove Source By Name output is not as expected.
+        success_msg: Remove Source By Name output is as expected.
+
+    - name: Remove MDT source operating system by name
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Remove Source By Name
+        state: absent
+      register: _remove_source_by_name
+
+    - name: Verify Remove Source By Name previous output # noqa no-handler
+      when:
+        - _remove_source_by_name is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_source_by_name.diff.before.name == 'Remove Source By Name'
+          - _remove_source_by_name.diff.before.type == 'source'
+          - _remove_source_by_name.diff.before.files_path == 'D:\MDTShare\Operating Systems\Remove Source By Name'
+          - _remove_source_by_name.diff.before.build == '10.0.22631.2861'
+          - _remove_source_by_name.diff.before.description == 'Windows 11 Enterprise'
+          - _remove_source_by_name.diff.before.flags == 'Enterprise'
+          - _remove_source_by_name.diff.before.hal == ''
+          - _remove_source_by_name.diff.before.image_name == 'Windows 11 Enterprise'
+          - _remove_source_by_name.diff.before.image_file == '.\Operating Systems\Remove Source By Name\sources\install.wim'
+          - _remove_source_by_name.diff.before.image_index == 6
+          - _remove_source_by_name.diff.before.languages | length == 1
+          - _remove_source_by_name.diff.before.languages[0] == 'en-US'
+          - _remove_source_by_name.diff.before.os_type == 'Windows IBS'
+          - _remove_source_by_name.diff.before.platform == 'x64'
+          - _remove_source_by_name.diff.before.size == 18606
+          - _remove_source_by_name.diff.before.comments == ''
+          - _remove_source_by_name.diff.before.enabled
+          - not _remove_source_by_name.diff.before.hidden
+          - _remove_source_by_name.diff.before.files is defined
+          - _remove_source_by_name.diff.before.files | length > 1
+          - _remove_source_by_name.diff.before.paths is defined
+          - _remove_source_by_name.diff.before.paths | length == 1
+          - _remove_source_by_name.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Remove Source By Name output
+      ansible.builtin.assert:
+        that:
+          - _remove_source_by_name.operating_system is not defined
+        fail_msg: Remove Source By Name output is not as expected.
+        success_msg: Remove Source By Name output is as expected.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _remove_source_by_name_check.changed == _remove_source_by_name.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Remove MDT WIM operating system by name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Remove WIM By Name
+        state: absent
+      register: _remove_wim_by_name_check
+
+    - name: Verify Remove WIM By Name previous output # noqa no-handler
+      when:
+        - _remove_wim_by_name_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_wim_by_name_check.diff.before.name == 'Remove WIM By Name'
+          - _remove_wim_by_name_check.diff.before.type == 'wim'
+          - _remove_wim_by_name_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Remove WIM By Name'
+          - _remove_wim_by_name_check.diff.before.build == '10.0.22631.2861'
+          - _remove_wim_by_name_check.diff.before.description == 'Windows 11 Enterprise'
+          - _remove_wim_by_name_check.diff.before.flags == 'Enterprise'
+          - _remove_wim_by_name_check.diff.before.hal == ''
+          - _remove_wim_by_name_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _remove_wim_by_name_check.diff.before.image_file == '.\Operating Systems\Remove WIM By Name\install.wim'
+          - _remove_wim_by_name_check.diff.before.image_index == 6
+          - _remove_wim_by_name_check.diff.before.languages | length == 1
+          - _remove_wim_by_name_check.diff.before.languages[0] == 'en-US'
+          - _remove_wim_by_name_check.diff.before.os_type == 'Windows IBS'
+          - _remove_wim_by_name_check.diff.before.platform == 'x64'
+          - _remove_wim_by_name_check.diff.before.size == 18606
+          - _remove_wim_by_name_check.diff.before.comments == ''
+          - _remove_wim_by_name_check.diff.before.enabled
+          - not _remove_wim_by_name_check.diff.before.hidden
+          - _remove_wim_by_name_check.diff.before.files is defined
+          - _remove_wim_by_name_check.diff.before.files | length == 1
+          - _remove_wim_by_name_check.diff.before.paths is defined
+          - _remove_wim_by_name_check.diff.before.paths | length == 1
+          - _remove_wim_by_name_check.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Remove WIM By Name output
+      ansible.builtin.assert:
+        that:
+          - _remove_wim_by_name_check.operating_system is not defined
+        fail_msg: Remove WIM By Name output is not as expected.
+        success_msg: Remove WIM By Name output is as expected.
+
+    - name: Remove MDT WIM operating system by name
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Remove WIM By Name
+        state: absent
+      register: _remove_wim_by_name
+
+    - name: Verify Remove WIM By Name previous output # noqa no-handler
+      when:
+        - _remove_wim_by_name is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_wim_by_name.diff.before.name == 'Remove WIM By Name'
+          - _remove_wim_by_name.diff.before.type == 'wim'
+          - _remove_wim_by_name.diff.before.files_path == 'D:\MDTShare\Operating Systems\Remove WIM By Name'
+          - _remove_wim_by_name.diff.before.build == '10.0.22631.2861'
+          - _remove_wim_by_name.diff.before.description == 'Windows 11 Enterprise'
+          - _remove_wim_by_name.diff.before.flags == 'Enterprise'
+          - _remove_wim_by_name.diff.before.hal == ''
+          - _remove_wim_by_name.diff.before.image_name == 'Windows 11 Enterprise'
+          - _remove_wim_by_name.diff.before.image_file == '.\Operating Systems\Remove WIM By Name\install.wim'
+          - _remove_wim_by_name.diff.before.image_index == 6
+          - _remove_wim_by_name.diff.before.languages | length == 1
+          - _remove_wim_by_name.diff.before.languages[0] == 'en-US'
+          - _remove_wim_by_name.diff.before.os_type == 'Windows IBS'
+          - _remove_wim_by_name.diff.before.platform == 'x64'
+          - _remove_wim_by_name.diff.before.size == 18606
+          - _remove_wim_by_name.diff.before.comments == ''
+          - _remove_wim_by_name.diff.before.enabled
+          - not _remove_wim_by_name.diff.before.hidden
+          - _remove_wim_by_name.diff.before.files is defined
+          - _remove_wim_by_name.diff.before.files | length == 1
+          - _remove_wim_by_name.diff.before.paths is defined
+          - _remove_wim_by_name.diff.before.paths | length == 1
+          - _remove_wim_by_name.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Remove WIM By Name output
+      ansible.builtin.assert:
+        that:
+          - _remove_wim_by_name.operating_system is not defined
+        fail_msg: Remove WIM By Name output is not as expected.
+        success_msg: Remove WIM By Name output is as expected.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _remove_wim_by_name_check.changed == _remove_wim_by_name.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Remove MDT source operating system by guid (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        guid: "{{ 'Remove Source By GUID' | to_uuid }}"
+        state: absent
+      register: _remove_source_by_guid_check
+
+    - name: Verify Remove Source By GUID previous output # noqa no-handler
+      when:
+        - _remove_source_by_guid_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_source_by_guid_check.diff.before.name == 'Remove Source By GUID'
+          - _remove_source_by_guid_check.diff.before.type == 'source'
+          - _remove_source_by_guid_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Remove Source By GUID'
+          - _remove_source_by_guid_check.diff.before.build == '10.0.22631.2861'
+          - _remove_source_by_guid_check.diff.before.description == 'Windows 11 Enterprise'
+          - _remove_source_by_guid_check.diff.before.flags == 'Enterprise'
+          - _remove_source_by_guid_check.diff.before.hal == ''
+          - _remove_source_by_guid_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _remove_source_by_guid_check.diff.before.image_file == '.\Operating Systems\Remove Source By GUID\sources\install.wim'
+          - _remove_source_by_guid_check.diff.before.image_index == 6
+          - _remove_source_by_guid_check.diff.before.languages | length == 1
+          - _remove_source_by_guid_check.diff.before.languages[0] == 'en-US'
+          - _remove_source_by_guid_check.diff.before.os_type == 'Windows IBS'
+          - _remove_source_by_guid_check.diff.before.platform == 'x64'
+          - _remove_source_by_guid_check.diff.before.size == 18606
+          - _remove_source_by_guid_check.diff.before.comments == ''
+          - _remove_source_by_guid_check.diff.before.enabled
+          - not _remove_source_by_guid_check.diff.before.hidden
+          - _remove_source_by_guid_check.diff.before.files is defined
+          - _remove_source_by_guid_check.diff.before.files | length > 1
+          - _remove_source_by_guid_check.diff.before.paths is defined
+          - _remove_source_by_guid_check.diff.before.paths | length == 1
+          - _remove_source_by_guid_check.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Remove Source By GUID output
+      ansible.builtin.assert:
+        that:
+          - _remove_source_by_guid_check.operating_system is not defined
+        fail_msg: Remove Source By GUID output is not as expected.
+        success_msg: Remove Source By GUID output is as expected.
+
+    - name: Remove MDT source operating system by guid
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        guid: "{{ 'Remove Source By GUID' | to_uuid }}"
+        state: absent
+      register: _remove_source_by_guid
+
+    - name: Verify Remove Source By GUID previous output # noqa no-handler
+      when:
+        - _remove_source_by_guid is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_source_by_guid.diff.before.name == 'Remove Source By GUID'
+          - _remove_source_by_guid.diff.before.type == 'source'
+          - _remove_source_by_guid.diff.before.files_path == 'D:\MDTShare\Operating Systems\Remove Source By GUID'
+          - _remove_source_by_guid.diff.before.build == '10.0.22631.2861'
+          - _remove_source_by_guid.diff.before.description == 'Windows 11 Enterprise'
+          - _remove_source_by_guid.diff.before.flags == 'Enterprise'
+          - _remove_source_by_guid.diff.before.hal == ''
+          - _remove_source_by_guid.diff.before.image_name == 'Windows 11 Enterprise'
+          - _remove_source_by_guid.diff.before.image_file == '.\Operating Systems\Remove Source By GUID\sources\install.wim'
+          - _remove_source_by_guid.diff.before.image_index == 6
+          - _remove_source_by_guid.diff.before.languages | length == 1
+          - _remove_source_by_guid.diff.before.languages[0] == 'en-US'
+          - _remove_source_by_guid.diff.before.os_type == 'Windows IBS'
+          - _remove_source_by_guid.diff.before.platform == 'x64'
+          - _remove_source_by_guid.diff.before.size == 18606
+          - _remove_source_by_guid.diff.before.comments == ''
+          - _remove_source_by_guid.diff.before.enabled
+          - not _remove_source_by_guid.diff.before.hidden
+          - _remove_source_by_guid.diff.before.files is defined
+          - _remove_source_by_guid.diff.before.files | length > 1
+          - _remove_source_by_guid.diff.before.paths is defined
+          - _remove_source_by_guid.diff.before.paths | length == 1
+          - _remove_source_by_guid.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Remove Source By GUID output
+      ansible.builtin.assert:
+        that:
+          - _remove_source_by_guid.operating_system is not defined
+        fail_msg: Remove Source By GUID output is not as expected.
+        success_msg: Remove Source By GUID output is as expected.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _remove_source_by_guid_check.changed == _remove_source_by_guid.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Remove MDT WIM operating system by guid (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        guid: "{{ 'Remove WIM By GUID' | to_uuid }}"
+        state: absent
+      register: _remove_wim_by_guid_check
+
+    - name: Verify Remove WIM By GUID previous output # noqa no-handler
+      when:
+        - _remove_wim_by_guid_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_wim_by_guid_check.diff.before.name == 'Remove WIM By GUID'
+          - _remove_wim_by_guid_check.diff.before.type == 'wim'
+          - _remove_wim_by_guid_check.diff.before.files_path == 'D:\MDTShare\Operating Systems\Remove WIM By GUID'
+          - _remove_wim_by_guid_check.diff.before.build == '10.0.22631.2861'
+          - _remove_wim_by_guid_check.diff.before.description == 'Windows 11 Enterprise'
+          - _remove_wim_by_guid_check.diff.before.flags == 'Enterprise'
+          - _remove_wim_by_guid_check.diff.before.hal == ''
+          - _remove_wim_by_guid_check.diff.before.image_name == 'Windows 11 Enterprise'
+          - _remove_wim_by_guid_check.diff.before.image_file == '.\Operating Systems\Remove WIM By GUID\install.wim'
+          - _remove_wim_by_guid_check.diff.before.image_index == 6
+          - _remove_wim_by_guid_check.diff.before.languages | length == 1
+          - _remove_wim_by_guid_check.diff.before.languages[0] == 'en-US'
+          - _remove_wim_by_guid_check.diff.before.os_type == 'Windows IBS'
+          - _remove_wim_by_guid_check.diff.before.platform == 'x64'
+          - _remove_wim_by_guid_check.diff.before.size == 18606
+          - _remove_wim_by_guid_check.diff.before.comments == ''
+          - _remove_wim_by_guid_check.diff.before.enabled
+          - not _remove_wim_by_guid_check.diff.before.hidden
+          - _remove_wim_by_guid_check.diff.before.files is defined
+          - _remove_wim_by_guid_check.diff.before.files | length == 1
+          - _remove_wim_by_guid_check.diff.before.paths is defined
+          - _remove_wim_by_guid_check.diff.before.paths | length == 1
+          - _remove_wim_by_guid_check.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Remove WIM By GUID output
+      ansible.builtin.assert:
+        that:
+          - _remove_wim_by_guid_check.operating_system is not defined
+        fail_msg: Remove WIM By GUID output is not as expected.
+        success_msg: Remove WIM By GUID output is as expected.
+
+    - name: Remove MDT WIM operating system by guid
+      diff: true
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        guid: "{{ 'Remove WIM By GUID' | to_uuid }}"
+        state: absent
+      register: _remove_wim_by_guid
+
+    - name: Verify Remove WIM By GUID previous output # noqa no-handler
+      when:
+        - _remove_wim_by_guid is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_wim_by_guid.diff.before.name == 'Remove WIM By GUID'
+          - _remove_wim_by_guid.diff.before.type == 'wim'
+          - _remove_wim_by_guid.diff.before.files_path == 'D:\MDTShare\Operating Systems\Remove WIM By GUID'
+          - _remove_wim_by_guid.diff.before.build == '10.0.22631.2861'
+          - _remove_wim_by_guid.diff.before.description == 'Windows 11 Enterprise'
+          - _remove_wim_by_guid.diff.before.flags == 'Enterprise'
+          - _remove_wim_by_guid.diff.before.hal == ''
+          - _remove_wim_by_guid.diff.before.image_name == 'Windows 11 Enterprise'
+          - _remove_wim_by_guid.diff.before.image_file == '.\Operating Systems\Remove WIM By GUID\install.wim'
+          - _remove_wim_by_guid.diff.before.image_index == 6
+          - _remove_wim_by_guid.diff.before.languages | length == 1
+          - _remove_wim_by_guid.diff.before.languages[0] == 'en-US'
+          - _remove_wim_by_guid.diff.before.os_type == 'Windows IBS'
+          - _remove_wim_by_guid.diff.before.platform == 'x64'
+          - _remove_wim_by_guid.diff.before.size == 18606
+          - _remove_wim_by_guid.diff.before.comments == ''
+          - _remove_wim_by_guid.diff.before.enabled
+          - not _remove_wim_by_guid.diff.before.hidden
+          - _remove_wim_by_guid.diff.before.files is defined
+          - _remove_wim_by_guid.diff.before.files | length == 1
+          - _remove_wim_by_guid.diff.before.paths is defined
+          - _remove_wim_by_guid.diff.before.paths | length == 1
+          - _remove_wim_by_guid.diff.before.paths[0] == ''
+        fail_msg: Previous output is not expected.
+        success_msg: Previous output is expected.
+
+    - name: Verify Remove WIM By GUID output
+      ansible.builtin.assert:
+        that:
+          - _remove_wim_by_guid.operating_system is not defined
+        fail_msg: Remove WIM By GUID output is not as expected.
+        success_msg: Remove WIM By GUID output is as expected.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _remove_wim_by_guid_check.changed == _remove_wim_by_guid.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.

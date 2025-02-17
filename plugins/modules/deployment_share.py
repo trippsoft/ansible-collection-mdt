@@ -8,52 +8,31 @@ DOCUMENTATION = r"""
 module: deployment_share
 version_added: 1.0.0
 author:
-  - Jim Tarpley
+  - Jim Tarpley (@trippsc2)
 short_description: Ensures an MDT deployment share is configured as expected
 description:
   - Ensures an MDT deployment share is configured as expected.
   - This module will not delete the deployment share contents when O(state=absent).
-attributes:
-  check_mode:
-    support: full
-    details:
-      - Fully supports check mode
+extends_documentation_fragment:
+  - trippsc2.mdt.action_group
+  - trippsc2.mdt.check_mode
+  - trippsc2.mdt.common
 options:
-  installation_path:
-    type: path
-    required: false
-    default: C:\\Program Files\\Microsoft Deployment Toolkit
-    description:
-      - The path to the MDT installation directory.
-  name:
-    type: str
-    required: false
-    description:
-      - The name of the deployment share.
-      - Mutually exclusive with O(path).
-      - Only used when O(state=absent).
-  path:
-    type: str
-    required: false
-    description:
-      - The path to the deployment share.
-      - Mutually exclusive with O(name).
-      - When O(state=present), this is required.
-      - If the path does not exist, it will be created.      
   description:
     type: str
     required: false
     description:
-      - The description of the deployment share.
-      - When O(state=absent), this is ignored.
+      - The descriptive name of the deployment share.
       - When O(state=present), this is required.
-  share_name:
+      - When O(state=absent), this is ignored.
+  unc_path:
     type: str
     required: false
     description:
-      - The share name of the deployment share.
-      - When O(state=absent), this is ignored.
+      - The UNC share path of the deployment share.
+      - This does B(not) share the deployment share folder.
       - When O(state=present), this is required.
+      - When O(state=absent), this is ignored.
   state:
     type: str
     required: false
@@ -69,64 +48,37 @@ EXAMPLES = r"""
 - name: Create deployment share
   trippsc2.mdt.deployment_share:
     installation_path: C:\\Program Files\\Microsoft Deployment Toolkit
-    path: C:\\DeploymentShare
+    mdt_share_path: C:\\DeploymentShare
     description: My Deployment Share
-    share_name: DeploymentShare
+    unc_path: "\\\\{{ inventory_hostname | upper }}\\DeploymentShare"
     state: present
 
-- name: Remove deployment share by name
+- name: Remove deployment share
   trippsc2.mdt.deployment_share:
     installation_path: C:\\Program Files\\Microsoft Deployment Toolkit
-    name: DS001
-    state: absent
-
-- name: Remove deployment share by path
-  trippsc2.mdt.deployment_share:
-    installation_path: C:\\Program Files\\Microsoft Deployment Toolkit
-    path: C:\\DeploymentShare
+    mdt_share_path: C:\\DeploymentShare
     state: absent
 """
 
 RETURN = r"""
 name:
   type: str
-  returned:
-    - success
-    - O(state=present)
+  returned: O(state=present)
   description:
     - The name of the deployment share.
 path:
   type: str
-  returned:
-    - success
-    - O(state=present)
+  returned: O(state=present)
   description:
     - The path to the deployment share.
-directory_created:
-  type: bool
-  returned:
-    - success
-    - O(state=present)
+description:
+  type: str
+  returned: O(state=present)
   description:
-    - Indicates if the deployment share directory was created and not just added as a persistent drive.
-previous:
-  type: dict
-  returned:
-    - O(state=absent)
-    - RV(changed=true)
+    - The descriptive name of the deployment share.
+unc_path:
+  type: str
+  returned: O(state=present)
   description:
-    - The previous state of the deployment share.
-  options:
-    name:
-      type: str
-      description:
-        - The name of the deployment share.
-    path:
-      type: str
-      description:
-        - The path to the deployment share.
-    description:
-      type: str
-      description:
-        - The description of the deployment share.
+    - The UNC share path of the deployment share.
 """

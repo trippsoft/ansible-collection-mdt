@@ -1,0 +1,517 @@
+---
+- name: Verify
+  hosts:
+    - subjects
+  tasks:
+    - name: Set testing GUID
+      ansible.builtin.set_fact:
+        _test_guid: "{{ '{' + 'test' | to_uuid | lower + '}' }}"
+
+    - name: Attempt to not supply MDT share path
+      trippsc2.mdt.operating_system:
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        image_index: 6
+        destination_folder: Test
+        state: present
+      register: _no_mdt_share_path
+      ignore_errors: true
+
+    - name: Verify that MDT share path is required
+      ansible.builtin.assert:
+        that:
+          - _no_mdt_share_path is failed
+          - '_no_mdt_share_path.msg == "missing required arguments: mdt_share_path"'
+        fail_msg: MDT share path is required.
+        success_msg: MDT share path is required.
+
+    - name: Attempt to supply non-existent MDT share path
+      trippsc2.mdt.operating_system:
+        mdt_share_path: C:\Test
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        image_index: 6
+        destination_folder: Test
+        state: present
+      register: _nonexistent_mdt_share_path
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_mdt_share_path is failed
+          - '_nonexistent_mdt_share_path.msg == "MDT share path ''C:\Test'' does not exist."'
+        fail_msg: The task should fail when the MDT share path does not exist.
+        success_msg: The task failed as expected when the MDT share path does not exist.
+
+    - name: Attempt to not supply name or GUID
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        image_index: 6
+        destination_folder: Test
+        state: present
+      register: _no_name_or_guid
+      ignore_errors: true
+
+    - name: Verify that name or GUID is required
+      ansible.builtin.assert:
+        that:
+          - _no_name_or_guid is failed
+          - '_no_name_or_guid.msg == "one of the following is required: name, guid"'
+        fail_msg: Name or GUID is required.
+        success_msg: Name or GUID is required.
+
+    - name: Attempt to not supply type when state is present
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        source_path: C:\temp\source\sources\install.wim
+        image_index: 6
+        destination_folder: Test
+        state: present
+      register: _no_type
+      ignore_errors: true
+
+    - name: Verify that type is required when state is present
+      ansible.builtin.assert:
+        that:
+          - _no_type is failed
+          - '_no_type.msg == "state is present but all of the following are missing: type"'
+        fail_msg: Type is required.
+        success_msg: Type is required.
+
+    - name: Attempt to not supply destination folder when state is present
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        image_index: 6
+        state: present
+      register: _no_destination_folder
+      ignore_errors: true
+
+    - name: Verify that destination folder is required when state is present
+      ansible.builtin.assert:
+        that:
+          - _no_destination_folder is failed
+          - '_no_destination_folder.msg == "state is present but all of the following are missing: destination_folder"'
+        fail_msg: Destination folder is required.
+        success_msg: Destination folder is required.
+
+    - name: Attempt to not supply source path when state is present
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        destination_folder: Test
+        image_index: 6
+        state: present
+      register: _no_source_path
+      ignore_errors: true
+
+    - name: Verify that source path is required when state is present
+      ansible.builtin.assert:
+        that:
+          - _no_source_path is failed
+          - '_no_source_path.msg == "state is present but all of the following are missing: source_path"'
+        fail_msg: Source path is required.
+        success_msg: Source path is required.
+
+    - name: Attempt to supply image index and name when state is present
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Test
+        image_index: 6
+        image_name: Windows 11 Enterprise
+        state: present
+      register: _image_index_and_name
+      ignore_errors: true
+
+    - name: Verify that image index and name are mutually exclusive when state is present
+      ansible.builtin.assert:
+        that:
+          - _image_index_and_name is failed
+          - '_image_index_and_name.msg == "parameters are mutually exclusive: image_index, image_name, image_edition_id"'
+        fail_msg: Image index and name are mutually exclusive.
+        success_msg: Image index and name are mutually exclusive.
+
+    - name: Attempt to supply image index and edition ID when state is present
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Test
+        image_index: 6
+        image_edition_id: Enterprise
+        state: present
+      register: _image_index_and_edition_id
+      ignore_errors: true
+
+    - name: Verify that image index and edition ID are mutually exclusive when state is present
+      ansible.builtin.assert:
+        that:
+          - _image_index_and_edition_id is failed
+          - '_image_index_and_edition_id.msg == "parameters are mutually exclusive: image_index, image_name, image_edition_id"'
+        fail_msg: Image index and edition ID are mutually exclusive.
+        success_msg: Image index and edition ID are mutually exclusive.
+
+    - name: Attempt to supply image name and edition ID when state is present
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Test
+        image_name: Windows 11 Enterprise
+        image_edition_id: Enterprise
+        state: present
+      register: _image_name_and_edition_id
+      ignore_errors: true
+
+    - name: Verify that image name and edition ID are mutually exclusive when state is present
+      ansible.builtin.assert:
+        that:
+          - _image_name_and_edition_id is failed
+          - '_image_name_and_edition_id.msg == "parameters are mutually exclusive: image_index, image_name, image_edition_id"'
+        fail_msg: Image name and edition ID are mutually exclusive.
+        success_msg: Image name and edition ID are mutually exclusive.
+
+    - name: Attempt to supply name and GUID when state is absent
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        guid: "{{ _test_guid }}"
+        state: absent
+      register: _name_and_guid
+      ignore_errors: true
+
+    - name: Verify that name and GUID cannot be supplied when state is absent
+      ansible.builtin.assert:
+        that:
+          - _name_and_guid is failed
+          - '_name_and_guid.msg == "The ''guid'' and ''name'' parameters are mutually exclusive when state is ''absent''."'
+        fail_msg: Name and GUID cannot be supplied when state is absent.
+        success_msg: Name and GUID cannot be supplied when state is absent.
+
+    - name: Attempt to supply paths when state is absent
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        paths:
+          add:
+            - Test
+        state: absent
+      register: _paths
+      ignore_errors: true
+
+    - name: Verify that paths cannot be supplied when state is absent
+      ansible.builtin.assert:
+        that:
+          - _paths is failed
+          - '_paths.msg == "The following parameters are invalid when state is absent: paths"'
+        fail_msg: Paths cannot be supplied when state is absent.
+        success_msg: Paths cannot be supplied when state is absent.
+
+    - name: Attempt to supply type when state is absent
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        type: wim
+        name: Test
+        state: absent
+      register: _type
+      ignore_errors: true
+
+    - name: Verify that type cannot be supplied when state is absent
+      ansible.builtin.assert:
+        that:
+          - _type is failed
+          - '_type.msg == "The following parameters are invalid when state is absent: type"'
+        fail_msg: Type cannot be supplied when state is absent.
+        success_msg: Type cannot be supplied when state is absent.
+
+    - name: Attempt to supply source path when state is absent
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        source_path: C:\temp\source\sources\install.wim
+        state: absent
+      register: _source_path
+      ignore_errors: true
+
+    - name: Verify that publisher cannot be supplied when state is absent
+      ansible.builtin.assert:
+        that:
+          - _source_path is failed
+          - '_source_path.msg == "The following parameters are invalid when state is absent: source_path"'
+        fail_msg: Source path cannot be supplied when state is absent.
+        success_msg: Source path cannot be supplied when state is absent.
+
+    - name: Attempt to supply image index when state is absent
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        image_index: 1
+        state: absent
+      register: _image_index
+      ignore_errors: true
+
+    - name: Verify that image index cannot be supplied when state is absent
+      ansible.builtin.assert:
+        that:
+          - _image_index is failed
+          - '_image_index.msg == "The following parameters are invalid when state is absent: image_index"'
+        fail_msg: Image index cannot be supplied when state is absent.
+        success_msg: Image index cannot be supplied when state is absent.
+
+    - name: Attempt to supply image name when state is absent
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        image_name: Windows 11 Enterprise
+        state: absent
+      register: _image_name
+      ignore_errors: true
+
+    - name: Verify that image name cannot be supplied when state is absent
+      ansible.builtin.assert:
+        that:
+          - _image_name is failed
+          - '_image_name.msg == "The following parameters are invalid when state is absent: image_name"'
+        fail_msg: Image name cannot be supplied when state is absent.
+        success_msg: Image name cannot be supplied when state is absent.
+
+    - name: Attempt to supply image edition ID when state is absent
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        image_edition_id: Enterprise
+        state: absent
+      register: _image_edition_id
+      ignore_errors: true
+
+    - name: Verify that image edition ID cannot be supplied when state is absent
+      ansible.builtin.assert:
+        that:
+          - _image_edition_id is failed
+          - '_image_edition_id.msg == "The following parameters are invalid when state is absent: image_edition_id"'
+        fail_msg: Image edition ID cannot be supplied when state is absent.
+        success_msg: Image edition ID cannot be supplied when state is absent.
+
+    - name: Attempt to add and set paths
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Test
+        image_index: 6
+        paths:
+          add:
+            - Test
+          set:
+            - Test2
+        state: present
+      register: _add_and_set_paths
+      ignore_errors: true
+
+    - name: Verify that add and set paths cannot be supplied together
+      ansible.builtin.assert:
+        that:
+          - _add_and_set_paths is failed
+          - '_add_and_set_paths.msg == "parameters are mutually exclusive: add, set found in paths"'
+        fail_msg: Add and set paths cannot be supplied together.
+        success_msg: Add and set paths cannot be supplied together.
+
+    - name: Attempt to remove and set paths
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Test
+        image_index: 6
+        paths:
+          remove:
+            - Test
+          set:
+            - Test2
+        state: present
+      register: _remove_and_set_paths
+      ignore_errors: true
+
+    - name: Verify that remove and set paths cannot be supplied together
+      ansible.builtin.assert:
+        that:
+          - _remove_and_set_paths is failed
+          - '_remove_and_set_paths.msg == "parameters are mutually exclusive: remove, set found in paths"'
+        fail_msg: Remove and set paths cannot be supplied together.
+        success_msg: Remove and set paths cannot be supplied together.
+
+    - name: Attempt to supply empty add paths
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Test
+        image_index: 6
+        paths:
+          add: []
+        state: present
+      register: _empty_add_paths
+      ignore_errors: true
+
+    - name: Verify that add paths cannot be empty
+      ansible.builtin.assert:
+        that:
+          - _empty_add_paths is failed
+          - '_empty_add_paths.msg == "The ''paths.add'' parameter must contain at least one path, if provided."'
+        fail_msg: Add paths cannot be empty.
+        success_msg: Add paths cannot be empty.
+
+    - name: Attempt to supply empty remove paths
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Test
+        image_index: 6
+        paths:
+          remove: []
+        state: present
+      register: _empty_remove_paths
+      ignore_errors: true
+
+    - name: Verify that remove paths cannot be empty
+      ansible.builtin.assert:
+        that:
+          - _empty_remove_paths is failed
+          - '_empty_remove_paths.msg == "The ''paths.remove'' parameter must contain at least one path, if provided."'
+        fail_msg: Remove paths cannot be empty.
+        success_msg: Remove paths cannot be empty.
+
+    - name: Attempt to supply empty set paths
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Test
+        image_index: 6
+        paths:
+          set: []
+        state: present
+      register: _empty_set_paths
+      ignore_errors: true
+
+    - name: Verify that set paths cannot be empty
+      ansible.builtin.assert:
+        that:
+          - _empty_set_paths is failed
+          - '_empty_set_paths.msg == "The ''paths'' parameter would remove the operating system."'
+        fail_msg: Set paths cannot be empty.
+        success_msg: Set paths cannot be empty.
+
+    - name: Attempt to remove only path that does not exist
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Test
+        image_index: 6
+        paths:
+          remove:
+            - ''
+        state: present
+      register: _remove_only_path
+      ignore_errors: true
+
+    - name: Verify that remove only path that does not exist fails
+      ansible.builtin.assert:
+        that:
+          - _remove_only_path is failed
+          - '_remove_only_path.msg == "The ''paths'' parameter would remove the operating system."'
+        fail_msg: Remove only path that does not exist fails.
+        success_msg: Remove only path that does not exist fails.
+
+    - name: Attempt to add nonexistent path
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Test
+        image_index: 6
+        paths:
+          add:
+            - Test
+        state: present
+      register: _add_nonexistent_path
+      ignore_errors: true
+
+    - name: Verify that add nonexistent path fails
+      ansible.builtin.assert:
+        that:
+          - _add_nonexistent_path is failed
+          - '_add_nonexistent_path.msg == "The directory ''Operating Systems\Test'' does not exist in the MDT share."'
+        fail_msg: Add nonexistent path fails.
+        success_msg: Add nonexistent path fails.
+
+    - name: Attempt to set nonexistent path
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Test
+        image_index: 6
+        paths:
+          set:
+            - Test
+        state: present
+      register: _set_nonexistent_path
+      ignore_errors: true
+
+    - name: Verify that set nonexistent path fails
+      ansible.builtin.assert:
+        that:
+          - _set_nonexistent_path is failed
+          - '_set_nonexistent_path.msg == "The directory ''Operating Systems\Test'' does not exist in the MDT share."'
+        fail_msg: Add nonexistent path fails.
+        success_msg: Add nonexistent path fails.
+        
+    - name: Attempt to supply same path as add path and remove path
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        name: Test
+        type: wim
+        source_path: C:\temp\source\sources\install.wim
+        destination_folder: Test
+        image_index: 6
+        paths:
+          add:
+            - Subdirectory
+          remove:
+            - Subdirectory
+        state: present
+      register: _same_path
+      ignore_errors: true
+
+    - name: Verify that same path cannot be supplied as add path and remove path
+      ansible.builtin.assert:
+        that:
+          - _same_path is failed
+          - '_same_path.msg == "The ''paths.add'' and ''paths.remove'' parameters must not contain the same path(s)."'
+        fail_msg: Same path cannot be supplied as add path and remove path.
+        success_msg: Same path cannot be supplied as add path and remove path.

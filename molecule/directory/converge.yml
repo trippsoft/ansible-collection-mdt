@@ -6,51 +6,51 @@
     - name: Check MDT directory
       check_mode: true
       trippsc2.mdt.directory:
-        path: Operating Systems\Windows 10
         mdt_share_path: C:\MDTShare
+        path: Operating Systems\Windows 10
         state: present
 
     - name: Create MDT directory
       trippsc2.mdt.directory:
-        path: Operating Systems\Windows 10
         mdt_share_path: C:\MDTShare
+        path: Operating Systems\Windows 10
         state: present
 
     - name: Check MDT directory
       check_mode: true
       trippsc2.mdt.directory:
-        path: Operating Systems\Windows 11
         mdt_share_path: C:\MDTShare
+        path: Operating Systems\Windows 11
         state: present
 
     - name: Create MDT directory
       trippsc2.mdt.directory:
-        path: Operating Systems\Windows 11
         mdt_share_path: C:\MDTShare
+        path: Operating Systems\Windows 11
         state: present
 
     - name: Check MDT directory
       check_mode: true
       trippsc2.mdt.directory:
-        path: Operating Systems\Windows 12
         mdt_share_path: C:\MDTShare
+        path: Operating Systems\Windows 12
         state: absent
 
     - name: Remove MDT directory
       trippsc2.mdt.directory:
-        path: Operating Systems\Windows 12
         mdt_share_path: C:\MDTShare
+        path: Operating Systems\Windows 12
         state: absent
 
     - name: Check MDT directory
       check_mode: true
       trippsc2.mdt.directory:
-        path: Out-of-Box Drivers\WinPE
         mdt_share_path: C:\MDTShare
+        path: Out-of-Box Drivers\WinPE
         state: absent
 
     - name: Remove MDT directory
       trippsc2.mdt.directory:
-        path: Out-of-Box Drivers\WinPE
         mdt_share_path: C:\MDTShare
+        path: Out-of-Box Drivers\WinPE
         state: absent

@@ -1,0 +1,81 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Create MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        mdt_share_path: C:\MDTShare
+        description: MDT Deployment Share
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare$"
+        state: present
+
+    - name: Create SMB share
+      ansible.windows.win_share:
+        name: MDTShare$
+        path: C:\MDTShare
+        full: Everyone
+        caching_mode: None
+
+    - name: Add permissions to MDT Deployment Share
+      ansible.windows.win_acl:
+        path: C:\MDTShare
+        user: vagrant
+        rights: FullControl
+        type: allow
+
+    - name: Create temporary folder
+      ansible.windows.win_file:
+        path: C:\temp\source
+        state: directory
+
+    - name: Copy Windows ISO files to temporary directory
+      ansible.windows.win_copy:
+        src: ../files/operating_system/source/
+        dest: C:\temp\source
+
+    - name: Copy WIM files to temporary directory
+      ansible.windows.win_copy:
+        src: ../files/operating_system/install.wim
+        dest: C:\temp\source\sources\install.wim
+
+    - name: Create MDT directory
+      trippsc2.mdt.directory:
+        mdt_share_path: C:\MDTShare
+        path: Operating Systems\Subdirectory
+        state: present
+
+    - name: Pre-create MDT Operating Systems
+      loop:
+        - guid: "{{ 'Source Operating System' | to_uuid }}"
+          name: Source Operating System
+          type: source
+          source_path: C:\temp\source
+          image_index: 6
+        - guid: "{{ 'WIM Operating System' | to_uuid }}"
+          name: WIM Operating System
+          type: wim
+          source_path: C:\temp\source\sources\install.wim
+          image_index: 6
+          paths:
+            add:
+              - Subdirectory
+      trippsc2.mdt.operating_system:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ item.guid | default(omit) }}"
+        name: "{{ item.name }}"
+        type: "{{ item.type }}"
+        source_path: "{{ item.source_path }}"
+        destination_folder: "{{ item.name }}"
+        image_index: "{{ item.image_index }}"
+        enabled: "{{ item.enabled | default(omit) }}"
+        hidden: "{{ item.hidden | default(omit) }}"
+        paths: "{{ item.paths | default(omit) }}"
+        state: present

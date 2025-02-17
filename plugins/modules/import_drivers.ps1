@@ -1,35 +1,37 @@
 #!powershell
 
 #AnsibleRequires -CSharpUtil Ansible.Basic
-#AnsibleRequires -PowerShell ansible_collections.trippsc2.mdt.plugins.module_utils.SharedFunctions
+#AnsibleRequires -PowerShell ansible_collections.trippsc2.mdt.plugins.module_utils.Common
+#AnsibleRequires -PowerShell ansible_collections.trippsc2.mdt.plugins.module_utils.Driver
 
-function Format-ImportedDriver {
-    [CmdletBinding()]
+function Confirm-ImportDriversParamsAreValid {
+    <#
+    .SYNOPSIS
+    Confirms that the parameters are valid.
+
+    .DESCRIPTION
+    Confirms that the parameters are valid.
+
+    .PARAMETER Module
+    The Ansible module object.
+
+    .EXAMPLE
+    Confirm-ImportDriversParamsAreValid -Module $Module
+    #>
+
+    [OutputType([System.Void])]
     param (
-        [Parameter(Mandatory = $true)]
-        [Microsoft.BDD.PSSnapIn.MDTObject[]]$Drivers
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true)]
+        [Ansible.Basic.AnsibleModule]$Module
     )
 
-    $formattedDrivers = New-Object System.Collections.Generic.List[System.Collections.IDictionary]
+    process {
 
-    foreach ($driver in $Drivers)
-    {
-        $formattedDriver = @{
-            class = $driver.Class
-            guid = $driver.guid
-            hash = $driver.Hash
-            name = $driver.Name
-            os_version = $driver.OSVersion
-            platform = $driver.Platform
-            source = $driver.Source
-            version = $driver.Version
-            whql_signed = [bool]::Parse($driver.WHQLSigned)
-        }
-
-        $formattedDrivers.Add($formattedDriver)
+        $Module.Params.path = $Module.Params.path | Format-MDTPath
+        $Module.Params.path | Confirm-MDTPathIsValid -Module $Module -ParameterName "path" | Out-Null
     }
-
-    return $formattedDrivers
 }
 
 $spec = @{
@@ -38,6 +40,10 @@ $spec = @{
             type = 'path'
             required = $false
             default = 'C:\Program Files\Microsoft Deployment Toolkit'
+        }
+        mdt_share_path = @{
+            type = 'path'
+            required = $true
         }
         source_paths = @{
             type = 'list'
@@ -53,65 +59,43 @@ $spec = @{
             required = $false
             default = $false
         }
-        mdt_share_path = @{
-            type = 'str'
-            required = $true
-        }
     }
     supports_check_mode = $false
 }
 
 $module = [Ansible.Basic.AnsibleModule]::Create($args, $spec)
 
-Import-MDTModule -InstallationPath $module.Params.installation_path
+$module | Confirm-ImportDriversParamsAreValid | Out-Null
+Import-MDTModule -Module $module | Out-Null
+
+$mdtDrive = Get-MDTPSDrive -Module $module -ReadWrite
 
 $sourcePaths = $module.Params.source_paths
 $path = $module.Params.path
 $importDuplicates = $module.Params.import_duplicates
-$mdtSharePath = $module.Params.mdt_share_path
 
-if (-not (Test-Path -Path $mdtSharePath))
-{
-    $module.FailJson("MDT share path '$mdtSharePath' does not exist.")
-}
+foreach ($sourcePath in $sourcePaths) {
 
-foreach ($sourcePath in $sourcePaths)
-{
-    if (-not (Test-Path -Path $sourcePath))
-    {
+    if (-not (Test-Path -LiteralPath $sourcePath)) {
         $module.FailJson("Source path '$sourcePath' does not exist.")
     }
 }
 
-$mdtDrive = Get-MDTPSDrive -Path $mdtSharePath
+$fullPath = "$($mdtDrive.Name):\$($path)"
 
-if ($null -eq $mdtDrive)
-{
-    $module.FailJson("Failed to find or create MDT PowerShell drive for '$mdtSharePath'.")
+if (-not (Test-Path -LiteralPath $fullPath -PathType Container)) {
+    $module.FailJson("Directory '$path' does not exist.")
 }
 
-if ($mdtDrive.ReadOnly)
-{
-    $module.FailJson("MDT drive '$($mdtDrive.Name)' is read-only.")
+$module.Result.changed = $false
+
+$importedDrivers = Import-MDTDriver -Path $fullPath -SourcePath $sourcePaths -ImportDuplicates:$importDuplicates
+
+if ($null -ne $importedDrivers) {
+    $module.Result.changed = $importedDrivers.Length -gt 0
+    $module.Result.drivers = $importedDrivers | Format-MDTDriver -Module $module -MDTDriveName $mdtDrive.Name -ExcludePaths
 }
 
-$path = $path.TrimStart('\')
-$fullPath = "$($mdtDrive.Name):/$($path)"
-
-if (-not (Test-Path -Path $fullPath))
-{
-    $module.FailJson("Path '$fullPath' does not exist.")
-}
-
-$importedDrivers = [Array](Import-MDTDriver -Path $fullPath -SourcePath $sourcePaths -ImportDuplicates:$importDuplicates)
-
-$module.Result["changed"] = $importedDrivers.Count -gt 0
-
-if ($module.Result["changed"])
-{
-    $module.Result["drivers"] = Format-ImportedDriver -Drivers $importedDrivers
-}
-
-$mdtDrive | Remove-PSDrive
+$mdtDrive | Remove-PSDrive | Out-Null
 
 $module.ExitJson()

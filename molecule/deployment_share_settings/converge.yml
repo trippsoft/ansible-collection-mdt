@@ -1,0 +1,1806 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks:
+    - name: Change comments without existing (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare1
+        comments: New Comments
+      register: _change_comments_1_check
+
+    - name: Verify change comments previous output # noqa no-handler
+      when:
+        - _change_comments_1_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_comments_1_check.diff.before.comments == ''
+          - not _change_comments_1_check.diff.before.enable_multicast
+          - _change_comments_1_check.diff.before.x64 is defined
+          - _change_comments_1_check.diff.before.x64.enabled
+          - _change_comments_1_check.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_1_check.diff.before.x64.feature_packs is defined
+          - _change_comments_1_check.diff.before.x64.feature_packs | length == 1
+          - _change_comments_1_check.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _change_comments_1_check.diff.before.x64.generic_iso is defined
+          - not _change_comments_1_check.diff.before.x64.generic_iso.enabled
+          - _change_comments_1_check.diff.before.x64.generic_wim is defined
+          - not _change_comments_1_check.diff.before.x64.generic_wim.enabled
+          - _change_comments_1_check.diff.before.x64.include_drivers is defined
+          - _change_comments_1_check.diff.before.x64.include_drivers | length == 2
+          - '"network" in _change_comments_1_check.diff.before.x64.include_drivers'
+          - '"mass_storage" in _change_comments_1_check.diff.before.x64.include_drivers'
+          - _change_comments_1_check.diff.before.x64.litetouch_iso is defined
+          - _change_comments_1_check.diff.before.x64.litetouch_iso.enabled
+          - _change_comments_1_check.diff.before.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _change_comments_1_check.diff.before.x64.litetouch_wim is defined
+          - _change_comments_1_check.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _change_comments_1_check.diff.before.x64.scratch_space == 32
+          - _change_comments_1_check.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _change_comments_1_check.diff.before.x86 is defined
+          - _change_comments_1_check.diff.before.x86.enabled
+          - _change_comments_1_check.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_1_check.diff.before.x86.feature_packs is defined
+          - _change_comments_1_check.diff.before.x86.feature_packs | length == 1
+          - _change_comments_1_check.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _change_comments_1_check.diff.before.x86.generic_iso is defined
+          - not _change_comments_1_check.diff.before.x86.generic_iso.enabled
+          - _change_comments_1_check.diff.before.x86.generic_wim is defined
+          - not _change_comments_1_check.diff.before.x86.generic_wim.enabled
+          - _change_comments_1_check.diff.before.x86.include_drivers is defined
+          - _change_comments_1_check.diff.before.x86.include_drivers | length == 2
+          - '"network" in _change_comments_1_check.diff.before.x86.include_drivers'
+          - '"mass_storage" in _change_comments_1_check.diff.before.x86.include_drivers'
+          - _change_comments_1_check.diff.before.x86.litetouch_iso is defined
+          - _change_comments_1_check.diff.before.x86.litetouch_iso.enabled
+          - _change_comments_1_check.diff.before.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _change_comments_1_check.diff.before.x86.litetouch_wim is defined
+          - _change_comments_1_check.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _change_comments_1_check.diff.before.x86.scratch_space == 32
+          - _change_comments_1_check.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 1 settings are not as expected.
+        success_msg: MDT Deployment Share 1 settings are as expected.
+
+    - name: Verify change comments output
+      ansible.builtin.assert:
+        that:
+          - _change_comments_1_check.deployment_share.comments == 'New Comments'
+          - not _change_comments_1_check.deployment_share.enable_multicast
+          - _change_comments_1_check.deployment_share.x64 is defined
+          - _change_comments_1_check.deployment_share.x64.enabled
+          - _change_comments_1_check.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_1_check.deployment_share.x64.feature_packs is defined
+          - _change_comments_1_check.deployment_share.x64.feature_packs | length == 1
+          - _change_comments_1_check.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _change_comments_1_check.deployment_share.x64.generic_iso is defined
+          - not _change_comments_1_check.deployment_share.x64.generic_iso.enabled
+          - _change_comments_1_check.deployment_share.x64.generic_wim is defined
+          - not _change_comments_1_check.deployment_share.x64.generic_wim.enabled
+          - _change_comments_1_check.deployment_share.x64.include_drivers is defined
+          - _change_comments_1_check.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _change_comments_1_check.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _change_comments_1_check.deployment_share.x64.include_drivers'
+          - _change_comments_1_check.deployment_share.x64.litetouch_iso is defined
+          - _change_comments_1_check.deployment_share.x64.litetouch_iso.enabled
+          - _change_comments_1_check.deployment_share.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _change_comments_1_check.deployment_share.x64.litetouch_wim is defined
+          - _change_comments_1_check.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _change_comments_1_check.deployment_share.x64.scratch_space == 32
+          - _change_comments_1_check.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _change_comments_1_check.deployment_share.x86 is defined
+          - _change_comments_1_check.deployment_share.x86.enabled
+          - _change_comments_1_check.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_1_check.deployment_share.x86.feature_packs is defined
+          - _change_comments_1_check.deployment_share.x86.feature_packs | length == 1
+          - _change_comments_1_check.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _change_comments_1_check.deployment_share.x86.generic_iso is defined
+          - not _change_comments_1_check.deployment_share.x86.generic_iso.enabled
+          - _change_comments_1_check.deployment_share.x86.generic_wim is defined
+          - not _change_comments_1_check.deployment_share.x86.generic_wim.enabled
+          - _change_comments_1_check.deployment_share.x86.include_drivers is defined
+          - _change_comments_1_check.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _change_comments_1_check.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _change_comments_1_check.deployment_share.x86.include_drivers'
+          - _change_comments_1_check.deployment_share.x86.litetouch_iso is defined
+          - _change_comments_1_check.deployment_share.x86.litetouch_iso.enabled
+          - _change_comments_1_check.deployment_share.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _change_comments_1_check.deployment_share.x86.litetouch_wim is defined
+          - _change_comments_1_check.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _change_comments_1_check.deployment_share.x86.scratch_space == 32
+          - _change_comments_1_check.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 1 settings are not as expected.
+        success_msg: MDT Deployment Share 1 settings are as expected.
+
+    - name: Change comments without existing
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare1
+        comments: New Comments
+      register: _change_comments_1
+
+    - name: Verify change comments previous output # noqa no-handler
+      when:
+        - _change_comments_1 is changed
+      ansible.builtin.assert:
+        that:
+          - _change_comments_1.diff.before.comments == ''
+          - not _change_comments_1.diff.before.enable_multicast
+          - _change_comments_1.diff.before.x64 is defined
+          - _change_comments_1.diff.before.x64.enabled
+          - _change_comments_1.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_1.diff.before.x64.feature_packs is defined
+          - _change_comments_1.diff.before.x64.feature_packs | length == 1
+          - _change_comments_1.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _change_comments_1.diff.before.x64.generic_iso is defined
+          - not _change_comments_1.diff.before.x64.generic_iso.enabled
+          - _change_comments_1.diff.before.x64.generic_wim is defined
+          - not _change_comments_1.diff.before.x64.generic_wim.enabled
+          - _change_comments_1.diff.before.x64.include_drivers is defined
+          - _change_comments_1.diff.before.x64.include_drivers | length == 2
+          - '"network" in _change_comments_1.diff.before.x64.include_drivers'
+          - '"mass_storage" in _change_comments_1.diff.before.x64.include_drivers'
+          - _change_comments_1.diff.before.x64.litetouch_iso is defined
+          - _change_comments_1.diff.before.x64.litetouch_iso.enabled
+          - _change_comments_1.diff.before.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _change_comments_1.diff.before.x64.litetouch_wim is defined
+          - _change_comments_1.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _change_comments_1.diff.before.x64.scratch_space == 32
+          - _change_comments_1.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _change_comments_1.diff.before.x86 is defined
+          - _change_comments_1.diff.before.x86.enabled
+          - _change_comments_1.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_1.diff.before.x86.feature_packs is defined
+          - _change_comments_1.diff.before.x86.feature_packs | length == 1
+          - _change_comments_1.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _change_comments_1.diff.before.x86.generic_iso is defined
+          - not _change_comments_1.diff.before.x86.generic_iso.enabled
+          - _change_comments_1.diff.before.x86.generic_wim is defined
+          - not _change_comments_1.diff.before.x86.generic_wim.enabled
+          - _change_comments_1.diff.before.x86.include_drivers is defined
+          - _change_comments_1.diff.before.x86.include_drivers | length == 2
+          - '"network" in _change_comments_1.diff.before.x86.include_drivers'
+          - '"mass_storage" in _change_comments_1.diff.before.x86.include_drivers'
+          - _change_comments_1.diff.before.x86.litetouch_iso is defined
+          - _change_comments_1.diff.before.x86.litetouch_iso.enabled
+          - _change_comments_1.diff.before.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _change_comments_1.diff.before.x86.litetouch_wim is defined
+          - _change_comments_1.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _change_comments_1.diff.before.x86.scratch_space == 32
+          - _change_comments_1.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 1 settings are not as expected.
+        success_msg: MDT Deployment Share 1 settings are as expected.
+
+    - name: Verify change comments output
+      ansible.builtin.assert:
+        that:
+          - _change_comments_1.deployment_share.comments == 'New Comments'
+          - not _change_comments_1.deployment_share.enable_multicast
+          - _change_comments_1.deployment_share.x64 is defined
+          - _change_comments_1.deployment_share.x64.enabled
+          - _change_comments_1.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_1.deployment_share.x64.feature_packs is defined
+          - _change_comments_1.deployment_share.x64.feature_packs | length == 1
+          - _change_comments_1.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _change_comments_1.deployment_share.x64.generic_iso is defined
+          - not _change_comments_1.deployment_share.x64.generic_iso.enabled
+          - _change_comments_1.deployment_share.x64.generic_wim is defined
+          - not _change_comments_1.deployment_share.x64.generic_wim.enabled
+          - _change_comments_1.deployment_share.x64.include_drivers is defined
+          - _change_comments_1.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _change_comments_1.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _change_comments_1.deployment_share.x64.include_drivers'
+          - _change_comments_1.deployment_share.x64.litetouch_iso is defined
+          - _change_comments_1.deployment_share.x64.litetouch_iso.enabled
+          - _change_comments_1.deployment_share.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _change_comments_1.deployment_share.x64.litetouch_wim is defined
+          - _change_comments_1.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _change_comments_1.deployment_share.x64.scratch_space == 32
+          - _change_comments_1.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _change_comments_1.deployment_share.x86 is defined
+          - _change_comments_1.deployment_share.x86.enabled
+          - _change_comments_1.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_1.deployment_share.x86.feature_packs is defined
+          - _change_comments_1.deployment_share.x86.feature_packs | length == 1
+          - _change_comments_1.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _change_comments_1.deployment_share.x86.generic_iso is defined
+          - not _change_comments_1.deployment_share.x86.generic_iso.enabled
+          - _change_comments_1.deployment_share.x86.generic_wim is defined
+          - not _change_comments_1.deployment_share.x86.generic_wim.enabled
+          - _change_comments_1.deployment_share.x86.include_drivers is defined
+          - _change_comments_1.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _change_comments_1.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _change_comments_1.deployment_share.x86.include_drivers'
+          - _change_comments_1.deployment_share.x86.litetouch_iso is defined
+          - _change_comments_1.deployment_share.x86.litetouch_iso.enabled
+          - _change_comments_1.deployment_share.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _change_comments_1.deployment_share.x86.litetouch_wim is defined
+          - _change_comments_1.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _change_comments_1.deployment_share.x86.scratch_space == 32
+          - _change_comments_1.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 1 settings are not as expected.
+        success_msg: MDT Deployment Share 1 settings are as expected.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _change_comments_1_check.changed == _change_comments_1.changed
+        fail_msg: MDT Deployment Share 1 settings were changed in check mode.
+        success_msg: MDT Deployment Share 1 settings were not changed in check mode.
+
+    - name: Change comments with existing (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare2
+        comments: New Comments
+      register: _change_comments_2_check
+
+    - name: Verify change comments previous output # noqa no-handler
+      when:
+        - _change_comments_2_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_comments_2_check.diff.before.comments == "Old Comments"
+          - not _change_comments_2_check.diff.before.enable_multicast
+          - _change_comments_2_check.diff.before.x64 is defined
+          - _change_comments_2_check.diff.before.x64.enabled
+          - _change_comments_2_check.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_2_check.diff.before.x64.feature_packs is defined
+          - _change_comments_2_check.diff.before.x64.feature_packs | length == 1
+          - _change_comments_2_check.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _change_comments_2_check.diff.before.x64.generic_iso is defined
+          - not _change_comments_2_check.diff.before.x64.generic_iso.enabled
+          - _change_comments_2_check.diff.before.x64.generic_wim is defined
+          - not _change_comments_2_check.diff.before.x64.generic_wim.enabled
+          - _change_comments_2_check.diff.before.x64.include_drivers is defined
+          - _change_comments_2_check.diff.before.x64.include_drivers | length == 2
+          - '"network" in _change_comments_2_check.diff.before.x64.include_drivers'
+          - '"mass_storage" in _change_comments_2_check.diff.before.x64.include_drivers'
+          - _change_comments_2_check.diff.before.x64.litetouch_iso is defined
+          - _change_comments_2_check.diff.before.x64.litetouch_iso.enabled
+          - _change_comments_2_check.diff.before.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _change_comments_2_check.diff.before.x64.litetouch_wim is defined
+          - _change_comments_2_check.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _change_comments_2_check.diff.before.x64.scratch_space == 32
+          - _change_comments_2_check.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _change_comments_2_check.diff.before.x86 is defined
+          - _change_comments_2_check.diff.before.x86.enabled
+          - _change_comments_2_check.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_2_check.diff.before.x86.feature_packs is defined
+          - _change_comments_2_check.diff.before.x86.feature_packs | length == 1
+          - _change_comments_2_check.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _change_comments_2_check.diff.before.x86.generic_iso is defined
+          - not _change_comments_2_check.diff.before.x86.generic_iso.enabled
+          - _change_comments_2_check.diff.before.x86.generic_wim is defined
+          - not _change_comments_2_check.diff.before.x86.generic_wim.enabled
+          - _change_comments_2_check.diff.before.x86.include_drivers is defined
+          - _change_comments_2_check.diff.before.x86.include_drivers | length == 2
+          - '"network" in _change_comments_2_check.diff.before.x86.include_drivers'
+          - '"mass_storage" in _change_comments_2_check.diff.before.x86.include_drivers'
+          - _change_comments_2_check.diff.before.x86.litetouch_iso is defined
+          - _change_comments_2_check.diff.before.x86.litetouch_iso.enabled
+          - _change_comments_2_check.diff.before.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _change_comments_2_check.diff.before.x86.litetouch_wim is defined
+          - _change_comments_2_check.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _change_comments_2_check.diff.before.x86.scratch_space == 32
+          - _change_comments_2_check.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 2 settings are not as expected.
+        success_msg: MDT Deployment Share 2 settings are as expected.
+
+    - name: Verify change comments output
+      ansible.builtin.assert:
+        that:
+          - _change_comments_2_check.deployment_share.comments == 'New Comments'
+          - not _change_comments_2_check.deployment_share.enable_multicast
+          - _change_comments_2_check.deployment_share.x64 is defined
+          - _change_comments_2_check.deployment_share.x64.enabled
+          - _change_comments_2_check.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_2_check.deployment_share.x64.feature_packs is defined
+          - _change_comments_2_check.deployment_share.x64.feature_packs | length == 1
+          - _change_comments_2_check.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _change_comments_2_check.deployment_share.x64.generic_iso is defined
+          - not _change_comments_2_check.deployment_share.x64.generic_iso.enabled
+          - _change_comments_2_check.deployment_share.x64.generic_wim is defined
+          - not _change_comments_2_check.deployment_share.x64.generic_wim.enabled
+          - _change_comments_2_check.deployment_share.x64.include_drivers is defined
+          - _change_comments_2_check.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _change_comments_2_check.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _change_comments_2_check.deployment_share.x64.include_drivers'
+          - _change_comments_2_check.deployment_share.x64.litetouch_iso is defined
+          - _change_comments_2_check.deployment_share.x64.litetouch_iso.enabled
+          - _change_comments_2_check.deployment_share.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _change_comments_2_check.deployment_share.x64.litetouch_wim is defined
+          - _change_comments_2_check.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _change_comments_2_check.deployment_share.x64.scratch_space == 32
+          - _change_comments_2_check.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _change_comments_2_check.deployment_share.x86 is defined
+          - _change_comments_2_check.deployment_share.x86.enabled
+          - _change_comments_2_check.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_2_check.deployment_share.x86.feature_packs is defined
+          - _change_comments_2_check.deployment_share.x86.feature_packs | length == 1
+          - _change_comments_2_check.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _change_comments_2_check.deployment_share.x86.generic_iso is defined
+          - not _change_comments_2_check.deployment_share.x86.generic_iso.enabled
+          - _change_comments_2_check.deployment_share.x86.generic_wim is defined
+          - not _change_comments_2_check.deployment_share.x86.generic_wim.enabled
+          - _change_comments_2_check.deployment_share.x86.include_drivers is defined
+          - _change_comments_2_check.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _change_comments_2_check.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _change_comments_2_check.deployment_share.x86.include_drivers'
+          - _change_comments_2_check.deployment_share.x86.litetouch_iso is defined
+          - _change_comments_2_check.deployment_share.x86.litetouch_iso.enabled
+          - _change_comments_2_check.deployment_share.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _change_comments_2_check.deployment_share.x86.litetouch_wim is defined
+          - _change_comments_2_check.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _change_comments_2_check.deployment_share.x86.scratch_space == 32
+          - _change_comments_2_check.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 2 settings are not as expected.
+        success_msg: MDT Deployment Share 2 settings are as expected.
+
+    - name: Change comments with existing
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare2
+        comments: New Comments
+      register: _change_comments_2
+
+    - name: Verify change comments previous output # noqa no-handler
+      when:
+        - _change_comments_2 is changed
+      ansible.builtin.assert:
+        that:
+          - _change_comments_2.diff.before.comments == "Old Comments"
+          - not _change_comments_2.diff.before.enable_multicast
+          - _change_comments_2.diff.before.x64 is defined
+          - _change_comments_2.diff.before.x64.enabled
+          - _change_comments_2.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_2.diff.before.x64.feature_packs is defined
+          - _change_comments_2.diff.before.x64.feature_packs | length == 1
+          - _change_comments_2.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _change_comments_2.diff.before.x64.generic_iso is defined
+          - not _change_comments_2.diff.before.x64.generic_iso.enabled
+          - _change_comments_2.diff.before.x64.generic_wim is defined
+          - not _change_comments_2.diff.before.x64.generic_wim.enabled
+          - _change_comments_2.diff.before.x64.include_drivers is defined
+          - _change_comments_2.diff.before.x64.include_drivers | length == 2
+          - '"network" in _change_comments_2.diff.before.x64.include_drivers'
+          - '"mass_storage" in _change_comments_2.diff.before.x64.include_drivers'
+          - _change_comments_2.diff.before.x64.litetouch_iso is defined
+          - _change_comments_2.diff.before.x64.litetouch_iso.enabled
+          - _change_comments_2.diff.before.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _change_comments_2.diff.before.x64.litetouch_wim is defined
+          - _change_comments_2.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _change_comments_2.diff.before.x64.scratch_space == 32
+          - _change_comments_2.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _change_comments_2.diff.before.x86 is defined
+          - _change_comments_2.diff.before.x86.enabled
+          - _change_comments_2.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_2.diff.before.x86.feature_packs is defined
+          - _change_comments_2.diff.before.x86.feature_packs | length == 1
+          - _change_comments_2.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _change_comments_2.diff.before.x86.generic_iso is defined
+          - not _change_comments_2.diff.before.x86.generic_iso.enabled
+          - _change_comments_2.diff.before.x86.generic_wim is defined
+          - not _change_comments_2.diff.before.x86.generic_wim.enabled
+          - _change_comments_2.diff.before.x86.include_drivers is defined
+          - _change_comments_2.diff.before.x86.include_drivers | length == 2
+          - '"network" in _change_comments_2.diff.before.x86.include_drivers'
+          - '"mass_storage" in _change_comments_2.diff.before.x86.include_drivers'
+          - _change_comments_2.diff.before.x86.litetouch_iso is defined
+          - _change_comments_2.diff.before.x86.litetouch_iso.enabled
+          - _change_comments_2.diff.before.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _change_comments_2.diff.before.x86.litetouch_wim is defined
+          - _change_comments_2.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _change_comments_2.diff.before.x86.scratch_space == 32
+          - _change_comments_2.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 2 settings are not as expected.
+        success_msg: MDT Deployment Share 2 settings are as expected.
+
+    - name: Verify change comments output
+      ansible.builtin.assert:
+        that:
+          - _change_comments_2.deployment_share.comments == 'New Comments'
+          - not _change_comments_2.deployment_share.enable_multicast
+          - _change_comments_2.deployment_share.x64 is defined
+          - _change_comments_2.deployment_share.x64.enabled
+          - _change_comments_2.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_2.deployment_share.x64.feature_packs is defined
+          - _change_comments_2.deployment_share.x64.feature_packs | length == 1
+          - _change_comments_2.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _change_comments_2.deployment_share.x64.generic_iso is defined
+          - not _change_comments_2.deployment_share.x64.generic_iso.enabled
+          - _change_comments_2.deployment_share.x64.generic_wim is defined
+          - not _change_comments_2.deployment_share.x64.generic_wim.enabled
+          - _change_comments_2.deployment_share.x64.include_drivers is defined
+          - _change_comments_2.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _change_comments_2.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _change_comments_2.deployment_share.x64.include_drivers'
+          - _change_comments_2.deployment_share.x64.litetouch_iso is defined
+          - _change_comments_2.deployment_share.x64.litetouch_iso.enabled
+          - _change_comments_2.deployment_share.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _change_comments_2.deployment_share.x64.litetouch_wim is defined
+          - _change_comments_2.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _change_comments_2.deployment_share.x64.scratch_space == 32
+          - _change_comments_2.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _change_comments_2.deployment_share.x86 is defined
+          - _change_comments_2.deployment_share.x86.enabled
+          - _change_comments_2.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _change_comments_2.deployment_share.x86.feature_packs is defined
+          - _change_comments_2.deployment_share.x86.feature_packs | length == 1
+          - _change_comments_2.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _change_comments_2.deployment_share.x86.generic_iso is defined
+          - not _change_comments_2.deployment_share.x86.generic_iso.enabled
+          - _change_comments_2.deployment_share.x86.generic_wim is defined
+          - not _change_comments_2.deployment_share.x86.generic_wim.enabled
+          - _change_comments_2.deployment_share.x86.include_drivers is defined
+          - _change_comments_2.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _change_comments_2.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _change_comments_2.deployment_share.x86.include_drivers'
+          - _change_comments_2.deployment_share.x86.litetouch_iso is defined
+          - _change_comments_2.deployment_share.x86.litetouch_iso.enabled
+          - _change_comments_2.deployment_share.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _change_comments_2.deployment_share.x86.litetouch_wim is defined
+          - _change_comments_2.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _change_comments_2.deployment_share.x86.scratch_space == 32
+          - _change_comments_2.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 2 settings are not as expected.
+        success_msg: MDT Deployment Share 2 settings are as expected.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _change_comments_2_check.changed == _change_comments_2.changed
+        fail_msg: MDT Deployment Share 2 settings were changed in check mode.
+        success_msg: MDT Deployment Share 2 settings were not changed in check mode.
+
+    - name: Enable multicast (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare3
+        enable_multicast: true
+      register: _enable_multicast_check
+
+    - name: Verify enable multicast previous output # noqa no-handler
+      when:
+        - _enable_multicast_check is changed
+      ansible.builtin.assert:
+        that:
+          - _enable_multicast_check.diff.before.comments == ""
+          - not _enable_multicast_check.diff.before.enable_multicast
+          - _enable_multicast_check.diff.before.x64 is defined
+          - _enable_multicast_check.diff.before.x64.enabled
+          - _enable_multicast_check.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_multicast_check.diff.before.x64.feature_packs is defined
+          - _enable_multicast_check.diff.before.x64.feature_packs | length == 1
+          - _enable_multicast_check.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_multicast_check.diff.before.x64.generic_iso is defined
+          - not _enable_multicast_check.diff.before.x64.generic_iso.enabled
+          - _enable_multicast_check.diff.before.x64.generic_wim is defined
+          - not _enable_multicast_check.diff.before.x64.generic_wim.enabled
+          - _enable_multicast_check.diff.before.x64.include_drivers is defined
+          - _enable_multicast_check.diff.before.x64.include_drivers | length == 2
+          - '"network" in _enable_multicast_check.diff.before.x64.include_drivers'
+          - '"mass_storage" in _enable_multicast_check.diff.before.x64.include_drivers'
+          - _enable_multicast_check.diff.before.x64.litetouch_iso is defined
+          - _enable_multicast_check.diff.before.x64.litetouch_iso.enabled
+          - _enable_multicast_check.diff.before.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _enable_multicast_check.diff.before.x64.litetouch_wim is defined
+          - _enable_multicast_check.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_multicast_check.diff.before.x64.scratch_space == 32
+          - _enable_multicast_check.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _enable_multicast_check.diff.before.x86 is defined
+          - _enable_multicast_check.diff.before.x86.enabled
+          - _enable_multicast_check.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_multicast_check.diff.before.x86.feature_packs is defined
+          - _enable_multicast_check.diff.before.x86.feature_packs | length == 1
+          - _enable_multicast_check.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_multicast_check.diff.before.x86.generic_iso is defined
+          - not _enable_multicast_check.diff.before.x86.generic_iso.enabled
+          - _enable_multicast_check.diff.before.x86.generic_wim is defined
+          - not _enable_multicast_check.diff.before.x86.generic_wim.enabled
+          - _enable_multicast_check.diff.before.x86.include_drivers is defined
+          - _enable_multicast_check.diff.before.x86.include_drivers | length == 2
+          - '"network" in _enable_multicast_check.diff.before.x86.include_drivers'
+          - '"mass_storage" in _enable_multicast_check.diff.before.x86.include_drivers'
+          - _enable_multicast_check.diff.before.x86.litetouch_iso is defined
+          - _enable_multicast_check.diff.before.x86.litetouch_iso.enabled
+          - _enable_multicast_check.diff.before.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _enable_multicast_check.diff.before.x86.litetouch_wim is defined
+          - _enable_multicast_check.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_multicast_check.diff.before.x86.scratch_space == 32
+          - _enable_multicast_check.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 3 settings are not as expected.
+        success_msg: MDT Deployment Share 3 settings are as expected.
+
+    - name: Verify enable multicast output
+      ansible.builtin.assert:
+        that:
+          - _enable_multicast_check.deployment_share.comments == ""
+          - _enable_multicast_check.deployment_share.enable_multicast
+          - _enable_multicast_check.deployment_share.x64 is defined
+          - _enable_multicast_check.deployment_share.x64.enabled
+          - _enable_multicast_check.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_multicast_check.deployment_share.x64.feature_packs is defined
+          - _enable_multicast_check.deployment_share.x64.feature_packs | length == 1
+          - _enable_multicast_check.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_multicast_check.deployment_share.x64.generic_iso is defined
+          - not _enable_multicast_check.deployment_share.x64.generic_iso.enabled
+          - _enable_multicast_check.deployment_share.x64.generic_wim is defined
+          - not _enable_multicast_check.deployment_share.x64.generic_wim.enabled
+          - _enable_multicast_check.deployment_share.x64.include_drivers is defined
+          - _enable_multicast_check.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _enable_multicast_check.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _enable_multicast_check.deployment_share.x64.include_drivers'
+          - _enable_multicast_check.deployment_share.x64.litetouch_iso is defined
+          - _enable_multicast_check.deployment_share.x64.litetouch_iso.enabled
+          - _enable_multicast_check.deployment_share.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _enable_multicast_check.deployment_share.x64.litetouch_wim is defined
+          - _enable_multicast_check.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_multicast_check.deployment_share.x64.scratch_space == 32
+          - _enable_multicast_check.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _enable_multicast_check.deployment_share.x86 is defined
+          - _enable_multicast_check.deployment_share.x86.enabled
+          - _enable_multicast_check.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_multicast_check.deployment_share.x86.feature_packs is defined
+          - _enable_multicast_check.deployment_share.x86.feature_packs | length == 1
+          - _enable_multicast_check.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_multicast_check.deployment_share.x86.generic_iso is defined
+          - not _enable_multicast_check.deployment_share.x86.generic_iso.enabled
+          - _enable_multicast_check.deployment_share.x86.generic_wim is defined
+          - not _enable_multicast_check.deployment_share.x86.generic_wim.enabled
+          - _enable_multicast_check.deployment_share.x86.include_drivers is defined
+          - _enable_multicast_check.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _enable_multicast_check.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _enable_multicast_check.deployment_share.x86.include_drivers'
+          - _enable_multicast_check.deployment_share.x86.litetouch_iso is defined
+          - _enable_multicast_check.deployment_share.x86.litetouch_iso.enabled
+          - _enable_multicast_check.deployment_share.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _enable_multicast_check.deployment_share.x86.litetouch_wim is defined
+          - _enable_multicast_check.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_multicast_check.deployment_share.x86.scratch_space == 32
+          - _enable_multicast_check.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 3 settings are not as expected.
+        success_msg: MDT Deployment Share 3 settings are as expected.
+
+    - name: Enable multicast
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare3
+        enable_multicast: true
+      register: _enable_multicast
+
+    - name: Verify enable multicast previous output # noqa no-handler
+      when:
+        - _enable_multicast is changed
+      ansible.builtin.assert:
+        that:
+          - _enable_multicast.diff.before.comments == ''
+          - not _enable_multicast.diff.before.enable_multicast
+          - _enable_multicast.diff.before.x64 is defined
+          - _enable_multicast.diff.before.x64.enabled
+          - _enable_multicast.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_multicast.diff.before.x64.feature_packs is defined
+          - _enable_multicast.diff.before.x64.feature_packs | length == 1
+          - _enable_multicast.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_multicast.diff.before.x64.generic_iso is defined
+          - not _enable_multicast.diff.before.x64.generic_iso.enabled
+          - _enable_multicast.diff.before.x64.generic_wim is defined
+          - not _enable_multicast.diff.before.x64.generic_wim.enabled
+          - _enable_multicast.diff.before.x64.include_drivers is defined
+          - _enable_multicast.diff.before.x64.include_drivers | length == 2
+          - '"network" in _enable_multicast.diff.before.x64.include_drivers'
+          - '"mass_storage" in _enable_multicast.diff.before.x64.include_drivers'
+          - _enable_multicast.diff.before.x64.litetouch_iso is defined
+          - _enable_multicast.diff.before.x64.litetouch_iso.enabled
+          - _enable_multicast.diff.before.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _enable_multicast.diff.before.x64.litetouch_wim is defined
+          - _enable_multicast.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_multicast.diff.before.x64.scratch_space == 32
+          - _enable_multicast.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _enable_multicast.diff.before.x86 is defined
+          - _enable_multicast.diff.before.x86.enabled
+          - _enable_multicast.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_multicast.diff.before.x86.feature_packs is defined
+          - _enable_multicast.diff.before.x86.feature_packs | length == 1
+          - _enable_multicast.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_multicast.diff.before.x86.generic_iso is defined
+          - not _enable_multicast.diff.before.x86.generic_iso.enabled
+          - _enable_multicast.diff.before.x86.generic_wim is defined
+          - not _enable_multicast.diff.before.x86.generic_wim.enabled
+          - _enable_multicast.diff.before.x86.include_drivers is defined
+          - _enable_multicast.diff.before.x86.include_drivers | length == 2
+          - '"network" in _enable_multicast.diff.before.x86.include_drivers'
+          - '"mass_storage" in _enable_multicast.diff.before.x86.include_drivers'
+          - _enable_multicast.diff.before.x86.litetouch_iso is defined
+          - _enable_multicast.diff.before.x86.litetouch_iso.enabled
+          - _enable_multicast.diff.before.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _enable_multicast.diff.before.x86.litetouch_wim is defined
+          - _enable_multicast.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_multicast.diff.before.x86.scratch_space == 32
+          - _enable_multicast.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 3 settings are not as expected.
+        success_msg: MDT Deployment Share 3 settings are as expected.
+
+    - name: Verify enable multicast output
+      ansible.builtin.assert:
+        that:
+          - _enable_multicast.deployment_share.comments == ''
+          - _enable_multicast.deployment_share.enable_multicast
+          - _enable_multicast.deployment_share.x64 is defined
+          - _enable_multicast.deployment_share.x64.enabled
+          - _enable_multicast.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_multicast.deployment_share.x64.feature_packs is defined
+          - _enable_multicast.deployment_share.x64.feature_packs | length == 1
+          - _enable_multicast.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_multicast.deployment_share.x64.generic_iso is defined
+          - not _enable_multicast.deployment_share.x64.generic_iso.enabled
+          - _enable_multicast.deployment_share.x64.generic_wim is defined
+          - not _enable_multicast.deployment_share.x64.generic_wim.enabled
+          - _enable_multicast.deployment_share.x64.include_drivers is defined
+          - _enable_multicast.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _enable_multicast.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _enable_multicast.deployment_share.x64.include_drivers'
+          - _enable_multicast.deployment_share.x64.litetouch_iso is defined
+          - _enable_multicast.deployment_share.x64.litetouch_iso.enabled
+          - _enable_multicast.deployment_share.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _enable_multicast.deployment_share.x64.litetouch_wim is defined
+          - _enable_multicast.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_multicast.deployment_share.x64.scratch_space == 32
+          - _enable_multicast.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _enable_multicast.deployment_share.x86 is defined
+          - _enable_multicast.deployment_share.x86.enabled
+          - _enable_multicast.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_multicast.deployment_share.x86.feature_packs is defined
+          - _enable_multicast.deployment_share.x86.feature_packs | length == 1
+          - _enable_multicast.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_multicast.deployment_share.x86.generic_iso is defined
+          - not _enable_multicast.deployment_share.x86.generic_iso.enabled
+          - _enable_multicast.deployment_share.x86.generic_wim is defined
+          - not _enable_multicast.deployment_share.x86.generic_wim.enabled
+          - _enable_multicast.deployment_share.x86.include_drivers is defined
+          - _enable_multicast.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _enable_multicast.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _enable_multicast.deployment_share.x86.include_drivers'
+          - _enable_multicast.deployment_share.x86.litetouch_iso is defined
+          - _enable_multicast.deployment_share.x86.litetouch_iso.enabled
+          - _enable_multicast.deployment_share.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _enable_multicast.deployment_share.x86.litetouch_wim is defined
+          - _enable_multicast.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_multicast.deployment_share.x86.scratch_space == 32
+          - _enable_multicast.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 3 settings are not as expected.
+        success_msg: MDT Deployment Share 3 settings are as expected.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _enable_multicast_check.changed == _enable_multicast.changed
+        fail_msg: MDT Deployment Share 3 settings were changed in check mode.
+        success_msg: MDT Deployment Share 3 settings were not changed in check mode.
+
+    - name: Disable x86 and x64 (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare4
+        x86:
+          enabled: false
+        x64:
+          enabled: false
+      register: _disable_x86_x64_check
+
+    - name: Verify disable x86 and x64 previous output # noqa no-handler
+      when:
+        - _disable_x86_x64_check is changed
+      ansible.builtin.assert:
+        that:
+          - _disable_x86_x64_check.diff.before.comments == ""
+          - not _disable_x86_x64_check.diff.before.enable_multicast
+          - _disable_x86_x64_check.diff.before.x64 is defined
+          - _disable_x86_x64_check.diff.before.x64.enabled
+          - _disable_x86_x64_check.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _disable_x86_x64_check.diff.before.x64.feature_packs is defined
+          - _disable_x86_x64_check.diff.before.x64.feature_packs | length == 1
+          - _disable_x86_x64_check.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _disable_x86_x64_check.diff.before.x64.generic_iso is defined
+          - not _disable_x86_x64_check.diff.before.x64.generic_iso.enabled
+          - _disable_x86_x64_check.diff.before.x64.generic_wim is defined
+          - not _disable_x86_x64_check.diff.before.x64.generic_wim.enabled
+          - _disable_x86_x64_check.diff.before.x64.include_drivers is defined
+          - _disable_x86_x64_check.diff.before.x64.include_drivers | length == 2
+          - '"network" in _disable_x86_x64_check.diff.before.x64.include_drivers'
+          - '"mass_storage" in _disable_x86_x64_check.diff.before.x64.include_drivers'
+          - _disable_x86_x64_check.diff.before.x64.litetouch_iso is defined
+          - _disable_x86_x64_check.diff.before.x64.litetouch_iso.enabled
+          - _disable_x86_x64_check.diff.before.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _disable_x86_x64_check.diff.before.x64.litetouch_wim is defined
+          - _disable_x86_x64_check.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _disable_x86_x64_check.diff.before.x64.scratch_space == 32
+          - _disable_x86_x64_check.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _disable_x86_x64_check.diff.before.x86 is defined
+          - _disable_x86_x64_check.diff.before.x86.enabled
+          - _disable_x86_x64_check.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _disable_x86_x64_check.diff.before.x86.feature_packs is defined
+          - _disable_x86_x64_check.diff.before.x86.feature_packs | length == 1
+          - _disable_x86_x64_check.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _disable_x86_x64_check.diff.before.x86.generic_iso is defined
+          - not _disable_x86_x64_check.diff.before.x86.generic_iso.enabled
+          - _disable_x86_x64_check.diff.before.x86.generic_wim is defined
+          - not _disable_x86_x64_check.diff.before.x86.generic_wim.enabled
+          - _disable_x86_x64_check.diff.before.x86.include_drivers is defined
+          - _disable_x86_x64_check.diff.before.x86.include_drivers | length == 2
+          - '"network" in _disable_x86_x64_check.diff.before.x86.include_drivers'
+          - '"mass_storage" in _disable_x86_x64_check.diff.before.x86.include_drivers'
+          - _disable_x86_x64_check.diff.before.x86.litetouch_iso is defined
+          - _disable_x86_x64_check.diff.before.x86.litetouch_iso.enabled
+          - _disable_x86_x64_check.diff.before.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _disable_x86_x64_check.diff.before.x86.litetouch_wim is defined
+          - _disable_x86_x64_check.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _disable_x86_x64_check.diff.before.x86.scratch_space == 32
+          - _disable_x86_x64_check.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 4 settings are not as expected.
+        success_msg: MDT Deployment Share 4 settings are as expected.
+
+    - name: Verify disable x86 and x64 output
+      ansible.builtin.assert:
+        that:
+          - _disable_x86_x64_check.deployment_share.comments == ""
+          - not _disable_x86_x64_check.deployment_share.enable_multicast
+          - _disable_x86_x64_check.deployment_share.x64 is defined
+          - not _disable_x86_x64_check.deployment_share.x64.enabled
+          - _disable_x86_x64_check.deployment_share.x86 is defined
+          - not _disable_x86_x64_check.deployment_share.x86.enabled
+        fail_msg: MDT Deployment Share 4 settings are not as expected.
+        success_msg: MDT Deployment Share 4 settings are as expected.
+
+    - name: Disable x86 and x64
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare4
+        x86:
+          enabled: false
+        x64:
+          enabled: false
+      register: _disable_x86_x64
+
+    - name: Verify disable x86 and x64 previous output # noqa no-handler
+      when:
+        - _disable_x86_x64 is changed
+      ansible.builtin.assert:
+        that:
+          - _disable_x86_x64.diff.before.comments == ''
+          - not _disable_x86_x64.diff.before.enable_multicast
+          - _disable_x86_x64.diff.before.x64 is defined
+          - _disable_x86_x64.diff.before.x64.enabled
+          - _disable_x86_x64.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _disable_x86_x64.diff.before.x64.feature_packs is defined
+          - _disable_x86_x64.diff.before.x64.feature_packs | length == 1
+          - _disable_x86_x64.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _disable_x86_x64.diff.before.x64.generic_iso is defined
+          - not _disable_x86_x64.diff.before.x64.generic_iso.enabled
+          - _disable_x86_x64.diff.before.x64.generic_wim is defined
+          - not _disable_x86_x64.diff.before.x64.generic_wim.enabled
+          - _disable_x86_x64.diff.before.x64.include_drivers is defined
+          - _disable_x86_x64.diff.before.x64.include_drivers | length == 2
+          - '"network" in _disable_x86_x64.diff.before.x64.include_drivers'
+          - '"mass_storage" in _disable_x86_x64.diff.before.x64.include_drivers'
+          - _disable_x86_x64.diff.before.x64.litetouch_iso is defined
+          - _disable_x86_x64.diff.before.x64.litetouch_iso.enabled
+          - _disable_x86_x64.diff.before.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _disable_x86_x64.diff.before.x64.litetouch_wim is defined
+          - _disable_x86_x64.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _disable_x86_x64.diff.before.x64.scratch_space == 32
+          - _disable_x86_x64.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _disable_x86_x64.diff.before.x86 is defined
+          - _disable_x86_x64.diff.before.x86.enabled
+          - _disable_x86_x64.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _disable_x86_x64.diff.before.x86.feature_packs is defined
+          - _disable_x86_x64.diff.before.x86.feature_packs | length == 1
+          - _disable_x86_x64.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _disable_x86_x64.diff.before.x86.generic_iso is defined
+          - not _disable_x86_x64.diff.before.x86.generic_iso.enabled
+          - _disable_x86_x64.diff.before.x86.generic_wim is defined
+          - not _disable_x86_x64.diff.before.x86.generic_wim.enabled
+          - _disable_x86_x64.diff.before.x86.include_drivers is defined
+          - _disable_x86_x64.diff.before.x86.include_drivers | length == 2
+          - '"network" in _disable_x86_x64.diff.before.x86.include_drivers'
+          - '"mass_storage" in _disable_x86_x64.diff.before.x86.include_drivers'
+          - _disable_x86_x64.diff.before.x86.litetouch_iso is defined
+          - _disable_x86_x64.diff.before.x86.litetouch_iso.enabled
+          - _disable_x86_x64.diff.before.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _disable_x86_x64.diff.before.x86.litetouch_wim is defined
+          - _disable_x86_x64.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _disable_x86_x64.diff.before.x86.scratch_space == 32
+          - _disable_x86_x64.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 4 settings are not as expected.
+        success_msg: MDT Deployment Share 4 settings are as expected.
+
+    - name: Verify disable x86 and x64 output
+      ansible.builtin.assert:
+        that:
+          - _disable_x86_x64.deployment_share.comments == ''
+          - not _disable_x86_x64.deployment_share.enable_multicast
+          - _disable_x86_x64.deployment_share.x64 is defined
+          - not _disable_x86_x64.deployment_share.x64.enabled
+          - _disable_x86_x64.deployment_share.x86 is defined
+          - not _disable_x86_x64.deployment_share.x86.enabled
+        fail_msg: MDT Deployment Share 4 settings are not as expected.
+        success_msg: MDT Deployment Share 4 settings are as expected.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _disable_x86_x64_check.changed == _disable_x86_x64.changed
+        fail_msg: MDT Deployment Share 4 settings were changed in check mode.
+        success_msg: MDT Deployment Share 4 settings were not changed in check mode.
+
+    - name: Enable x86 and x64 (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare5
+        x86:
+          enabled: true
+        x64:
+          enabled: true
+      register: _enable_x86_x64_check
+
+    - name: Verify enable x86 and x64 previous output # noqa no-handler
+      when:
+        - _enable_x86_x64_check is changed
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_x64_check.diff.before.comments == ""
+          - not _enable_x86_x64_check.diff.before.enable_multicast
+          - _enable_x86_x64_check.diff.before.x64 is defined
+          - not _enable_x86_x64_check.diff.before.x64.enabled
+          - _enable_x86_x64_check.diff.before.x86 is defined
+          - not _enable_x86_x64_check.diff.before.x86.enabled
+        fail_msg: MDT Deployment Share 5 settings are not as expected.
+        success_msg: MDT Deployment Share 5 settings are as expected.
+
+    - name: Verify enable x86 and x64 output
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_x64_check.deployment_share.comments == ""
+          - not _enable_x86_x64_check.deployment_share.enable_multicast
+          - _enable_x86_x64_check.deployment_share.x64 is defined
+          - _enable_x86_x64_check.deployment_share.x64.enabled
+          - _enable_x86_x64_check.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_x86_x64_check.deployment_share.x64.feature_packs is defined
+          - _enable_x86_x64_check.deployment_share.x64.feature_packs | length == 1
+          - _enable_x86_x64_check.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_x86_x64_check.deployment_share.x64.generic_iso is defined
+          - not _enable_x86_x64_check.deployment_share.x64.generic_iso.enabled
+          - _enable_x86_x64_check.deployment_share.x64.generic_wim is defined
+          - not _enable_x86_x64_check.deployment_share.x64.generic_wim.enabled
+          - _enable_x86_x64_check.deployment_share.x64.include_drivers is defined
+          - _enable_x86_x64_check.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _enable_x86_x64_check.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _enable_x86_x64_check.deployment_share.x64.include_drivers'
+          - _enable_x86_x64_check.deployment_share.x64.litetouch_iso is defined
+          - _enable_x86_x64_check.deployment_share.x64.litetouch_iso.enabled
+          - _enable_x86_x64_check.deployment_share.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _enable_x86_x64_check.deployment_share.x64.litetouch_wim is defined
+          - _enable_x86_x64_check.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_x86_x64_check.deployment_share.x64.scratch_space == 32
+          - _enable_x86_x64_check.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _enable_x86_x64_check.deployment_share.x86 is defined
+          - _enable_x86_x64_check.deployment_share.x86.enabled
+          - _enable_x86_x64_check.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_x86_x64_check.deployment_share.x86.feature_packs is defined
+          - _enable_x86_x64_check.deployment_share.x86.feature_packs | length == 1
+          - _enable_x86_x64_check.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_x86_x64_check.deployment_share.x86.generic_iso is defined
+          - not _enable_x86_x64_check.deployment_share.x86.generic_iso.enabled
+          - _enable_x86_x64_check.deployment_share.x86.generic_wim is defined
+          - not _enable_x86_x64_check.deployment_share.x86.generic_wim.enabled
+          - _enable_x86_x64_check.deployment_share.x86.include_drivers is defined
+          - _enable_x86_x64_check.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _enable_x86_x64_check.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _enable_x86_x64_check.deployment_share.x86.include_drivers'
+          - _enable_x86_x64_check.deployment_share.x86.litetouch_iso is defined
+          - _enable_x86_x64_check.deployment_share.x86.litetouch_iso.enabled
+          - _enable_x86_x64_check.deployment_share.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _enable_x86_x64_check.deployment_share.x86.litetouch_wim is defined
+          - _enable_x86_x64_check.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_x86_x64_check.deployment_share.x86.scratch_space == 32
+          - _enable_x86_x64_check.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 5 settings are not as expected.
+        success_msg: MDT Deployment Share 5 settings are as expected.
+
+    - name: Enable x86 and x64
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare5
+        x86:
+          enabled: true
+        x64:
+          enabled: true
+      register: _enable_x86_x64
+
+    - name: Verify enable x86 and x64 previous output # noqa no-handler
+      when:
+        - _enable_x86_x64 is changed
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_x64.diff.before.comments == ''
+          - not _enable_x86_x64.diff.before.enable_multicast
+          - _enable_x86_x64.diff.before.x64 is defined
+          - not _enable_x86_x64.diff.before.x64.enabled
+          - _enable_x86_x64.diff.before.x86 is defined
+          - not _enable_x86_x64.diff.before.x86.enabled
+        fail_msg: MDT Deployment Share 5 settings are not as expected.
+        success_msg: MDT Deployment Share 5 settings are as expected.
+
+    - name: Verify enable x86 and x64 output
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_x64.deployment_share.comments == ''
+          - not _enable_x86_x64.deployment_share.enable_multicast
+          - _enable_x86_x64.deployment_share.x64 is defined
+          - _enable_x86_x64.deployment_share.x64.enabled
+          - _enable_x86_x64.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_x86_x64.deployment_share.x64.feature_packs is defined
+          - _enable_x86_x64.deployment_share.x64.feature_packs | length == 1
+          - _enable_x86_x64.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_x86_x64.deployment_share.x64.generic_iso is defined
+          - not _enable_x86_x64.deployment_share.x64.generic_iso.enabled
+          - _enable_x86_x64.deployment_share.x64.generic_wim is defined
+          - not _enable_x86_x64.deployment_share.x64.generic_wim.enabled
+          - _enable_x86_x64.deployment_share.x64.include_drivers is defined
+          - _enable_x86_x64.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _enable_x86_x64.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _enable_x86_x64.deployment_share.x64.include_drivers'
+          - _enable_x86_x64.deployment_share.x64.litetouch_iso is defined
+          - _enable_x86_x64.deployment_share.x64.litetouch_iso.enabled
+          - _enable_x86_x64.deployment_share.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _enable_x86_x64.deployment_share.x64.litetouch_wim is defined
+          - _enable_x86_x64.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_x86_x64.deployment_share.x64.scratch_space == 32
+          - _enable_x86_x64.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _enable_x86_x64.deployment_share.x86 is defined
+          - _enable_x86_x64.deployment_share.x86.enabled
+          - _enable_x86_x64.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_x86_x64.deployment_share.x86.feature_packs is defined
+          - _enable_x86_x64.deployment_share.x86.feature_packs | length == 1
+          - _enable_x86_x64.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_x86_x64.deployment_share.x86.generic_iso is defined
+          - not _enable_x86_x64.deployment_share.x86.generic_iso.enabled
+          - _enable_x86_x64.deployment_share.x86.generic_wim is defined
+          - not _enable_x86_x64.deployment_share.x86.generic_wim.enabled
+          - _enable_x86_x64.deployment_share.x86.include_drivers is defined
+          - _enable_x86_x64.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _enable_x86_x64.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _enable_x86_x64.deployment_share.x86.include_drivers'
+          - _enable_x86_x64.deployment_share.x86.litetouch_iso is defined
+          - _enable_x86_x64.deployment_share.x86.litetouch_iso.enabled
+          - _enable_x86_x64.deployment_share.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _enable_x86_x64.deployment_share.x86.litetouch_wim is defined
+          - _enable_x86_x64.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_x86_x64.deployment_share.x86.scratch_space == 32
+          - _enable_x86_x64.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 5 settings are not as expected.
+        success_msg: MDT Deployment Share 5 settings are as expected.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_x64_check.changed == _enable_x86_x64.changed
+        fail_msg: MDT Deployment Share 5 settings were changed in check mode.
+        success_msg: MDT Deployment Share 5 settings were not changed in check mode.
+
+    - name: Enable and configure x64 and x86 (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare6
+        x86:
+          background_file: "%INSTALLDIR%\\Samples\\Background2.bmp"
+          feature_packs:
+            - winpe-mdac
+            - winpe-powershell
+          generic_iso:
+            enabled: false
+          generic_wim:
+            enabled: false
+          include_drivers:
+            - all
+          litetouch_iso:
+            enabled: false
+          litetouch_wim:
+            description: Lite Touch x86
+          scratch_space: 64
+          selection_profile: Nothing
+        x64:
+          background_file: "%INSTALLDIR%\\Samples\\Background2.bmp"
+          feature_packs:
+            - winpe-mdac
+            - winpe-powershell
+          generic_iso:
+            enabled: false
+          generic_wim:
+            enabled: false
+          include_drivers:
+            - all
+          litetouch_iso:
+            enabled: false
+          litetouch_wim:
+            description: Lite Touch x64
+          scratch_space: 64
+          selection_profile: Nothing
+      register: _enable_x86_x64_check
+
+    - name: Verify enable and configure x64 and x86 previous output # noqa no-handler
+      when:
+        - _enable_x86_x64_check is changed
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_x64_check.diff.before.comments == ""
+          - not _enable_x86_x64_check.diff.before.enable_multicast
+          - _enable_x86_x64_check.diff.before.x64 is defined
+          - _enable_x86_x64_check.diff.before.x64.enabled
+          - _enable_x86_x64_check.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_x86_x64_check.diff.before.x64.feature_packs is defined
+          - _enable_x86_x64_check.diff.before.x64.feature_packs | length == 1
+          - _enable_x86_x64_check.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_x86_x64_check.diff.before.x64.generic_iso is defined
+          - _enable_x86_x64_check.diff.before.x64.generic_iso.enabled
+          - _enable_x86_x64_check.diff.before.x64.generic_iso.name == "Generic_x64.iso"
+          - _enable_x86_x64_check.diff.before.x64.generic_wim is defined
+          - _enable_x86_x64_check.diff.before.x64.generic_wim.enabled
+          - _enable_x86_x64_check.diff.before.x64.generic_wim.description == "Generic Windows PE (x64)"
+          - _enable_x86_x64_check.diff.before.x64.include_drivers is defined
+          - _enable_x86_x64_check.diff.before.x64.include_drivers | length == 2
+          - '"network" in _enable_x86_x64_check.diff.before.x64.include_drivers'
+          - '"mass_storage" in _enable_x86_x64_check.diff.before.x64.include_drivers'
+          - _enable_x86_x64_check.diff.before.x64.litetouch_iso is defined
+          - _enable_x86_x64_check.diff.before.x64.litetouch_iso.enabled
+          - _enable_x86_x64_check.diff.before.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _enable_x86_x64_check.diff.before.x64.litetouch_wim is defined
+          - _enable_x86_x64_check.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_x86_x64_check.diff.before.x64.scratch_space == 32
+          - _enable_x86_x64_check.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _enable_x86_x64_check.diff.before.x86 is defined
+          - _enable_x86_x64_check.diff.before.x86.enabled
+          - _enable_x86_x64_check.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_x86_x64_check.diff.before.x86.feature_packs is defined
+          - _enable_x86_x64_check.diff.before.x86.feature_packs | length == 1
+          - _enable_x86_x64_check.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_x86_x64_check.diff.before.x86.generic_iso is defined
+          - _enable_x86_x64_check.diff.before.x86.generic_iso.enabled
+          - _enable_x86_x64_check.diff.before.x86.generic_iso.name == "Generic_x86.iso"
+          - _enable_x86_x64_check.diff.before.x86.generic_wim is defined
+          - _enable_x86_x64_check.diff.before.x86.generic_wim.enabled
+          - _enable_x86_x64_check.diff.before.x86.generic_wim.description == "Generic Windows PE (x86)"
+          - _enable_x86_x64_check.diff.before.x86.include_drivers is defined
+          - _enable_x86_x64_check.diff.before.x86.include_drivers | length == 2
+          - '"network" in _enable_x86_x64_check.diff.before.x86.include_drivers'
+          - '"mass_storage" in _enable_x86_x64_check.diff.before.x86.include_drivers'
+          - _enable_x86_x64_check.diff.before.x86.litetouch_iso is defined
+          - _enable_x86_x64_check.diff.before.x86.litetouch_iso.enabled
+          - _enable_x86_x64_check.diff.before.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _enable_x86_x64_check.diff.before.x86.litetouch_wim is defined
+          - _enable_x86_x64_check.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_x86_x64_check.diff.before.x86.scratch_space == 32
+          - _enable_x86_x64_check.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 6 settings are not as expected.
+        success_msg: MDT Deployment Share 6 settings are as expected.
+
+    - name: Verify enable and configure x64 and x86 output
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_x64_check.deployment_share.comments == ""
+          - not _enable_x86_x64_check.deployment_share.enable_multicast
+          - _enable_x86_x64_check.deployment_share.x64 is defined
+          - _enable_x86_x64_check.deployment_share.x64.enabled
+          - _enable_x86_x64_check.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background2.bmp"
+          - _enable_x86_x64_check.deployment_share.x64.feature_packs is defined
+          - _enable_x86_x64_check.deployment_share.x64.feature_packs | length == 2
+          - _enable_x86_x64_check.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_x86_x64_check.deployment_share.x64.feature_packs[1] == "winpe-powershell"
+          - _enable_x86_x64_check.deployment_share.x64.generic_iso is defined
+          - not _enable_x86_x64_check.deployment_share.x64.generic_iso.enabled
+          - _enable_x86_x64_check.deployment_share.x64.generic_wim is defined
+          - not _enable_x86_x64_check.deployment_share.x64.generic_wim.enabled
+          - _enable_x86_x64_check.deployment_share.x64.include_drivers is defined
+          - _enable_x86_x64_check.deployment_share.x64.include_drivers | length == 1
+          - _enable_x86_x64_check.deployment_share.x64.include_drivers[0] == "all"
+          - _enable_x86_x64_check.deployment_share.x64.litetouch_iso is defined
+          - not _enable_x86_x64_check.deployment_share.x64.litetouch_iso.enabled
+          - _enable_x86_x64_check.deployment_share.x64.litetouch_wim is defined
+          - _enable_x86_x64_check.deployment_share.x64.litetouch_wim.description == "Lite Touch x64"
+          - _enable_x86_x64_check.deployment_share.x64.scratch_space == 64
+          - _enable_x86_x64_check.deployment_share.x64.selection_profile == "Nothing"
+          - _enable_x86_x64_check.deployment_share.x86 is defined
+          - _enable_x86_x64_check.deployment_share.x86.enabled
+          - _enable_x86_x64_check.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background2.bmp"
+          - _enable_x86_x64_check.deployment_share.x86.feature_packs is defined
+          - _enable_x86_x64_check.deployment_share.x86.feature_packs | length == 2
+          - _enable_x86_x64_check.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_x86_x64_check.deployment_share.x86.feature_packs[1] == "winpe-powershell"
+          - _enable_x86_x64_check.deployment_share.x86.generic_iso is defined
+          - not _enable_x86_x64_check.deployment_share.x86.generic_iso.enabled
+          - _enable_x86_x64_check.deployment_share.x86.generic_wim is defined
+          - not _enable_x86_x64_check.deployment_share.x86.generic_wim.enabled
+          - _enable_x86_x64_check.deployment_share.x86.include_drivers is defined
+          - _enable_x86_x64_check.deployment_share.x86.include_drivers | length == 1
+          - _enable_x86_x64_check.deployment_share.x86.include_drivers[0] == "all"
+          - _enable_x86_x64_check.deployment_share.x86.litetouch_iso is defined
+          - not _enable_x86_x64_check.deployment_share.x86.litetouch_iso.enabled
+          - _enable_x86_x64_check.deployment_share.x86.litetouch_wim is defined
+          - _enable_x86_x64_check.deployment_share.x86.litetouch_wim.description == "Lite Touch x86"
+          - _enable_x86_x64_check.deployment_share.x86.scratch_space == 64
+          - _enable_x86_x64_check.deployment_share.x86.selection_profile == "Nothing"
+        fail_msg: MDT Deployment Share 6 settings are not as expected.
+        success_msg: MDT Deployment Share 6 settings are as expected.
+
+    - name: Enable and configure x64 and x86
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare6
+        x86:
+          background_file: "%INSTALLDIR%\\Samples\\Background2.bmp"
+          feature_packs:
+            - winpe-mdac
+            - winpe-powershell
+          generic_iso:
+            enabled: false
+          generic_wim:
+            enabled: false
+          include_drivers:
+            - all
+          litetouch_iso:
+            enabled: false
+          litetouch_wim:
+            description: Lite Touch x86
+          scratch_space: 64
+          selection_profile: Nothing
+        x64:
+          background_file: "%INSTALLDIR%\\Samples\\Background2.bmp"
+          feature_packs:
+            - winpe-mdac
+            - winpe-powershell
+          generic_iso:
+            enabled: false
+          generic_wim:
+            enabled: false
+          include_drivers:
+            - all
+          litetouch_iso:
+            enabled: false
+          litetouch_wim:
+            description: Lite Touch x64
+          scratch_space: 64
+          selection_profile: Nothing
+      register: _enable_x86_x64
+
+    - name: Verify enable and configure x64 and x86 previous output # noqa no-handler
+      when:
+        - _enable_x86_x64 is changed
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_x64.diff.before.comments == ''
+          - not _enable_x86_x64.diff.before.enable_multicast
+          - _enable_x86_x64.diff.before.x64 is defined
+          - _enable_x86_x64.diff.before.x64.enabled
+          - _enable_x86_x64.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_x86_x64.diff.before.x64.feature_packs is defined
+          - _enable_x86_x64.diff.before.x64.feature_packs | length == 1
+          - _enable_x86_x64.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_x86_x64.diff.before.x64.generic_iso is defined
+          - _enable_x86_x64.diff.before.x64.generic_iso.enabled
+          - _enable_x86_x64.diff.before.x64.generic_iso.name == "Generic_x64.iso"
+          - _enable_x86_x64.diff.before.x64.generic_wim is defined
+          - _enable_x86_x64.diff.before.x64.generic_wim.enabled
+          - _enable_x86_x64.diff.before.x64.generic_wim.description == "Generic Windows PE (x64)"
+          - _enable_x86_x64.diff.before.x64.include_drivers is defined
+          - _enable_x86_x64.diff.before.x64.include_drivers | length == 2
+          - '"network" in _enable_x86_x64.diff.before.x64.include_drivers'
+          - '"mass_storage" in _enable_x86_x64.diff.before.x64.include_drivers'
+          - _enable_x86_x64.diff.before.x64.litetouch_iso is defined
+          - _enable_x86_x64.diff.before.x64.litetouch_iso.enabled
+          - _enable_x86_x64.diff.before.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _enable_x86_x64.diff.before.x64.litetouch_wim is defined
+          - _enable_x86_x64.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_x86_x64.diff.before.x64.scratch_space == 32
+          - _enable_x86_x64.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _enable_x86_x64.diff.before.x86 is defined
+          - _enable_x86_x64.diff.before.x86.enabled
+          - _enable_x86_x64.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_x86_x64.diff.before.x86.feature_packs is defined
+          - _enable_x86_x64.diff.before.x86.feature_packs | length == 1
+          - _enable_x86_x64.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_x86_x64.diff.before.x86.generic_iso is defined
+          - _enable_x86_x64.diff.before.x86.generic_iso.enabled
+          - _enable_x86_x64.diff.before.x86.generic_iso.name == "Generic_x86.iso"
+          - _enable_x86_x64.diff.before.x86.generic_wim is defined
+          - _enable_x86_x64.diff.before.x86.generic_wim.enabled
+          - _enable_x86_x64.diff.before.x86.generic_wim.description == "Generic Windows PE (x86)"
+          - _enable_x86_x64.diff.before.x86.include_drivers is defined
+          - _enable_x86_x64.diff.before.x86.include_drivers | length == 2
+          - '"network" in _enable_x86_x64.diff.before.x86.include_drivers'
+          - '"mass_storage" in _enable_x86_x64.diff.before.x86.include_drivers'
+          - _enable_x86_x64.diff.before.x86.litetouch_iso is defined
+          - _enable_x86_x64.diff.before.x86.litetouch_iso.enabled
+          - _enable_x86_x64.diff.before.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _enable_x86_x64.diff.before.x86.litetouch_wim is defined
+          - _enable_x86_x64.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_x86_x64.diff.before.x86.scratch_space == 32
+          - _enable_x86_x64.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 6 settings are not as expected.
+        success_msg: MDT Deployment Share 6 settings are as expected.
+
+    - name: Verify enable and configure x64 and x86 output
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_x64.deployment_share.comments == ''
+          - not _enable_x86_x64.deployment_share.enable_multicast
+          - _enable_x86_x64.deployment_share.x64 is defined
+          - _enable_x86_x64.deployment_share.x64.enabled
+          - _enable_x86_x64.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background2.bmp"
+          - _enable_x86_x64.deployment_share.x64.feature_packs is defined
+          - _enable_x86_x64.deployment_share.x64.feature_packs | length == 2
+          - _enable_x86_x64.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_x86_x64.deployment_share.x64.feature_packs[1] == "winpe-powershell"
+          - _enable_x86_x64.deployment_share.x64.generic_iso is defined
+          - not _enable_x86_x64.deployment_share.x64.generic_iso.enabled
+          - _enable_x86_x64.deployment_share.x64.generic_wim is defined
+          - not _enable_x86_x64.deployment_share.x64.generic_wim.enabled
+          - _enable_x86_x64.deployment_share.x64.include_drivers is defined
+          - _enable_x86_x64.deployment_share.x64.include_drivers | length == 1
+          - _enable_x86_x64.deployment_share.x64.include_drivers[0] == "all"
+          - _enable_x86_x64.deployment_share.x64.litetouch_iso is defined
+          - not _enable_x86_x64.deployment_share.x64.litetouch_iso.enabled
+          - _enable_x86_x64.deployment_share.x64.litetouch_wim is defined
+          - _enable_x86_x64.deployment_share.x64.litetouch_wim.description == "Lite Touch x64"
+          - _enable_x86_x64.deployment_share.x64.scratch_space == 64
+          - _enable_x86_x64.deployment_share.x64.selection_profile == "Nothing"
+          - _enable_x86_x64.deployment_share.x86 is defined
+          - _enable_x86_x64.deployment_share.x86.enabled
+          - _enable_x86_x64.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background2.bmp"
+          - _enable_x86_x64.deployment_share.x86.feature_packs is defined
+          - _enable_x86_x64.deployment_share.x86.feature_packs | length == 2
+          - _enable_x86_x64.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_x86_x64.deployment_share.x86.feature_packs[1] == "winpe-powershell"
+          - _enable_x86_x64.deployment_share.x86.generic_iso is defined
+          - not _enable_x86_x64.deployment_share.x86.generic_iso.enabled
+          - _enable_x86_x64.deployment_share.x86.generic_wim is defined
+          - not _enable_x86_x64.deployment_share.x86.generic_wim.enabled
+          - _enable_x86_x64.deployment_share.x86.include_drivers is defined
+          - _enable_x86_x64.deployment_share.x86.include_drivers | length == 1
+          - _enable_x86_x64.deployment_share.x86.include_drivers[0] == "all"
+          - _enable_x86_x64.deployment_share.x86.litetouch_iso is defined
+          - not _enable_x86_x64.deployment_share.x86.litetouch_iso.enabled
+          - _enable_x86_x64.deployment_share.x86.litetouch_wim is defined
+          - _enable_x86_x64.deployment_share.x86.litetouch_wim.description == "Lite Touch x86"
+          - _enable_x86_x64.deployment_share.x86.scratch_space == 64
+          - _enable_x86_x64.deployment_share.x86.selection_profile == "Nothing"
+        fail_msg: MDT Deployment Share 6 settings are not as expected.
+        success_msg: MDT Deployment Share 6 settings are as expected.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _enable_x86_x64_check.changed == _enable_x86_x64.changed
+        fail_msg: MDT Deployment Share 6 settings were changed in check mode.
+        success_msg: MDT Deployment Share 6 settings were not changed in check mode.
+
+    - name: Enable generic WinPE x86 and x64 (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare7
+        x86:
+          generic_iso:
+            enabled: true
+          generic_wim:
+            enabled: true
+          litetouch_iso:
+            enabled: true
+        x64:
+          generic_iso:
+            enabled: true
+          generic_wim:
+            enabled: true
+          litetouch_iso:
+            enabled: true
+      register: _enable_generic_wim_iso_check
+
+    - name: Verify enable generic WinPE x86 and x64 previous output # noqa no-handler
+      when:
+        - _enable_generic_wim_iso_check is changed
+      ansible.builtin.assert:
+        that:
+          - _enable_generic_wim_iso_check.diff.before.comments == ""
+          - not _enable_generic_wim_iso_check.diff.before.enable_multicast
+          - _enable_generic_wim_iso_check.diff.before.x64 is defined
+          - _enable_generic_wim_iso_check.diff.before.x64.enabled
+          - _enable_generic_wim_iso_check.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso_check.diff.before.x64.feature_packs is defined
+          - _enable_generic_wim_iso_check.diff.before.x64.feature_packs | length == 1
+          - _enable_generic_wim_iso_check.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso_check.diff.before.x64.generic_iso is defined
+          - not _enable_generic_wim_iso_check.diff.before.x64.generic_iso.enabled
+          - _enable_generic_wim_iso_check.diff.before.x64.generic_wim is defined
+          - not _enable_generic_wim_iso_check.diff.before.x64.generic_wim.enabled
+          - _enable_generic_wim_iso_check.diff.before.x64.include_drivers is defined
+          - _enable_generic_wim_iso_check.diff.before.x64.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso_check.diff.before.x64.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso_check.diff.before.x64.include_drivers'
+          - _enable_generic_wim_iso_check.diff.before.x64.litetouch_iso is defined
+          - _enable_generic_wim_iso_check.diff.before.x64.litetouch_iso.enabled
+          - _enable_generic_wim_iso_check.diff.before.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _enable_generic_wim_iso_check.diff.before.x64.litetouch_wim is defined
+          - _enable_generic_wim_iso_check.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_generic_wim_iso_check.diff.before.x64.scratch_space == 32
+          - _enable_generic_wim_iso_check.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _enable_generic_wim_iso_check.diff.before.x86 is defined
+          - _enable_generic_wim_iso_check.diff.before.x86.enabled
+          - _enable_generic_wim_iso_check.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso_check.diff.before.x86.feature_packs is defined
+          - _enable_generic_wim_iso_check.diff.before.x86.feature_packs | length == 1
+          - _enable_generic_wim_iso_check.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso_check.diff.before.x86.generic_iso is defined
+          - not _enable_generic_wim_iso_check.diff.before.x86.generic_iso.enabled
+          - _enable_generic_wim_iso_check.diff.before.x86.generic_wim is defined
+          - not _enable_generic_wim_iso_check.diff.before.x86.generic_wim.enabled
+          - _enable_generic_wim_iso_check.diff.before.x86.include_drivers is defined
+          - _enable_generic_wim_iso_check.diff.before.x86.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso_check.diff.before.x86.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso_check.diff.before.x86.include_drivers'
+          - _enable_generic_wim_iso_check.diff.before.x86.litetouch_iso is defined
+          - _enable_generic_wim_iso_check.diff.before.x86.litetouch_iso.enabled
+          - _enable_generic_wim_iso_check.diff.before.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _enable_generic_wim_iso_check.diff.before.x86.litetouch_wim is defined
+          - _enable_generic_wim_iso_check.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_generic_wim_iso_check.diff.before.x86.scratch_space == 32
+          - _enable_generic_wim_iso_check.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 7 settings are not as expected.
+        success_msg: MDT Deployment Share 7 settings are as expected.
+
+    - name: Verify enable generic WinPE x86 and x64 output
+      ansible.builtin.assert:
+        that:
+          - _enable_generic_wim_iso_check.deployment_share.comments == ""
+          - not _enable_generic_wim_iso_check.deployment_share.enable_multicast
+          - _enable_generic_wim_iso_check.deployment_share.x64 is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso_check.deployment_share.x64.feature_packs is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.feature_packs | length == 1
+          - _enable_generic_wim_iso_check.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso_check.deployment_share.x64.generic_iso is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.generic_iso.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x64.generic_iso.name == "Generic_x64.iso"
+          - _enable_generic_wim_iso_check.deployment_share.x64.generic_wim is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.generic_wim.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x64.generic_wim.description == "Generic Windows PE (x64)"
+          - _enable_generic_wim_iso_check.deployment_share.x64.include_drivers is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso_check.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso_check.deployment_share.x64.include_drivers'
+          - _enable_generic_wim_iso_check.deployment_share.x64.litetouch_iso is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.litetouch_iso.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _enable_generic_wim_iso_check.deployment_share.x64.litetouch_wim is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_generic_wim_iso_check.deployment_share.x64.scratch_space == 32
+          - _enable_generic_wim_iso_check.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _enable_generic_wim_iso_check.deployment_share.x86 is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso_check.deployment_share.x86.feature_packs is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.feature_packs | length == 1
+          - _enable_generic_wim_iso_check.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso_check.deployment_share.x86.generic_iso is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.generic_iso.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x86.generic_iso.name == "Generic_x86.iso"
+          - _enable_generic_wim_iso_check.deployment_share.x86.generic_wim is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.generic_wim.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x86.generic_wim.description == "Generic Windows PE (x86)"
+          - _enable_generic_wim_iso_check.deployment_share.x86.include_drivers is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso_check.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso_check.deployment_share.x86.include_drivers'
+          - _enable_generic_wim_iso_check.deployment_share.x86.litetouch_iso is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.litetouch_iso.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _enable_generic_wim_iso_check.deployment_share.x86.litetouch_wim is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_generic_wim_iso_check.deployment_share.x86.scratch_space == 32
+          - _enable_generic_wim_iso_check.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 7 settings are not as expected.
+        success_msg: MDT Deployment Share 7 settings are as expected.
+
+    - name: Enable generic WinPE x86 and x64
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare7
+        x86:
+          generic_iso:
+            enabled: true
+          generic_wim:
+            enabled: true
+          litetouch_iso:
+            enabled: true
+        x64:
+          generic_iso:
+            enabled: true
+          generic_wim:
+            enabled: true
+          litetouch_iso:
+            enabled: true
+      register: _enable_generic_wim_iso
+
+    - name: Verify enable generic WinPE x86 and x64 previous output # noqa no-handler
+      when:
+        - _enable_generic_wim_iso is changed
+      ansible.builtin.assert:
+        that:
+          - _enable_generic_wim_iso.diff.before.comments == ''
+          - not _enable_generic_wim_iso.diff.before.enable_multicast
+          - _enable_generic_wim_iso.diff.before.x64 is defined
+          - _enable_generic_wim_iso.diff.before.x64.enabled
+          - _enable_generic_wim_iso.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso.diff.before.x64.feature_packs is defined
+          - _enable_generic_wim_iso.diff.before.x64.feature_packs | length == 1
+          - _enable_generic_wim_iso.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso.diff.before.x64.generic_iso is defined
+          - not _enable_generic_wim_iso.diff.before.x64.generic_iso.enabled
+          - _enable_generic_wim_iso.diff.before.x64.generic_wim is defined
+          - not _enable_generic_wim_iso.diff.before.x64.generic_wim.enabled
+          - _enable_generic_wim_iso.diff.before.x64.include_drivers is defined
+          - _enable_generic_wim_iso.diff.before.x64.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso.diff.before.x64.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso.diff.before.x64.include_drivers'
+          - _enable_generic_wim_iso.diff.before.x64.litetouch_iso is defined
+          - _enable_generic_wim_iso.diff.before.x64.litetouch_iso.enabled
+          - _enable_generic_wim_iso.diff.before.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _enable_generic_wim_iso.diff.before.x64.litetouch_wim is defined
+          - _enable_generic_wim_iso.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_generic_wim_iso.diff.before.x64.scratch_space == 32
+          - _enable_generic_wim_iso.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _enable_generic_wim_iso.diff.before.x86 is defined
+          - _enable_generic_wim_iso.diff.before.x86.enabled
+          - _enable_generic_wim_iso.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso.diff.before.x86.feature_packs is defined
+          - _enable_generic_wim_iso.diff.before.x86.feature_packs | length == 1
+          - _enable_generic_wim_iso.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso.diff.before.x86.generic_iso is defined
+          - not _enable_generic_wim_iso.diff.before.x86.generic_iso.enabled
+          - _enable_generic_wim_iso.diff.before.x86.generic_wim is defined
+          - not _enable_generic_wim_iso.diff.before.x86.generic_wim.enabled
+          - _enable_generic_wim_iso.diff.before.x86.include_drivers is defined
+          - _enable_generic_wim_iso.diff.before.x86.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso.diff.before.x86.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso.diff.before.x86.include_drivers'
+          - _enable_generic_wim_iso.diff.before.x86.litetouch_iso is defined
+          - _enable_generic_wim_iso.diff.before.x86.litetouch_iso.enabled
+          - _enable_generic_wim_iso.diff.before.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _enable_generic_wim_iso.diff.before.x86.litetouch_wim is defined
+          - _enable_generic_wim_iso.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_generic_wim_iso.diff.before.x86.scratch_space == 32
+          - _enable_generic_wim_iso.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 7 settings are not as expected.
+        success_msg: MDT Deployment Share 7 settings are as expected.
+
+    - name: Verify enable generic WinPE x86 and x64 output
+      ansible.builtin.assert:
+        that:
+          - _enable_generic_wim_iso.deployment_share.comments == ''
+          - not _enable_generic_wim_iso.deployment_share.enable_multicast
+          - _enable_generic_wim_iso.deployment_share.x64 is defined
+          - _enable_generic_wim_iso.deployment_share.x64.enabled
+          - _enable_generic_wim_iso.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso.deployment_share.x64.feature_packs is defined
+          - _enable_generic_wim_iso.deployment_share.x64.feature_packs | length == 1
+          - _enable_generic_wim_iso.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso.deployment_share.x64.generic_iso is defined
+          - _enable_generic_wim_iso.deployment_share.x64.generic_iso.enabled
+          - _enable_generic_wim_iso.deployment_share.x64.generic_iso.name == "Generic_x64.iso"
+          - _enable_generic_wim_iso.deployment_share.x64.generic_wim is defined
+          - _enable_generic_wim_iso.deployment_share.x64.generic_wim.enabled
+          - _enable_generic_wim_iso.deployment_share.x64.generic_wim.description == "Generic Windows PE (x64)"
+          - _enable_generic_wim_iso.deployment_share.x64.include_drivers is defined
+          - _enable_generic_wim_iso.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso.deployment_share.x64.include_drivers'
+          - _enable_generic_wim_iso.deployment_share.x64.litetouch_iso is defined
+          - _enable_generic_wim_iso.deployment_share.x64.litetouch_iso.enabled
+          - _enable_generic_wim_iso.deployment_share.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _enable_generic_wim_iso.deployment_share.x64.litetouch_wim is defined
+          - _enable_generic_wim_iso.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_generic_wim_iso.deployment_share.x64.scratch_space == 32
+          - _enable_generic_wim_iso.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _enable_generic_wim_iso.deployment_share.x86 is defined
+          - _enable_generic_wim_iso.deployment_share.x86.enabled
+          - _enable_generic_wim_iso.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso.deployment_share.x86.feature_packs is defined
+          - _enable_generic_wim_iso.deployment_share.x86.feature_packs | length == 1
+          - _enable_generic_wim_iso.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso.deployment_share.x86.generic_iso is defined
+          - _enable_generic_wim_iso.deployment_share.x86.generic_iso.enabled
+          - _enable_generic_wim_iso.deployment_share.x86.generic_iso.name == "Generic_x86.iso"
+          - _enable_generic_wim_iso.deployment_share.x86.generic_wim is defined
+          - _enable_generic_wim_iso.deployment_share.x86.generic_wim.enabled
+          - _enable_generic_wim_iso.deployment_share.x86.generic_wim.description == "Generic Windows PE (x86)"
+          - _enable_generic_wim_iso.deployment_share.x86.include_drivers is defined
+          - _enable_generic_wim_iso.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso.deployment_share.x86.include_drivers'
+          - _enable_generic_wim_iso.deployment_share.x86.litetouch_iso is defined
+          - _enable_generic_wim_iso.deployment_share.x86.litetouch_iso.enabled
+          - _enable_generic_wim_iso.deployment_share.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _enable_generic_wim_iso.deployment_share.x86.litetouch_wim is defined
+          - _enable_generic_wim_iso.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_generic_wim_iso.deployment_share.x86.scratch_space == 32
+          - _enable_generic_wim_iso.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 7 settings are not as expected.
+        success_msg: MDT Deployment Share 7 settings are as expected.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _enable_generic_wim_iso_check.changed == _enable_generic_wim_iso.changed
+        fail_msg: MDT Deployment Share 7 settings were changed in check mode.
+        success_msg: MDT Deployment Share 7 settings were not changed in check mode.
+
+    - name: Enable configure x86 and x64 WIMs and ISOs (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare8
+        x86:
+          generic_iso:
+            name: winpe-x86.iso
+          generic_wim:
+            description: Generic WinPE - x86
+          litetouch_iso:
+            name: mdt-x86.iso
+        x64:
+          generic_iso:
+            name: winpe-x64.iso
+          generic_wim:
+            description: Generic WinPE - x64
+          litetouch_iso:
+            name: mdt-x64.iso
+      register: _enable_generic_wim_iso_check
+
+    - name: Verify enable configure x86 and x64 WIMs and ISOs previous output # noqa no-handler
+      when:
+        - _enable_generic_wim_iso_check is changed
+      ansible.builtin.assert:
+        that:
+          - _enable_generic_wim_iso_check.diff.before.comments == ""
+          - not _enable_generic_wim_iso_check.diff.before.enable_multicast
+          - _enable_generic_wim_iso_check.diff.before.x64 is defined
+          - _enable_generic_wim_iso_check.diff.before.x64.enabled
+          - _enable_generic_wim_iso_check.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso_check.diff.before.x64.feature_packs is defined
+          - _enable_generic_wim_iso_check.diff.before.x64.feature_packs | length == 1
+          - _enable_generic_wim_iso_check.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso_check.diff.before.x64.generic_iso is defined
+          - not _enable_generic_wim_iso_check.diff.before.x64.generic_iso.enabled
+          - _enable_generic_wim_iso_check.diff.before.x64.generic_wim is defined
+          - not _enable_generic_wim_iso_check.diff.before.x64.generic_wim.enabled
+          - _enable_generic_wim_iso_check.diff.before.x64.include_drivers is defined
+          - _enable_generic_wim_iso_check.diff.before.x64.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso_check.diff.before.x64.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso_check.diff.before.x64.include_drivers'
+          - _enable_generic_wim_iso_check.diff.before.x64.litetouch_iso is defined
+          - not _enable_generic_wim_iso_check.diff.before.x64.litetouch_iso.enabled
+          - _enable_generic_wim_iso_check.diff.before.x64.litetouch_wim is defined
+          - _enable_generic_wim_iso_check.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_generic_wim_iso_check.diff.before.x64.scratch_space == 32
+          - _enable_generic_wim_iso_check.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _enable_generic_wim_iso_check.diff.before.x86 is defined
+          - _enable_generic_wim_iso_check.diff.before.x86.enabled
+          - _enable_generic_wim_iso_check.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso_check.diff.before.x86.feature_packs is defined
+          - _enable_generic_wim_iso_check.diff.before.x86.feature_packs | length == 1
+          - _enable_generic_wim_iso_check.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso_check.diff.before.x86.generic_iso is defined
+          - not _enable_generic_wim_iso_check.diff.before.x86.generic_iso.enabled
+          - _enable_generic_wim_iso_check.diff.before.x86.generic_wim is defined
+          - not _enable_generic_wim_iso_check.diff.before.x86.generic_wim.enabled
+          - _enable_generic_wim_iso_check.diff.before.x86.include_drivers is defined
+          - _enable_generic_wim_iso_check.diff.before.x86.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso_check.diff.before.x86.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso_check.diff.before.x86.include_drivers'
+          - _enable_generic_wim_iso_check.diff.before.x86.litetouch_iso is defined
+          - not _enable_generic_wim_iso_check.diff.before.x86.litetouch_iso.enabled
+          - _enable_generic_wim_iso_check.diff.before.x86.litetouch_wim is defined
+          - _enable_generic_wim_iso_check.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_generic_wim_iso_check.diff.before.x86.scratch_space == 32
+          - _enable_generic_wim_iso_check.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 8 settings are not as expected.
+        success_msg: MDT Deployment Share 8 settings are as expected.
+
+    - name: Verify enable configure x86 and x64 WIMs and ISOs output
+      ansible.builtin.assert:
+        that:
+          - _enable_generic_wim_iso_check.deployment_share.comments == ""
+          - not _enable_generic_wim_iso_check.deployment_share.enable_multicast
+          - _enable_generic_wim_iso_check.deployment_share.x64 is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso_check.deployment_share.x64.feature_packs is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.feature_packs | length == 1
+          - _enable_generic_wim_iso_check.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso_check.deployment_share.x64.generic_iso is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.generic_iso.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x64.generic_iso.name == "winpe-x64.iso"
+          - _enable_generic_wim_iso_check.deployment_share.x64.generic_wim is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.generic_wim.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x64.generic_wim.description == "Generic WinPE - x64"
+          - _enable_generic_wim_iso_check.deployment_share.x64.include_drivers is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso_check.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso_check.deployment_share.x64.include_drivers'
+          - _enable_generic_wim_iso_check.deployment_share.x64.litetouch_iso is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.litetouch_iso.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x64.litetouch_iso.name == "mdt-x64.iso"
+          - _enable_generic_wim_iso_check.deployment_share.x64.litetouch_wim is defined
+          - _enable_generic_wim_iso_check.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_generic_wim_iso_check.deployment_share.x64.scratch_space == 32
+          - _enable_generic_wim_iso_check.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _enable_generic_wim_iso_check.deployment_share.x86 is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso_check.deployment_share.x86.feature_packs is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.feature_packs | length == 1
+          - _enable_generic_wim_iso_check.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso_check.deployment_share.x86.generic_iso is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.generic_iso.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x86.generic_iso.name == "winpe-x86.iso"
+          - _enable_generic_wim_iso_check.deployment_share.x86.generic_wim is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.generic_wim.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x86.generic_wim.description == "Generic WinPE - x86"
+          - _enable_generic_wim_iso_check.deployment_share.x86.include_drivers is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso_check.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso_check.deployment_share.x86.include_drivers'
+          - _enable_generic_wim_iso_check.deployment_share.x86.litetouch_iso is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.litetouch_iso.enabled
+          - _enable_generic_wim_iso_check.deployment_share.x86.litetouch_iso.name == "mdt-x86.iso"
+          - _enable_generic_wim_iso_check.deployment_share.x86.litetouch_wim is defined
+          - _enable_generic_wim_iso_check.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_generic_wim_iso_check.deployment_share.x86.scratch_space == 32
+          - _enable_generic_wim_iso_check.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 8 settings are not as expected.
+        success_msg: MDT Deployment Share 8 settings are as expected.
+
+    - name: Enable configure x86 and x64 WIMs and ISOs
+      diff: true
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: C:\MDTShare8
+        x86:
+          generic_iso:
+            name: winpe-x86.iso
+          generic_wim:
+            description: Generic WinPE - x86
+          litetouch_iso:
+            name: mdt-x86.iso
+        x64:
+          generic_iso:
+            name: winpe-x64.iso
+          generic_wim:
+            description: Generic WinPE - x64
+          litetouch_iso:
+            name: mdt-x64.iso
+      register: _enable_generic_wim_iso
+
+    - name: Verify enable configure x86 and x64 WIMs and ISOs previous output # noqa no-handler
+      when:
+        - _enable_generic_wim_iso is changed
+      ansible.builtin.assert:
+        that:
+          - _enable_generic_wim_iso.diff.before.comments == ''
+          - not _enable_generic_wim_iso.diff.before.enable_multicast
+          - _enable_generic_wim_iso.diff.before.x64 is defined
+          - _enable_generic_wim_iso.diff.before.x64.enabled
+          - _enable_generic_wim_iso.diff.before.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso.diff.before.x64.feature_packs is defined
+          - _enable_generic_wim_iso.diff.before.x64.feature_packs | length == 1
+          - _enable_generic_wim_iso.diff.before.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso.diff.before.x64.generic_iso is defined
+          - not _enable_generic_wim_iso.diff.before.x64.generic_iso.enabled
+          - _enable_generic_wim_iso.diff.before.x64.generic_wim is defined
+          - not _enable_generic_wim_iso.diff.before.x64.generic_wim.enabled
+          - _enable_generic_wim_iso.diff.before.x64.include_drivers is defined
+          - _enable_generic_wim_iso.diff.before.x64.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso.diff.before.x64.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso.diff.before.x64.include_drivers'
+          - _enable_generic_wim_iso.diff.before.x64.litetouch_iso is defined
+          - not _enable_generic_wim_iso.diff.before.x64.litetouch_iso.enabled
+          - _enable_generic_wim_iso.diff.before.x64.litetouch_wim is defined
+          - _enable_generic_wim_iso.diff.before.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_generic_wim_iso.diff.before.x64.scratch_space == 32
+          - _enable_generic_wim_iso.diff.before.x64.selection_profile == "All Drivers and Packages"
+          - _enable_generic_wim_iso.diff.before.x86 is defined
+          - _enable_generic_wim_iso.diff.before.x86.enabled
+          - _enable_generic_wim_iso.diff.before.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso.diff.before.x86.feature_packs is defined
+          - _enable_generic_wim_iso.diff.before.x86.feature_packs | length == 1
+          - _enable_generic_wim_iso.diff.before.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso.diff.before.x86.generic_iso is defined
+          - not _enable_generic_wim_iso.diff.before.x86.generic_iso.enabled
+          - _enable_generic_wim_iso.diff.before.x86.generic_wim is defined
+          - not _enable_generic_wim_iso.diff.before.x86.generic_wim.enabled
+          - _enable_generic_wim_iso.diff.before.x86.include_drivers is defined
+          - _enable_generic_wim_iso.diff.before.x86.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso.diff.before.x86.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso.diff.before.x86.include_drivers'
+          - _enable_generic_wim_iso.diff.before.x86.litetouch_iso is defined
+          - not _enable_generic_wim_iso.diff.before.x86.litetouch_iso.enabled
+          - _enable_generic_wim_iso.diff.before.x86.litetouch_wim is defined
+          - _enable_generic_wim_iso.diff.before.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_generic_wim_iso.diff.before.x86.scratch_space == 32
+          - _enable_generic_wim_iso.diff.before.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 8 settings are not as expected.
+        success_msg: MDT Deployment Share 8 settings are as expected.
+
+    - name: Verify enable configure x86 and x64 WIMs and ISOs output
+      ansible.builtin.assert:
+        that:
+          - _enable_generic_wim_iso.deployment_share.comments == ''
+          - not _enable_generic_wim_iso.deployment_share.enable_multicast
+          - _enable_generic_wim_iso.deployment_share.x64 is defined
+          - _enable_generic_wim_iso.deployment_share.x64.enabled
+          - _enable_generic_wim_iso.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso.deployment_share.x64.feature_packs is defined
+          - _enable_generic_wim_iso.deployment_share.x64.feature_packs | length == 1
+          - _enable_generic_wim_iso.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso.deployment_share.x64.generic_iso is defined
+          - _enable_generic_wim_iso.deployment_share.x64.generic_iso.enabled
+          - _enable_generic_wim_iso.deployment_share.x64.generic_iso.name == "winpe-x64.iso"
+          - _enable_generic_wim_iso.deployment_share.x64.generic_wim is defined
+          - _enable_generic_wim_iso.deployment_share.x64.generic_wim.enabled
+          - _enable_generic_wim_iso.deployment_share.x64.generic_wim.description == "Generic WinPE - x64"
+          - _enable_generic_wim_iso.deployment_share.x64.include_drivers is defined
+          - _enable_generic_wim_iso.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso.deployment_share.x64.include_drivers'
+          - _enable_generic_wim_iso.deployment_share.x64.litetouch_iso is defined
+          - _enable_generic_wim_iso.deployment_share.x64.litetouch_iso.enabled
+          - _enable_generic_wim_iso.deployment_share.x64.litetouch_iso.name == "mdt-x64.iso"
+          - _enable_generic_wim_iso.deployment_share.x64.litetouch_wim is defined
+          - _enable_generic_wim_iso.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _enable_generic_wim_iso.deployment_share.x64.scratch_space == 32
+          - _enable_generic_wim_iso.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _enable_generic_wim_iso.deployment_share.x86 is defined
+          - _enable_generic_wim_iso.deployment_share.x86.enabled
+          - _enable_generic_wim_iso.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _enable_generic_wim_iso.deployment_share.x86.feature_packs is defined
+          - _enable_generic_wim_iso.deployment_share.x86.feature_packs | length == 1
+          - _enable_generic_wim_iso.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _enable_generic_wim_iso.deployment_share.x86.generic_iso is defined
+          - _enable_generic_wim_iso.deployment_share.x86.generic_iso.enabled
+          - _enable_generic_wim_iso.deployment_share.x86.generic_iso.name == "winpe-x86.iso"
+          - _enable_generic_wim_iso.deployment_share.x86.generic_wim is defined
+          - _enable_generic_wim_iso.deployment_share.x86.generic_wim.enabled
+          - _enable_generic_wim_iso.deployment_share.x86.generic_wim.description == "Generic WinPE - x86"
+          - _enable_generic_wim_iso.deployment_share.x86.include_drivers is defined
+          - _enable_generic_wim_iso.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _enable_generic_wim_iso.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _enable_generic_wim_iso.deployment_share.x86.include_drivers'
+          - _enable_generic_wim_iso.deployment_share.x86.litetouch_iso is defined
+          - _enable_generic_wim_iso.deployment_share.x86.litetouch_iso.enabled
+          - _enable_generic_wim_iso.deployment_share.x86.litetouch_iso.name == "mdt-x86.iso"
+          - _enable_generic_wim_iso.deployment_share.x86.litetouch_wim is defined
+          - _enable_generic_wim_iso.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _enable_generic_wim_iso.deployment_share.x86.scratch_space == 32
+          - _enable_generic_wim_iso.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: MDT Deployment Share 8 settings are not as expected.
+        success_msg: MDT Deployment Share 8 settings are as expected.
+
+    - name: Verify check mode did not change anything
+      ansible.builtin.assert:
+        that:
+          - _enable_generic_wim_iso_check.changed == _enable_generic_wim_iso.changed
+        fail_msg: MDT Deployment Share 8 settings were changed in check mode.
+        success_msg: MDT Deployment Share 8 settings were not changed in check mode.

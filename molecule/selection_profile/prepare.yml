@@ -1,0 +1,86 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Create MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        mdt_share_path: C:\MDTShare
+        description: MDT Deployment Share
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare$"
+        state: present
+
+    - name: Create SMB share
+      ansible.windows.win_share:
+        name: MDTShare$
+        path: C:\MDTShare
+        full: Everyone
+        caching_mode: None
+
+    - name: Add permissions to MDT Deployment Share
+      ansible.windows.win_acl:
+        path: C:\MDTShare
+        user: vagrant
+        rights: FullControl
+        type: allow
+
+    - name: Pre-create Selection Profile
+      loop:
+        - name: Add Paths
+          definition_paths:
+            set: []
+        - name: Remove Paths
+          definition_paths:
+            set:
+              - Operating Systems
+        - name: Add And Remove Paths
+          definition_paths:
+            set:
+              - Applications
+        - name: Set Empty
+          definition_paths:
+            set:
+              - Applications
+        - name: Set Paths
+          definition_paths:
+            set:
+              - Operating Systems
+        - name: Change Comments
+          definition_paths:
+            set: []
+          comments: Old Comments
+        - name: Change Enabled
+          definition_paths:
+            set: []
+          enabled: false
+        - name: Change Hidden
+          definition_paths:
+            set: []
+          hidden: true
+        - guid: "{{ 'Rename' | to_uuid }}"
+          name: Rename
+          definition_paths:
+            set: []
+        - name: Remove By Name
+          definition_paths:
+            set: []
+        - guid: "{{ 'Remove By GUID' | to_uuid }}"
+          name: Remove By GUID
+          definition_paths:
+            set: []
+      trippsc2.mdt.selection_profile:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ item.guid | default(omit) }}"
+        name: "{{ item.name }}"
+        definition_paths: "{{ item.definition_paths }}"
+        comments: "{{ item.comments | default(omit) }}"
+        enabled: "{{ item.enabled | default(omit) }}"
+        hidden: "{{ item.hidden | default(omit) }}"
+        state: present

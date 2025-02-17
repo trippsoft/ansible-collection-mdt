@@ -1,2 +1,21 @@
 ---
 requires_ansible: '>=2.15.0'
+
+action_groups:
+  mdt:
+    - application
+    - application_dependency
+    - application_info
+    - boot_image
+    - deployment_share
+    - deployment_share_info
+    - directory
+    - directory_info
+    - driver_info
+    - import_drivers
+    - operating_system
+    - operating_system_info
+    - selection_profile
+    - selection_profile_info
+    - task_sequence
+    - task_sequence_info

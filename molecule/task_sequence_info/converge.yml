@@ -1,0 +1,565 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks:
+    - name: Get No product key info by ID
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        id: NONE-NO-ADMIN
+      register: _no_product_key_info_by_id
+
+    - name: Verify that the No product key info by ID is correct
+      ansible.builtin.assert:
+        that:
+          - _no_product_key_info_by_id.task_sequence is defined
+          - _no_product_key_info_by_id.task_sequence.id == "NONE-NO-ADMIN"
+          - _no_product_key_info_by_id.task_sequence.name == 'No product key'
+          - _no_product_key_info_by_id.task_sequence.template == 'Client.xml'
+          - _no_product_key_info_by_id.task_sequence.product_key_type == 'none'
+          - _no_product_key_info_by_id.task_sequence.product_key is not defined
+          - _no_product_key_info_by_id.task_sequence.admin_password is not defined
+          - _no_product_key_info_by_id.task_sequence.operating_system is defined
+          - _no_product_key_info_by_id.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _no_product_key_info_by_id.task_sequence.version == '1.0'
+          - _no_product_key_info_by_id.task_sequence.full_name == "Test User"
+          - _no_product_key_info_by_id.task_sequence.organization == "Test Organization"
+          - _no_product_key_info_by_id.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The No product key info by ID output is not correct.
+        success_msg: The No product key info by ID output is correct.
+
+    - name: Get No product key info by ID with secrets
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        id: NONE-NO-ADMIN
+        include_secrets: true
+      register: _no_product_key_info_by_id_with_secrets
+
+    - name: Verify that the No product key info by ID with secrets is correct
+      ansible.builtin.assert:
+        that:
+          - _no_product_key_info_by_id_with_secrets.task_sequence is defined
+          - _no_product_key_info_by_id_with_secrets.task_sequence.id == 'NONE-NO-ADMIN'
+          - _no_product_key_info_by_id_with_secrets.task_sequence.name == 'No product key'
+          - _no_product_key_info_by_id_with_secrets.task_sequence.template == 'Client.xml'
+          - _no_product_key_info_by_id_with_secrets.task_sequence.product_key_type == 'none'
+          - _no_product_key_info_by_id_with_secrets.task_sequence.product_key is not defined
+          - _no_product_key_info_by_id_with_secrets.task_sequence.admin_password is not defined
+          - _no_product_key_info_by_id_with_secrets.task_sequence.operating_system is defined
+          - _no_product_key_info_by_id_with_secrets.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _no_product_key_info_by_id_with_secrets.task_sequence.version == '1.0'
+          - _no_product_key_info_by_id_with_secrets.task_sequence.full_name == "Test User"
+          - _no_product_key_info_by_id_with_secrets.task_sequence.organization == "Test Organization"
+          - _no_product_key_info_by_id_with_secrets.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The No product key info by ID with secrets output is not correct.
+        success_msg: The No product key info by ID with secrets output is correct.
+
+    - name: Get No product key info by name
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        name: No product key
+      register: _no_product_key_info_by_name
+
+    - name: Verify that the No product key info by name is correct
+      ansible.builtin.assert:
+        that:
+          - _no_product_key_info_by_name.task_sequence is defined
+          - _no_product_key_info_by_name.task_sequence.id == 'NONE-NO-ADMIN'
+          - _no_product_key_info_by_name.task_sequence.name == 'No product key'
+          - _no_product_key_info_by_name.task_sequence.template == 'Client.xml'
+          - _no_product_key_info_by_name.task_sequence.product_key_type == 'none'
+          - _no_product_key_info_by_name.task_sequence.product_key is not defined
+          - _no_product_key_info_by_name.task_sequence.admin_password is not defined
+          - _no_product_key_info_by_name.task_sequence.operating_system is defined
+          - _no_product_key_info_by_name.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _no_product_key_info_by_name.task_sequence.version == '1.0'
+          - _no_product_key_info_by_name.task_sequence.full_name == "Test User"
+          - _no_product_key_info_by_name.task_sequence.organization == "Test Organization"
+          - _no_product_key_info_by_name.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The No product key info by name output is not correct.
+        success_msg: The No product key info by name output is correct.
+
+    - name: Get No product key info by name with secrets
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        name: No product key
+        include_secrets: true
+      register: _no_product_key_info_by_name_with_secrets
+
+    - name: Verify that the No product key info by name with secrets is correct
+      ansible.builtin.assert:
+        that:
+          - _no_product_key_info_by_name_with_secrets.task_sequence is defined
+          - _no_product_key_info_by_name_with_secrets.task_sequence.id == 'NONE-NO-ADMIN'
+          - _no_product_key_info_by_name_with_secrets.task_sequence.name == 'No product key'
+          - _no_product_key_info_by_name_with_secrets.task_sequence.template == 'Client.xml'
+          - _no_product_key_info_by_name_with_secrets.task_sequence.product_key_type == 'none'
+          - _no_product_key_info_by_name_with_secrets.task_sequence.product_key is not defined
+          - _no_product_key_info_by_name_with_secrets.task_sequence.admin_password is not defined
+          - _no_product_key_info_by_name_with_secrets.task_sequence.operating_system is defined
+          - _no_product_key_info_by_name_with_secrets.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _no_product_key_info_by_name_with_secrets.task_sequence.version == '1.0'
+          - _no_product_key_info_by_name_with_secrets.task_sequence.full_name == "Test User"
+          - _no_product_key_info_by_name_with_secrets.task_sequence.organization == "Test Organization"
+          - _no_product_key_info_by_name_with_secrets.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The No product key info by name with secrets output is not correct.
+        success_msg: The No product key info by name with secrets output is correct.
+
+    - name: Get MAK product key info by ID
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        id: MAK-NO-ADMIN
+      register: _mak_product_key_info_by_id
+
+    - name: Verify that the MAK product key info by ID is correct
+      ansible.builtin.assert:
+        that:
+          - _mak_product_key_info_by_id.task_sequence is defined
+          - _mak_product_key_info_by_id.task_sequence.id == 'MAK-NO-ADMIN'
+          - _mak_product_key_info_by_id.task_sequence.name == 'MAK product key'
+          - _mak_product_key_info_by_id.task_sequence.template == 'Client.xml'
+          - _mak_product_key_info_by_id.task_sequence.product_key_type == 'mak'
+          - _mak_product_key_info_by_id.task_sequence.product_key is not defined
+          - _mak_product_key_info_by_id.task_sequence.admin_password is not defined
+          - _mak_product_key_info_by_id.task_sequence.operating_system is defined
+          - _mak_product_key_info_by_id.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _mak_product_key_info_by_id.task_sequence.version == '1.0'
+          - _mak_product_key_info_by_id.task_sequence.full_name == "Test User"
+          - _mak_product_key_info_by_id.task_sequence.organization == "Test Organization"
+          - _mak_product_key_info_by_id.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The MAK product key info by ID output is not correct.
+        success_msg: The MAK product key info by ID output is correct.
+
+    - name: Get MAK product key info by ID with secrets
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        id: MAK-NO-ADMIN
+        include_secrets: true
+      register: _mak_product_key_info_by_id_with_secrets
+
+    - name: Verify that the MAK product key info by ID with secrets is correct
+      ansible.builtin.assert:
+        that:
+          - _mak_product_key_info_by_id_with_secrets.task_sequence is defined
+          - _mak_product_key_info_by_id_with_secrets.task_sequence.id == 'MAK-NO-ADMIN'
+          - _mak_product_key_info_by_id_with_secrets.task_sequence.name == 'MAK product key'
+          - _mak_product_key_info_by_id_with_secrets.task_sequence.template == 'Client.xml'
+          - _mak_product_key_info_by_id_with_secrets.task_sequence.product_key_type == 'mak'
+          - _mak_product_key_info_by_id_with_secrets.task_sequence.product_key == 'XXXXX-XXXXX-XXXXX-XXXXX-XXXXX'
+          - _mak_product_key_info_by_id_with_secrets.task_sequence.admin_password is not defined
+          - _mak_product_key_info_by_id_with_secrets.task_sequence.operating_system is defined
+          - _mak_product_key_info_by_id_with_secrets.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _mak_product_key_info_by_id_with_secrets.task_sequence.version == '1.0'
+          - _mak_product_key_info_by_id_with_secrets.task_sequence.full_name == "Test User"
+          - _mak_product_key_info_by_id_with_secrets.task_sequence.organization == "Test Organization"
+          - _mak_product_key_info_by_id_with_secrets.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The MAK product key info by ID with secrets output is not correct.
+        success_msg: The MAK product key info by ID with secrets output is correct.
+
+    - name: Get MAK product key info by name
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        name: MAK product key
+      register: _mak_product_key_info_by_name
+
+    - name: Verify that the MAK product key info by name is correct
+      ansible.builtin.assert:
+        that:
+          - _mak_product_key_info_by_name.task_sequence is defined
+          - _mak_product_key_info_by_name.task_sequence.id == 'MAK-NO-ADMIN'
+          - _mak_product_key_info_by_name.task_sequence.name == 'MAK product key'
+          - _mak_product_key_info_by_name.task_sequence.template == 'Client.xml'
+          - _mak_product_key_info_by_name.task_sequence.product_key_type == 'mak'
+          - _mak_product_key_info_by_name.task_sequence.product_key is not defined
+          - _mak_product_key_info_by_name.task_sequence.admin_password is not defined
+          - _mak_product_key_info_by_name.task_sequence.operating_system is defined
+          - _mak_product_key_info_by_name.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _mak_product_key_info_by_name.task_sequence.version == '1.0'
+          - _mak_product_key_info_by_name.task_sequence.full_name == "Test User"
+          - _mak_product_key_info_by_name.task_sequence.organization == "Test Organization"
+          - _mak_product_key_info_by_name.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The MAK product key info by name output is not correct.
+        success_msg: The MAK product key info by name output is correct.
+
+    - name: Get MAK product key info by name with secrets
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        name: MAK product key
+        include_secrets: true
+      register: _mak_product_key_info_by_name_with_secrets
+
+    - name: Verify that the MAK product key info by name with secrets is correct
+      ansible.builtin.assert:
+        that:
+          - _mak_product_key_info_by_name_with_secrets.task_sequence is defined
+          - _mak_product_key_info_by_name_with_secrets.task_sequence.id == 'MAK-NO-ADMIN'
+          - _mak_product_key_info_by_name_with_secrets.task_sequence.name == 'MAK product key'
+          - _mak_product_key_info_by_name_with_secrets.task_sequence.template == 'Client.xml'
+          - _mak_product_key_info_by_name_with_secrets.task_sequence.product_key_type == 'mak'
+          - _mak_product_key_info_by_name_with_secrets.task_sequence.product_key == 'XXXXX-XXXXX-XXXXX-XXXXX-XXXXX'
+          - _mak_product_key_info_by_name_with_secrets.task_sequence.admin_password is not defined
+          - _mak_product_key_info_by_name_with_secrets.task_sequence.operating_system is defined
+          - _mak_product_key_info_by_name_with_secrets.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _mak_product_key_info_by_name_with_secrets.task_sequence.version == '1.0'
+          - _mak_product_key_info_by_name_with_secrets.task_sequence.full_name == "Test User"
+          - _mak_product_key_info_by_name_with_secrets.task_sequence.organization == "Test Organization"
+          - _mak_product_key_info_by_name_with_secrets.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The MAK product key info by name with secrets output is not correct.
+        success_msg: The MAK product key info by name with secrets output is correct.
+
+    - name: Get Retail product key info by ID
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        id: RETAIL-NO-ADMIN
+      register: _retail_product_key_info_by_id
+
+    - name: Verify that the Retail product key info by ID is correct
+      ansible.builtin.assert:
+        that:
+          - _retail_product_key_info_by_id.task_sequence is defined
+          - _retail_product_key_info_by_id.task_sequence.id == 'RETAIL-NO-ADMIN'
+          - _retail_product_key_info_by_id.task_sequence.name == 'Retail product key'
+          - _retail_product_key_info_by_id.task_sequence.template == 'Client.xml'
+          - _retail_product_key_info_by_id.task_sequence.product_key_type == 'retail'
+          - _retail_product_key_info_by_id.task_sequence.product_key is not defined
+          - _retail_product_key_info_by_id.task_sequence.admin_password is not defined
+          - _retail_product_key_info_by_id.task_sequence.operating_system is defined
+          - _retail_product_key_info_by_id.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _retail_product_key_info_by_id.task_sequence.version == '1.0'
+          - _retail_product_key_info_by_id.task_sequence.full_name == "Test User"
+          - _retail_product_key_info_by_id.task_sequence.organization == "Test Organization"
+          - _retail_product_key_info_by_id.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The Retail product key info by ID output is not correct.
+        success_msg: The Retail product key info by ID output is correct.
+
+    - name: Get Retail product key info by ID with secrets
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        id: RETAIL-NO-ADMIN
+        include_secrets: true
+      register: _retail_product_key_info_by_id_with_secrets
+
+    - name: Verify that the Retail product key info by ID with secrets is correct
+      ansible.builtin.assert:
+        that:
+          - _retail_product_key_info_by_id_with_secrets.task_sequence is defined
+          - _retail_product_key_info_by_id_with_secrets.task_sequence.id == 'RETAIL-NO-ADMIN'
+          - _retail_product_key_info_by_id_with_secrets.task_sequence.name == 'Retail product key'
+          - _retail_product_key_info_by_id_with_secrets.task_sequence.template == 'Client.xml'
+          - _retail_product_key_info_by_id_with_secrets.task_sequence.product_key_type == 'retail'
+          - _retail_product_key_info_by_id_with_secrets.task_sequence.product_key == 'XXXXX-XXXXX-XXXXX-XXXXX-XXXXX'
+          - _retail_product_key_info_by_id_with_secrets.task_sequence.admin_password is not defined
+          - _retail_product_key_info_by_id_with_secrets.task_sequence.operating_system is defined
+          - _retail_product_key_info_by_id_with_secrets.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _retail_product_key_info_by_id_with_secrets.task_sequence.version == '1.0'
+          - _retail_product_key_info_by_id_with_secrets.task_sequence.full_name == "Test User"
+          - _retail_product_key_info_by_id_with_secrets.task_sequence.organization == "Test Organization"
+          - _retail_product_key_info_by_id_with_secrets.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The Retail product key info by ID with secrets output is not correct.
+        success_msg: The Retail product key info by ID with secrets output is correct.
+
+    - name: Get Retail product key info by name
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        name: Retail product key
+      register: _retail_product_key_info_by_name
+
+    - name: Verify that the Retail product key info by name is correct
+      ansible.builtin.assert:
+        that:
+          - _retail_product_key_info_by_name.task_sequence is defined
+          - _retail_product_key_info_by_name.task_sequence.id == 'RETAIL-NO-ADMIN'
+          - _retail_product_key_info_by_name.task_sequence.name == 'Retail product key'
+          - _retail_product_key_info_by_name.task_sequence.template == 'Client.xml'
+          - _retail_product_key_info_by_name.task_sequence.product_key_type == 'retail'
+          - _retail_product_key_info_by_name.task_sequence.product_key is not defined
+          - _retail_product_key_info_by_name.task_sequence.admin_password is not defined
+          - _retail_product_key_info_by_name.task_sequence.operating_system is defined
+          - _retail_product_key_info_by_name.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _retail_product_key_info_by_name.task_sequence.version == '1.0'
+          - _retail_product_key_info_by_name.task_sequence.full_name == "Test User"
+          - _retail_product_key_info_by_name.task_sequence.organization == "Test Organization"
+          - _retail_product_key_info_by_name.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The Retail product key info by name output is not correct.
+        success_msg: The Retail product key info by name output is correct.
+
+    - name: Get Retail product key info by name with secrets
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        name: Retail product key
+        include_secrets: true
+      register: _retail_product_key_info_by_name_with_secrets
+
+    - name: Verify that the Retail product key info by name with secrets is correct
+      ansible.builtin.assert:
+        that:
+          - _retail_product_key_info_by_name_with_secrets.task_sequence is defined
+          - _retail_product_key_info_by_name_with_secrets.task_sequence.id == 'RETAIL-NO-ADMIN'
+          - _retail_product_key_info_by_name_with_secrets.task_sequence.name == 'Retail product key'
+          - _retail_product_key_info_by_name_with_secrets.task_sequence.template == 'Client.xml'
+          - _retail_product_key_info_by_name_with_secrets.task_sequence.product_key_type == 'retail'
+          - _retail_product_key_info_by_name_with_secrets.task_sequence.product_key == 'XXXXX-XXXXX-XXXXX-XXXXX-XXXXX'
+          - _retail_product_key_info_by_name_with_secrets.task_sequence.admin_password is not defined
+          - _retail_product_key_info_by_name_with_secrets.task_sequence.operating_system is defined
+          - _retail_product_key_info_by_name_with_secrets.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _retail_product_key_info_by_name_with_secrets.task_sequence.version == '1.0'
+          - _retail_product_key_info_by_name_with_secrets.task_sequence.full_name == "Test User"
+          - _retail_product_key_info_by_name_with_secrets.task_sequence.organization == "Test Organization"
+          - _retail_product_key_info_by_name_with_secrets.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The Retail product key info by name with secrets output is not correct.
+        success_msg: The Retail product key info by name with secrets output is correct.
+
+    - name: Get No product key with admin password info by ID
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        id: NONE-ADMIN
+      register: _no_product_key_with_admin_password_info_by_id
+
+    - name: Verify that the No product key with admin password info by ID is correct
+      ansible.builtin.assert:
+        that:
+          - _no_product_key_with_admin_password_info_by_id.task_sequence is defined
+          - _no_product_key_with_admin_password_info_by_id.task_sequence.id == 'NONE-ADMIN'
+          - _no_product_key_with_admin_password_info_by_id.task_sequence.name == 'No product key with admin password'
+          - _no_product_key_with_admin_password_info_by_id.task_sequence.template == 'Client.xml'
+          - _no_product_key_with_admin_password_info_by_id.task_sequence.product_key_type == 'none'
+          - _no_product_key_with_admin_password_info_by_id.task_sequence.product_key is not defined
+          - _no_product_key_with_admin_password_info_by_id.task_sequence.admin_password is not defined
+          - _no_product_key_with_admin_password_info_by_id.task_sequence.operating_system is defined
+          - _no_product_key_with_admin_password_info_by_id.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _no_product_key_with_admin_password_info_by_id.task_sequence.version == '1.1'
+          - _no_product_key_with_admin_password_info_by_id.task_sequence.full_name == "Test User"
+          - _no_product_key_with_admin_password_info_by_id.task_sequence.organization == "Test Organization"
+          - _no_product_key_with_admin_password_info_by_id.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The No product key with admin password info by ID output is not correct.
+        success_msg: The No product key with admin password info by ID output is correct.
+
+    - name: Get No product key with admin password info by ID with secrets
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        id: NONE-ADMIN
+        include_secrets: true
+      register: _no_product_key_with_admin_password_info_by_id_with_secrets
+
+    - name: Verify that the No product key with admin password info by ID with secrets is correct
+      ansible.builtin.assert:
+        that:
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence is defined
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.id == 'NONE-ADMIN'
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.name == 'No product key with admin password'
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.template == 'Client.xml'
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.product_key_type == 'none'
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.product_key is not defined
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.admin_password == 'Password123!'
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.operating_system is defined
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.version == '1.1'
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.full_name == "Test User"
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.organization == "Test Organization"
+          - _no_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The No product key with admin password info by ID with secrets output is not correct.
+        success_msg: The No product key with admin password info by ID with secrets output is correct.
+
+    - name: Get No product key with admin password info by name
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        name: No product key with admin password
+      register: _no_product_key_with_admin_password_info_by_name
+
+    - name: Verify that the No product key with admin password info by name is correct
+      ansible.builtin.assert:
+        that:
+          - _no_product_key_with_admin_password_info_by_name.task_sequence is defined
+          - _no_product_key_with_admin_password_info_by_name.task_sequence.id == 'NONE-ADMIN'
+          - _no_product_key_with_admin_password_info_by_name.task_sequence.name == 'No product key with admin password'
+          - _no_product_key_with_admin_password_info_by_name.task_sequence.template == 'Client.xml'
+          - _no_product_key_with_admin_password_info_by_name.task_sequence.product_key_type == 'none'
+          - _no_product_key_with_admin_password_info_by_name.task_sequence.product_key is not defined
+          - _no_product_key_with_admin_password_info_by_name.task_sequence.admin_password is not defined
+          - _no_product_key_with_admin_password_info_by_name.task_sequence.operating_system is defined
+          - _no_product_key_with_admin_password_info_by_name.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _no_product_key_with_admin_password_info_by_name.task_sequence.version == '1.1'
+          - _no_product_key_with_admin_password_info_by_name.task_sequence.full_name == "Test User"
+          - _no_product_key_with_admin_password_info_by_name.task_sequence.organization == "Test Organization"
+          - _no_product_key_with_admin_password_info_by_name.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The No product key with admin password info by name output is not correct.
+        success_msg: The No product key with admin password info by name output is correct.
+
+    - name: Get No product key with admin password info by name with secrets
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        name: No product key with admin password
+        include_secrets: true
+      register: _no_product_key_with_admin_password_info_by_name_with_secrets
+
+    - name: Verify that the No product key with admin password info by name with secrets is correct
+      ansible.builtin.assert:
+        that:
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence is defined
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.id == 'NONE-ADMIN'
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.name == 'No product key with admin password'
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.template == 'Client.xml'
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.product_key_type == 'none'
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.product_key is not defined
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.admin_password == 'Password123!'
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.operating_system is defined
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.version == '1.1'
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.full_name == "Test User"
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.organization == "Test Organization"
+          - _no_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The No product key with admin password info by name with secrets output is not correct.
+        success_msg: The No product key with admin password info by name with secrets output is correct.
+
+    - name: Get MAK product key with admin password info by ID
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        id: MAK-ADMIN
+      register: _mak_product_key_with_admin_password_info_by_id
+
+    - name: Verify that the MAK product key with admin password info by ID is correct
+      ansible.builtin.assert:
+        that:
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence is defined
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence.id == 'MAK-ADMIN'
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence.name == 'MAK product key with admin password'
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence.template == 'Client.xml'
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence.product_key_type == 'mak'
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence.product_key is not defined
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence.admin_password is not defined
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence.operating_system is defined
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence.version == '1.1'
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence.full_name == "Test User"
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence.organization == "Test Organization"
+          - _mak_product_key_with_admin_password_info_by_id.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The MAK product key with admin password info by ID output is not correct.
+        success_msg: The MAK product key with admin password info by ID output is correct.
+
+    - name: Get MAK product key with admin password info by ID with secrets
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        id: MAK-ADMIN
+        include_secrets: true
+      register: _mak_product_key_with_admin_password_info_by_id_with_secrets
+
+    - name: Verify that the MAK product key with admin password info by ID with secrets is correct
+      ansible.builtin.assert:
+        that:
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence is defined
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.id == 'MAK-ADMIN'
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.name == 'MAK product key with admin password'
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.template == 'Client.xml'
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.product_key_type == 'mak'
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.product_key == 'XXXXX-XXXXX-XXXXX-XXXXX-XXXXX'
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.admin_password == 'Password123!'
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.operating_system is defined
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.version == '1.1'
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.full_name == "Test User"
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.organization == "Test Organization"
+          - _mak_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The MAK product key with admin password info by ID with secrets output is not correct.
+        success_msg: The MAK product key with admin password info by ID with secrets output is correct.
+
+    - name: Get MAK product key with admin password info by name
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        name: MAK product key with admin password
+      register: _mak_product_key_with_admin_password_info_by_name
+
+    - name: Verify that the MAK product key with admin password info by name is correct
+      ansible.builtin.assert:
+        that:
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence is defined
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence.id == 'MAK-ADMIN'
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence.name == 'MAK product key with admin password'
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence.template == 'Client.xml'
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence.product_key_type == 'mak'
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence.product_key is not defined
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence.admin_password is not defined
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence.operating_system is defined
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence.version == '1.1'
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence.full_name == "Test User"
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence.organization == "Test Organization"
+          - _mak_product_key_with_admin_password_info_by_name.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The MAK product key with admin password info by name output is not correct.
+        success_msg: The MAK product key with admin password info by name output is correct.
+
+    - name: Get MAK product key with admin password info by name with secrets
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        name: MAK product key with admin password
+        include_secrets: true
+      register: _mak_product_key_with_admin_password_info_by_name_with_secrets
+
+    - name: Verify that the MAK product key with admin password info by name with secrets is correct
+      ansible.builtin.assert:
+        that:
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence is defined
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.id == 'MAK-ADMIN'
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.name == 'MAK product key with admin password'
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.template == 'Client.xml'
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.product_key_type == 'mak'
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.product_key == 'XXXXX-XXXXX-XXXXX-XXXXX-XXXXX'
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.admin_password == 'Password123!'
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.operating_system is defined
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.version == '1.1'
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.full_name == "Test User"
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.organization == "Test Organization"
+          - _mak_product_key_with_admin_password_info_by_name_with_secrets.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The MAK product key with admin password info by name with secrets output is not correct.
+        success_msg: The MAK product key with admin password info by name with secrets output is correct.
+
+    - name: Get Retail product key with admin password info by ID
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        id: RETAIL-ADMIN
+      register: _retail_product_key_with_admin_password_info_by_id
+
+    - name: Verify that the Retail product key with admin password info by ID is correct
+      ansible.builtin.assert:
+        that:
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence is defined
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence.id == 'RETAIL-ADMIN'
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence.name == 'Retail product key with admin password'
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence.template == 'Client.xml'
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence.product_key_type == 'retail'
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence.product_key is not defined
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence.admin_password is not defined
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence.operating_system is defined
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence.version == '1.1'
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence.full_name == "Test User"
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence.organization == "Test Organization"
+          - _retail_product_key_with_admin_password_info_by_id.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The Retail product key with admin password info by ID output is not correct.
+        success_msg: The Retail product key with admin password info by ID output is correct.
+
+    - name: Get Retail product key with admin password info by ID with secrets
+      trippsc2.mdt.task_sequence_info:
+        mdt_share_path: C:\MDTShare
+        id: RETAIL-ADMIN
+        include_secrets: true
+      register: _retail_product_key_with_admin_password_info_by_id_with_secrets
+
+    - name: Verify that the Retail product key with admin password info by ID with secrets is correct
+      ansible.builtin.assert:
+        that:
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence is defined
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.id == "RETAIL-ADMIN"
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.name == 'Retail product key with admin password'
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.template == 'Client.xml'
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.product_key_type == 'retail'
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.product_key == 'XXXXX-XXXXX-XXXXX-XXXXX-XXXXX'
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.admin_password == 'Password123!'
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.operating_system is defined
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.operating_system.name == 'Windows 11 Enterprise'
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.version == '1.1'
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.full_name == "Test User"
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.organization == "Test Organization"
+          - _retail_product_key_with_admin_password_info_by_id_with_secrets.task_sequence.ie_home_page == "about:blank"
+        fail_msg: The Retail product key with admin password info by ID with secrets output is not correct.
+        success_msg: The Retail product key with admin password info by ID with secrets output is correct.

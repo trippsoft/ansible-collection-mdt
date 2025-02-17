@@ -1,0 +1,78 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks:
+    - name: Get MDT Deployment Share Info
+      trippsc2.mdt.deployment_share_info:
+        mdt_share_path: C:\MDTShare
+      register: _mdt_share_info
+
+    - name: Verify MDT Deployment Share Info
+      ansible.builtin.assert:
+        that:
+          - _mdt_share_info.exists
+          - _mdt_share_info.deployment_share is defined
+          - _mdt_share_info.deployment_share.comments == ""
+          - _mdt_share_info.deployment_share.database is defined
+          - not _mdt_share_info.deployment_share.database.enabled
+          - _mdt_share_info.deployment_share.description == "MDT Deployment Share"
+          - not _mdt_share_info.deployment_share.enable_multicast
+          - _mdt_share_info.deployment_share.unc_path == "\\\\WIN\\MDTShare$"
+          - _mdt_share_info.deployment_share.x64 is defined
+          - _mdt_share_info.deployment_share.x64.enabled
+          - _mdt_share_info.deployment_share.x64.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _mdt_share_info.deployment_share.x64.feature_packs is defined
+          - _mdt_share_info.deployment_share.x64.feature_packs | length == 1
+          - _mdt_share_info.deployment_share.x64.feature_packs[0] == "winpe-mdac"
+          - _mdt_share_info.deployment_share.x64.generic_iso is defined
+          - not _mdt_share_info.deployment_share.x64.generic_iso.enabled
+          - _mdt_share_info.deployment_share.x64.generic_wim is defined
+          - not _mdt_share_info.deployment_share.x64.generic_wim.enabled
+          - _mdt_share_info.deployment_share.x64.include_drivers is defined
+          - _mdt_share_info.deployment_share.x64.include_drivers | length == 2
+          - '"network" in _mdt_share_info.deployment_share.x64.include_drivers'
+          - '"mass_storage" in _mdt_share_info.deployment_share.x64.include_drivers'
+          - _mdt_share_info.deployment_share.x64.litetouch_iso is defined
+          - _mdt_share_info.deployment_share.x64.litetouch_iso.enabled
+          - _mdt_share_info.deployment_share.x64.litetouch_iso.name == "LiteTouchPE_x64.iso"
+          - _mdt_share_info.deployment_share.x64.litetouch_wim is defined
+          - _mdt_share_info.deployment_share.x64.litetouch_wim.description == "Lite Touch Windows PE (x64)"
+          - _mdt_share_info.deployment_share.x64.scratch_space == 32
+          - _mdt_share_info.deployment_share.x64.selection_profile == "All Drivers and Packages"
+          - _mdt_share_info.deployment_share.x86 is defined
+          - _mdt_share_info.deployment_share.x86.enabled
+          - _mdt_share_info.deployment_share.x86.background_file == "%INSTALLDIR%\\Samples\\Background.bmp"
+          - _mdt_share_info.deployment_share.x86.feature_packs is defined
+          - _mdt_share_info.deployment_share.x86.feature_packs | length == 1
+          - _mdt_share_info.deployment_share.x86.feature_packs[0] == "winpe-mdac"
+          - _mdt_share_info.deployment_share.x86.generic_iso is defined
+          - not _mdt_share_info.deployment_share.x86.generic_iso.enabled
+          - _mdt_share_info.deployment_share.x86.generic_wim is defined
+          - not _mdt_share_info.deployment_share.x86.generic_wim.enabled
+          - _mdt_share_info.deployment_share.x86.include_drivers is defined
+          - _mdt_share_info.deployment_share.x86.include_drivers | length == 2
+          - '"network" in _mdt_share_info.deployment_share.x86.include_drivers'
+          - '"mass_storage" in _mdt_share_info.deployment_share.x86.include_drivers'
+          - _mdt_share_info.deployment_share.x86.litetouch_iso is defined
+          - _mdt_share_info.deployment_share.x86.litetouch_iso.enabled
+          - _mdt_share_info.deployment_share.x86.litetouch_iso.name == "LiteTouchPE_x86.iso"
+          - _mdt_share_info.deployment_share.x86.litetouch_wim is defined
+          - _mdt_share_info.deployment_share.x86.litetouch_wim.description == "Lite Touch Windows PE (x86)"
+          - _mdt_share_info.deployment_share.x86.scratch_space == 32
+          - _mdt_share_info.deployment_share.x86.selection_profile == "All Drivers and Packages"
+        fail_msg: The module did not return expected info.
+        success_msg: The module returned expected info.
+
+    - name: Get non-existent MDT Deployment Share Info
+      trippsc2.mdt.deployment_share_info:
+        mdt_share_path: C:\Test
+      register: _nonexistent_mdt_share_info
+
+    - name: Verify non-existent MDT Deployment Share Info
+      ansible.builtin.assert:
+        that:
+          - not _nonexistent_mdt_share_info.exists
+          - _nonexistent_mdt_share_info.deployment_share is not defined
+        fail_msg: The module should return that the MDT Deployment Share does not exist.
+        success_msg: The module should return that the MDT Deployment Share does not exist.

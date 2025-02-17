@@ -1,0 +1,356 @@
+---
+- name: Verify
+  hosts:
+    - subjects
+  tasks:
+    - name: Get MDT dependency application info
+      check_mode: true
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Dependency 1
+      register: _mdt_dependency_1
+
+    - name: Get MDT dependency application info
+      check_mode: true
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Dependency 2
+      register: _mdt_dependency_2
+
+    - name: Get MDT dependency application info
+      check_mode: true
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Nested Dependency 3
+      register: _mdt_dependency_3
+
+    - name: Get MDT dependency application info
+      check_mode: true
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Nested Dependency 4
+      register: _mdt_dependency_4
+
+    - name: Attempt to not supply the MDT share path
+      trippsc2.mdt.application_dependency:
+        name: Set To Empty
+        set: []
+      register: _no_mdt_share_path
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _no_mdt_share_path is failed
+          - '_no_mdt_share_path.msg == "missing required arguments: mdt_share_path"'
+        fail_msg: The task should fail when the MDT share path is not supplied.
+        success_msg: The task failed as expected when the MDT share path was not supplied.
+
+    - name: Attempt to supply non-existent MDT share path
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\Test
+        name: Set To Name
+        add:
+          - name: Dependency 1
+      register: _nonexistent_mdt_share_path
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_mdt_share_path is failed
+          - '_nonexistent_mdt_share_path.msg == "MDT share path ''C:\Test'' does not exist."'
+        fail_msg: The task should fail when the MDT share path does not exist.
+        success_msg: The task failed as expected when the MDT share path does not exist.
+
+    - name: Attempt to not supply the application name or GUID.
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        set: []
+      register: _no_name
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _no_name is failed
+          - '_no_name.msg == "one of the following is required: name, guid"'
+        fail_msg: The task should fail when the application name is not supplied.
+        success_msg: The task failed as expected when the application name was not supplied.
+
+    - name: Attempt to supply both add and set
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        add:
+          - name: Dependency 1
+        set: []
+      register: _add_and_set
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _add_and_set is failed
+          - '_add_and_set.msg == "parameters are mutually exclusive: add, set"'
+        fail_msg: The task should fail when both add and set are supplied.
+        success_msg: The task failed as expected when both add and set are supplied.
+
+    - name: Attempt to supply both remove and set
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        remove:
+          - name: Dependency 2
+        set: []
+      register: _remove_and_set
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _remove_and_set is failed
+          - '_remove_and_set.msg == "parameters are mutually exclusive: remove, set"'
+        fail_msg: The task should fail when both remove and set are supplied.
+        success_msg: The task failed as expected when both remove and set are supplied.
+
+    - name: Attempt to supply empty add
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        add: []
+      register: _empty_add
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _empty_add is failed
+          - '_empty_add.msg == "The ''add'' parameter must contain at least one element."'
+        fail_msg: The task should fail when add is empty.
+        success_msg: The task failed as expected when add is empty.
+
+    - name: Attempt to supply empty remove
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        remove: []
+      register: _empty_remove
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _empty_remove is failed
+          - '_empty_remove.msg == "The ''remove'' parameter must contain at least one element."'
+        fail_msg: The task should fail when remove is empty.
+        success_msg: The task failed as expected when remove is empty.
+
+    - name: Attempt to supply non-existent application name
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: NonExistent
+        add:
+          - name: Dependency 1
+      register: _nonexistent_application_name
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_application_name is failed
+          - '_nonexistent_application_name.msg == "Application ''NonExistent'' does not exist."'
+        fail_msg: The task should fail when the application name does not exist.
+        success_msg: The task failed as expected when the application name does not exist.
+
+    - name: Attempt to supply non-existent application name in folder
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: NonExistent
+        add:
+          - name: Dependency 1
+      register: _nonexistent_application_name_and_path
+      ignore_errors: true 
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_application_name_and_path is failed
+          - '_nonexistent_application_name_and_path.msg == "Application ''NonExistent'' does not exist."'
+        fail_msg: The task should fail when the application name in folder does not exist.
+        success_msg: The task failed as expected when the application name in folder does not exist.
+
+    - name: Set non-existent GUID
+      ansible.builtin.set_fact:
+        _non_existent_application_guid: "{{ '{' + ansible_date_time.iso8601_micro | to_uuid + '}' }}"
+
+    - name: Attempt to supply non-existent application GUID
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ _non_existent_application_guid }}"
+        add:
+          - name: Dependency 1
+      register: _non_existent_application_by_guid
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _non_existent_application_by_guid is failed
+          - '_non_existent_application_by_guid.msg == "Application with GUID ''" + _non_existent_application_guid + "'' does not exist."'
+        fail_msg: The task should fail when the application GUID does not exist.
+        success_msg: The task failed as expected when the application GUID does not exist.
+
+    - name: Attempt to supply invalid GUID
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        guid: NotAGUID
+        add:
+          - name: Dependency 1
+      register: _invalid_guid_application
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _invalid_guid_application is failed
+          - '_invalid_guid_application.msg == "The specified GUID ''NotAGUID'' is not in any valid GUID format."'
+        fail_msg: The task should fail when the application GUID does not exist.
+        success_msg: The task failed as expected when the application GUID does not exist.
+
+    - name: Attempt to supply dependency by name and GUID
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        add:
+          - name: Dependency 1
+            guid: "{{ _non_existent_application_guid }}"
+      register: _dependency_name_and_guid
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _dependency_name_and_guid is failed
+          - '_dependency_name_and_guid.msg == "parameters are mutually exclusive: name, guid found in add"'
+        fail_msg: The task should fail when both name and GUID are supplied.
+        success_msg: The task failed as expected when both name and GUID are supplied.
+
+    - name: Attempt to supply add dependency by non-existent name
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        add:
+          - name: NonExistent
+      register: _nonexistent_add_dependency_name
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_add_dependency_name is failed
+          - '_nonexistent_add_dependency_name.msg == "Dependency ''NonExistent'' does not exist."'
+        fail_msg: The task should fail when the dependency name does not exist.
+        success_msg: The task failed as expected when the dependency name does not exist.
+
+    - name: Attempt to supply add dependency by non-existent GUID
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        add:
+          - guid: "{{ _non_existent_application_guid }}"
+      register: _nonexistent_add_dependency_guid
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_add_dependency_guid is failed
+          - '_nonexistent_add_dependency_guid.msg == "Dependency with GUID ''" + _non_existent_application_guid + "'' does not exist."'
+        fail_msg: The task should fail when the dependency GUID does not exist.
+        success_msg: The task failed as expected when the dependency GUID does not exist.
+
+    - name: Attempt to supply add dependency by invalid GUID
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        add:
+          - guid: NotAGUID
+      register: _invalid_add_dependency_guid
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _invalid_add_dependency_guid is failed
+          - '_invalid_add_dependency_guid.msg == "The specified GUID ''NotAGUID'' is not in any valid GUID format."'
+        fail_msg: The task should fail when the dependency GUID does not exist.
+        success_msg: The task failed as expected when the dependency GUID does not exist.
+
+    - name: Attempt to supply set dependency by non-existent name
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        set:
+          - name: NonExistent
+      register: _nonexistent_set_dependency_name
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_set_dependency_name is failed
+          - '_nonexistent_set_dependency_name.msg == "Dependency ''NonExistent'' does not exist."'
+        fail_msg: The task should fail when the dependency name does not exist.
+        success_msg: The task failed as expected when the dependency name does not exist.
+
+    - name: Attempt to supply set dependency by non-existent name in folder
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        set:
+          - name: NonExistent
+      register: _nonexistent_set_dependency_name_and_path
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_set_dependency_name_and_path is failed
+          - '_nonexistent_set_dependency_name_and_path.msg == "Dependency ''NonExistent'' does not exist."'
+        fail_msg: The task should fail when the dependency name in folder does not exist.
+        success_msg: The task failed as expected when the dependency name in folder does not exist.
+
+    - name: Attempt to supply set dependency by non-existent GUID
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        set:
+          - guid: "{{ _non_existent_application_guid }}"
+      register: _nonexistent_set_dependency_guid
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_set_dependency_guid is failed
+          - '_nonexistent_set_dependency_guid.msg == "Dependency with GUID ''" + _non_existent_application_guid + "'' does not exist."'
+        fail_msg: The task should fail when the dependency GUID does not exist.
+        success_msg: The task failed as expected when the dependency GUID does not exist.
+
+    - name: Attempt to supply set dependency by invalid GUID
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        set:
+          - guid: NotAGUID
+      register: _invalid_set_dependency_guid
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _invalid_set_dependency_guid is failed
+          - '_invalid_set_dependency_guid.msg == "The specified GUID ''NotAGUID'' is not in any valid GUID format."'
+        fail_msg: The task should fail when the dependency GUID does not exist.
+        success_msg: The task failed as expected when the dependency GUID does not exist.

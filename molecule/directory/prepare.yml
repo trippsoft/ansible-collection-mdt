@@ -12,10 +12,17 @@
 
     - name: Create MDT Deployment Share
       trippsc2.mdt.deployment_share:
-        path: C:\MDTShare
+        mdt_share_path: C:\MDTShare
         description: MDT Deployment Share
-        share_name: MDTShare
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare$"
         state: present
+
+    - name: Create SMB share
+      ansible.windows.win_share:
+        name: MDTShare$
+        path: C:\MDTShare
+        full: Everyone
+        caching_mode: None
 
     - name: Add permissions to MDT Deployment Share
       ansible.windows.win_acl:
@@ -30,6 +37,6 @@
         - Out-of-Box Drivers\WinPE
         - Out-of-Box Drivers\WinPE\Dell
       trippsc2.mdt.directory:
-        path: "{{ item }}"
         mdt_share_path: C:\MDTShare
+        path: "{{ item }}"
         state: present

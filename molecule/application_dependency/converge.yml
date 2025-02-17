@@ -1,0 +1,1292 @@
+---
+- name: Converge # noqa complexity[play]
+  hosts:
+    - subjects
+  tasks:
+    - name: Get MDT dependency application info
+      check_mode: true
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Dependency 1
+      register: _mdt_dependency_1
+
+    - name: Get MDT dependency application info
+      check_mode: true
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Dependency 2
+      register: _mdt_dependency_2
+
+    - name: Get MDT dependency application info
+      check_mode: true
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Nested Dependency 3
+      register: _mdt_dependency_3
+
+    - name: Get MDT dependency application info
+      check_mode: true
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Nested Dependency 4
+      register: _mdt_dependency_4
+
+    - name: Add MDT dependency by GUID (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By GUID No Existing
+        add:
+          - guid: "{{ _mdt_dependency_1.application.guid }}"
+      register: _add_by_guid_no_existing_check
+
+    - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
+      when:
+        - _add_by_guid_no_existing_check.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_no_existing_check.diff.before.dependencies is defined
+          - _add_by_guid_no_existing_check.diff.before.dependencies | length == 0
+        fail_msg: Add By GUID No Existing did not return expected previous dependencies.
+        success_msg: Add By GUID No Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by GUID
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_no_existing_check.application_dependencies is defined
+          - _add_by_guid_no_existing_check.application_dependencies | length == 1
+          - _add_by_guid_no_existing_check.application_dependencies[0].guid == _mdt_dependency_1.application.guid
+          - _add_by_guid_no_existing_check.application_dependencies[0].name == _mdt_dependency_1.application.name
+        fail_msg: Add By GUID No Existing did not return expected current dependencies.
+        success_msg: Add By GUID No Existing returned expected current dependencies.
+
+    - name: Add MDT dependency by GUID
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By GUID No Existing
+        add:
+          - guid: "{{ _mdt_dependency_1.application.guid }}"
+      register: _add_by_guid_no_existing
+
+    - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
+      when:
+        - _add_by_guid_no_existing.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_no_existing.diff.before.dependencies is defined
+          - _add_by_guid_no_existing.diff.before.dependencies | length == 0
+        fail_msg: Add By GUID No Existing did not return expected previous dependencies.
+        success_msg: Add By GUID No Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by GUID
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_no_existing.application_dependencies is defined
+          - _add_by_guid_no_existing.application_dependencies | length == 1
+          - _add_by_guid_no_existing.application_dependencies[0].guid == _mdt_dependency_1.application.guid
+          - _add_by_guid_no_existing.application_dependencies[0].name == _mdt_dependency_1.application.name
+        fail_msg: Add By GUID No Existing did not return expected current dependencies.
+        success_msg: Add By GUID No Existing returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_no_existing.changed == _add_by_guid_no_existing_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Add MDT dependency by GUID (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By GUID Existing
+        add:
+          - guid: "{{ _mdt_dependency_1.application.guid }}"
+      register: _add_by_guid_existing_check
+
+    - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
+      when:
+        - _add_by_guid_existing_check.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_existing_check.diff.before.dependencies is defined
+          - _add_by_guid_existing_check.diff.before.dependencies | length == 2
+          - _add_by_guid_existing_check.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_guid_existing_check.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_guid_existing_check.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_guid_existing_check.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Add By GUID Existing did not return expected previous dependencies.
+        success_msg: Add By GUID Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by GUID
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_existing_check.application_dependencies is defined
+          - _add_by_guid_existing_check.application_dependencies | length == 3
+          - _add_by_guid_existing_check.application_dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_guid_existing_check.application_dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_guid_existing_check.application_dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_guid_existing_check.application_dependencies[1].name == _mdt_dependency_4.application.name
+          - _add_by_guid_existing_check.application_dependencies[2].guid == _mdt_dependency_1.application.guid
+          - _add_by_guid_existing_check.application_dependencies[2].name == _mdt_dependency_1.application.name
+        fail_msg: Add By GUID Existing did not return expected current dependencies.
+        success_msg: Add By GUID Existing returned expected current dependencies.
+
+    - name: Add MDT dependency by GUID
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By GUID Existing
+        add:
+          - guid: "{{ _mdt_dependency_1.application.guid }}"
+      register: _add_by_guid_existing
+
+    - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
+      when:
+        - _add_by_guid_existing.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_existing.diff.before.dependencies is defined
+          - _add_by_guid_existing.diff.before.dependencies | length == 2
+          - _add_by_guid_existing.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_guid_existing.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_guid_existing.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_guid_existing.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Add By GUID Existing did not return expected previous dependencies.
+        success_msg: Add By GUID Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by GUID
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_existing.application_dependencies is defined
+          - _add_by_guid_existing.application_dependencies | length == 3
+          - _add_by_guid_existing.application_dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_guid_existing.application_dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_guid_existing.application_dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_guid_existing.application_dependencies[1].name == _mdt_dependency_4.application.name
+          - _add_by_guid_existing.application_dependencies[2].guid == _mdt_dependency_1.application.guid
+          - _add_by_guid_existing.application_dependencies[2].name == _mdt_dependency_1.application.name
+        fail_msg: Add By GUID Existing did not return expected current dependencies.
+        success_msg: Add By GUID Existing returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_existing.changed == _add_by_guid_existing_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Add MDT dependency by GUID (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By GUID In Folder No Existing
+        add:
+          - guid: "{{ _mdt_dependency_3.application.guid }}"
+      register: _add_by_guid_in_folder_no_existing_check
+
+    - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
+      when:
+        - _add_by_guid_in_folder_no_existing_check.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_in_folder_no_existing_check.diff.before.dependencies is defined
+          - _add_by_guid_in_folder_no_existing_check.diff.before.dependencies | length == 0
+        fail_msg: Add By GUID In Folder No Existing did not return expected previous dependencies.
+        success_msg: Add By GUID In Folder No Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by GUID
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_in_folder_no_existing_check.application_dependencies is defined
+          - _add_by_guid_in_folder_no_existing_check.application_dependencies | length == 1
+          - _add_by_guid_in_folder_no_existing_check.application_dependencies[0].guid == _mdt_dependency_3.application.guid
+          - _add_by_guid_in_folder_no_existing_check.application_dependencies[0].name == _mdt_dependency_3.application.name
+        fail_msg: Add By GUID In Folder No Existing did not return expected current dependencies.
+        success_msg: Add By GUID In Folder No Existing returned expected current dependencies.
+
+    - name: Add MDT dependency by GUID
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By GUID In Folder No Existing
+        add:
+          - guid: "{{ _mdt_dependency_3.application.guid }}"
+      register: _add_by_guid_in_folder_no_existing
+
+    - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
+      when:
+        - _add_by_guid_in_folder_no_existing.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_in_folder_no_existing.diff.before.dependencies is defined
+          - _add_by_guid_in_folder_no_existing.diff.before.dependencies | length == 0
+        fail_msg: Add By GUID In Folder No Existing did not return expected previous dependencies.
+        success_msg: Add By GUID In Folder No Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by GUID
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_in_folder_no_existing.application_dependencies is defined
+          - _add_by_guid_in_folder_no_existing.application_dependencies | length == 1
+          - _add_by_guid_in_folder_no_existing.application_dependencies[0].guid == _mdt_dependency_3.application.guid
+          - _add_by_guid_in_folder_no_existing.application_dependencies[0].name == _mdt_dependency_3.application.name
+        fail_msg: Add By GUID In Folder No Existing did not return expected current dependencies.
+        success_msg: Add By GUID In Folder No Existing returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_in_folder_no_existing.changed == _add_by_guid_in_folder_no_existing_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Add MDT dependency by GUID (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By GUID In Folder Existing
+        add:
+          - guid: "{{ _mdt_dependency_3.application.guid }}"
+      register: _add_by_guid_in_folder_existing_check
+
+    - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
+      when:
+        - _add_by_guid_in_folder_existing_check.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_in_folder_existing_check.diff.before.dependencies is defined
+          - _add_by_guid_in_folder_existing_check.diff.before.dependencies | length == 2
+          - _add_by_guid_in_folder_existing_check.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_guid_in_folder_existing_check.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_guid_in_folder_existing_check.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_guid_in_folder_existing_check.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Add By GUID In Folder Existing did not return expected previous dependencies.
+        success_msg: Add By GUID In Folder Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by GUID
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_in_folder_existing_check.application_dependencies is defined
+          - _add_by_guid_in_folder_existing_check.application_dependencies | length == 3
+          - _add_by_guid_in_folder_existing_check.application_dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_guid_in_folder_existing_check.application_dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_guid_in_folder_existing_check.application_dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_guid_in_folder_existing_check.application_dependencies[1].name == _mdt_dependency_4.application.name
+          - _add_by_guid_in_folder_existing_check.application_dependencies[2].guid == _mdt_dependency_3.application.guid
+          - _add_by_guid_in_folder_existing_check.application_dependencies[2].name == _mdt_dependency_3.application.name
+        fail_msg: Add By GUID In Folder Existing did not return expected current dependencies.
+        success_msg: Add By GUID In Folder Existing returned expected current dependencies.
+
+    - name: Add MDT dependency by GUID
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By GUID In Folder Existing
+        add:
+          - guid: "{{ _mdt_dependency_3.application.guid }}"
+      register: _add_by_guid_in_folder_existing
+
+    - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
+      when:
+        - _add_by_guid_in_folder_existing.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_in_folder_existing.diff.before.dependencies is defined
+          - _add_by_guid_in_folder_existing.diff.before.dependencies | length == 2
+          - _add_by_guid_in_folder_existing.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_guid_in_folder_existing.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_guid_in_folder_existing.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_guid_in_folder_existing.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Add By GUID In Folder Existing did not return expected previous dependencies.
+        success_msg: Add By GUID In Folder Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by GUID
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_in_folder_existing.application_dependencies is defined
+          - _add_by_guid_in_folder_existing.application_dependencies | length == 3
+          - _add_by_guid_in_folder_existing.application_dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_guid_in_folder_existing.application_dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_guid_in_folder_existing.application_dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_guid_in_folder_existing.application_dependencies[1].name == _mdt_dependency_4.application.name
+          - _add_by_guid_in_folder_existing.application_dependencies[2].guid == _mdt_dependency_3.application.guid
+          - _add_by_guid_in_folder_existing.application_dependencies[2].name == _mdt_dependency_3.application.name
+        fail_msg: Add By GUID In Folder Existing did not return expected current dependencies.
+        success_msg: Add By GUID In Folder Existing returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _add_by_guid_in_folder_existing.changed == _add_by_guid_in_folder_existing_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Add MDT dependency by name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By Name No Existing
+        add:
+          - name: Dependency 1
+      register: _add_by_name_no_existing_check
+
+    - name: Verify previous dependencies for Add MDT dependency by name # noqa no-handler
+      when:
+        - _add_by_name_no_existing_check.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_no_existing_check.diff.before.dependencies is defined
+          - _add_by_name_no_existing_check.diff.before.dependencies | length == 0
+        fail_msg: Add By Name No Existing did not return expected previous dependencies.
+        success_msg: Add By Name No Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by name
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_no_existing_check.application_dependencies is defined
+          - _add_by_name_no_existing_check.application_dependencies | length == 1
+          - _add_by_name_no_existing_check.application_dependencies[0].guid == _mdt_dependency_1.application.guid
+          - _add_by_name_no_existing_check.application_dependencies[0].name == _mdt_dependency_1.application.name
+        fail_msg: Add By Name No Existing did not return expected current dependencies.
+        success_msg: Add By Name No Existing returned expected current dependencies.
+
+    - name: Add MDT dependency by name
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By Name No Existing
+        add:
+          - name: Dependency 1
+      register: _add_by_name_no_existing
+
+    - name: Verify previous dependencies for Add MDT dependency by name # noqa no-handler
+      when:
+        - _add_by_name_no_existing.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_no_existing.diff.before.dependencies is defined
+          - _add_by_name_no_existing.diff.before.dependencies | length == 0
+        fail_msg: Add By Name No Existing did not return expected previous dependencies.
+        success_msg: Add By Name No Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by name
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_no_existing.application_dependencies is defined
+          - _add_by_name_no_existing.application_dependencies | length == 1
+          - _add_by_name_no_existing.application_dependencies[0].guid == _mdt_dependency_1.application.guid
+          - _add_by_name_no_existing.application_dependencies[0].name == _mdt_dependency_1.application.name
+        fail_msg: Add By Name No Existing did not return expected current dependencies.
+        success_msg: Add By Name No Existing returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_no_existing.changed == _add_by_name_no_existing_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Add MDT dependency by name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By Name Existing
+        add:
+          - name: Dependency 1
+      register: _add_by_name_existing_check
+
+    - name: Verify previous dependencies for Add MDT dependency by name # noqa no-handler
+      when:
+        - _add_by_name_existing_check.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_existing_check.diff.before.dependencies is defined
+          - _add_by_name_existing_check.diff.before.dependencies | length == 2
+          - _add_by_name_existing_check.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_name_existing_check.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_name_existing_check.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_name_existing_check.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Add By Name Existing did not return expected previous dependencies.
+        success_msg: Add By Name Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by name
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_existing_check.application_dependencies is defined
+          - _add_by_name_existing_check.application_dependencies | length == 3
+          - _add_by_name_existing_check.application_dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_name_existing_check.application_dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_name_existing_check.application_dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_name_existing_check.application_dependencies[1].name == _mdt_dependency_4.application.name
+          - _add_by_name_existing_check.application_dependencies[2].guid == _mdt_dependency_1.application.guid
+          - _add_by_name_existing_check.application_dependencies[2].name == _mdt_dependency_1.application.name
+        fail_msg: Add By Name Existing did not return expected current dependencies.
+        success_msg: Add By Name Existing returned expected current dependencies.
+
+    - name: Add MDT dependency by name
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By Name Existing
+        add:
+          - name: Dependency 1
+      register: _add_by_name_existing
+
+    - name: Verify previous dependencies for Add MDT dependency by name # noqa no-handler
+      when:
+        - _add_by_name_existing.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_existing.diff.before.dependencies is defined
+          - _add_by_name_existing.diff.before.dependencies | length == 2
+          - _add_by_name_existing.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_name_existing.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_name_existing.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_name_existing.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Add By Name Existing did not return expected previous dependencies.
+        success_msg: Add By Name Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by name
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_existing.application_dependencies is defined
+          - _add_by_name_existing.application_dependencies | length == 3
+          - _add_by_name_existing.application_dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_name_existing.application_dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_name_existing.application_dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_name_existing.application_dependencies[1].name == _mdt_dependency_4.application.name
+          - _add_by_name_existing.application_dependencies[2].guid == _mdt_dependency_1.application.guid
+          - _add_by_name_existing.application_dependencies[2].name == _mdt_dependency_1.application.name
+        fail_msg: Add By Name Existing did not return expected current dependencies.
+        success_msg: Add By Name Existing returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_existing.changed == _add_by_name_existing_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Add MDT dependency by name in folder (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By Name In Folder No Existing
+        add:
+          - name: Nested Dependency 3
+      register: _add_by_name_in_folder_no_existing_check
+
+    - name: Verify previous dependencies for Add MDT dependency by name in folder # noqa no-handler
+      when:
+        - _add_by_name_in_folder_no_existing_check.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_in_folder_no_existing_check.diff.before.dependencies is defined
+          - _add_by_name_in_folder_no_existing_check.diff.before.dependencies | length == 0
+        fail_msg: Add By Name In Folder No Existing did not return expected previous dependencies.
+        success_msg: Add By Name In Folder No Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by name in folder
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_in_folder_no_existing_check.application_dependencies is defined
+          - _add_by_name_in_folder_no_existing_check.application_dependencies | length == 1
+          - _add_by_name_in_folder_no_existing_check.application_dependencies[0].guid == _mdt_dependency_3.application.guid
+          - _add_by_name_in_folder_no_existing_check.application_dependencies[0].name == _mdt_dependency_3.application.name
+        fail_msg: Add By Name In Folder No Existing did not return expected current dependencies.
+        success_msg: Add By Name In Folder No Existing returned expected current dependencies.
+
+    - name: Add MDT dependency by name in folder
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By Name In Folder No Existing
+        add:
+          - name: Nested Dependency 3
+      register: _add_by_name_in_folder_no_existing
+
+    - name: Verify previous dependencies for Add MDT dependency by name in folder # noqa no-handler
+      when:
+        - _add_by_name_in_folder_no_existing.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_in_folder_no_existing.diff.before.dependencies is defined
+          - _add_by_name_in_folder_no_existing.diff.before.dependencies | length == 0
+        fail_msg: Add By Name In Folder No Existing did not return expected previous dependencies.
+        success_msg: Add By Name In Folder No Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by name in folder
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_in_folder_no_existing.application_dependencies is defined
+          - _add_by_name_in_folder_no_existing.application_dependencies | length == 1
+          - _add_by_name_in_folder_no_existing.application_dependencies[0].guid == _mdt_dependency_3.application.guid
+          - _add_by_name_in_folder_no_existing.application_dependencies[0].name == _mdt_dependency_3.application.name
+        fail_msg: Add By Name In Folder No Existing did not return expected current dependencies.
+        success_msg: Add By Name In Folder No Existing returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_in_folder_no_existing.changed == _add_by_name_in_folder_no_existing_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Add MDT dependency by name in folder (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By Name And Path Existing
+        add:
+          - name: Nested Dependency 3
+      register: _add_by_name_in_folder_existing_check
+
+    - name: Verify previous dependencies for Add MDT dependency by name in folder # noqa no-handler
+      when:
+        - _add_by_name_in_folder_existing_check.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_in_folder_existing_check.diff.before.dependencies is defined
+          - _add_by_name_in_folder_existing_check.diff.before.dependencies | length == 2
+          - _add_by_name_in_folder_existing_check.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_name_in_folder_existing_check.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_name_in_folder_existing_check.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_name_in_folder_existing_check.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Add By Name And Path Existing did not return expected previous dependencies.
+        success_msg: Add By Name And Path Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by name in folder
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_in_folder_existing_check.application_dependencies is defined
+          - _add_by_name_in_folder_existing_check.application_dependencies | length == 3
+          - _add_by_name_in_folder_existing_check.application_dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_name_in_folder_existing_check.application_dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_name_in_folder_existing_check.application_dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_name_in_folder_existing_check.application_dependencies[1].name == _mdt_dependency_4.application.name
+          - _add_by_name_in_folder_existing_check.application_dependencies[2].guid == _mdt_dependency_3.application.guid
+          - _add_by_name_in_folder_existing_check.application_dependencies[2].name == _mdt_dependency_3.application.name
+        fail_msg: Add By Name And Path Existing did not return expected current dependencies.
+        success_msg: Add By Name And Path Existing returned expected current dependencies.
+
+    - name: Add MDT dependency by name in folder
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Add By Name And Path Existing
+        add:
+          - name: Nested Dependency 3
+      register: _add_by_name_in_folder_existing
+
+    - name: Verify previous dependencies for Add MDT dependency by name in folder # noqa no-handler
+      when:
+        - _add_by_name_in_folder_existing.changed
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_in_folder_existing.diff.before.dependencies is defined
+          - _add_by_name_in_folder_existing.diff.before.dependencies | length == 2
+          - _add_by_name_in_folder_existing.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_name_in_folder_existing.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_name_in_folder_existing.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_name_in_folder_existing.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Add By Name And Path Existing did not return expected previous dependencies.
+        success_msg: Add By Name And Path Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Add MDT dependency by name in folder
+      ansible.builtin.assert:
+        that:
+          - _add_by_name_in_folder_existing.application_dependencies is defined
+          - _add_by_name_in_folder_existing.application_dependencies | length == 3
+          - _add_by_name_in_folder_existing.application_dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _add_by_name_in_folder_existing.application_dependencies[0].name == _mdt_dependency_2.application.name
+          - _add_by_name_in_folder_existing.application_dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _add_by_name_in_folder_existing.application_dependencies[1].name == _mdt_dependency_4.application.name
+          - _add_by_name_in_folder_existing.application_dependencies[2].guid == _mdt_dependency_3.application.guid
+          - _add_by_name_in_folder_existing.application_dependencies[2].name == _mdt_dependency_3.application.name
+        fail_msg: Add By Name And Path Existing did not return expected current dependencies.
+        success_msg: Add By Name And Path Existing returned expected current dependencies.
+
+    - name: Remove MDT dependency by GUID (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Remove By GUID
+        remove:
+          - guid: "{{ _mdt_dependency_1.application.guid }}"
+      register: _remove_by_guid_check
+
+    - name: Verify previous dependencies for Remove MDT dependency by GUID # noqa no-handler
+      when:
+        - _remove_by_guid_check.changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid_check.diff.before.dependencies is defined
+          - _remove_by_guid_check.diff.before.dependencies | length == 1
+          - _remove_by_guid_check.diff.before.dependencies[0].guid == _mdt_dependency_1.application.guid
+          - _remove_by_guid_check.diff.before.dependencies[0].name == _mdt_dependency_1.application.name
+        fail_msg: Remove By GUID did not return expected previous dependencies.
+        success_msg: Remove By GUID returned expected previous dependencies.
+
+    - name: Verify current dependencies for Remove MDT dependency by GUID
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid_check.application_dependencies is defined
+          - _remove_by_guid_check.application_dependencies | length == 0
+        fail_msg: Remove By GUID did not return expected current dependencies.
+        success_msg: Remove By GUID returned expected current dependencies.
+
+    - name: Remove MDT dependency by GUID
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Remove By GUID
+        remove:
+          - guid: "{{ _mdt_dependency_1.application.guid }}"
+      register: _remove_by_guid
+
+    - name: Verify previous dependencies for Remove MDT dependency by GUID # noqa no-handler
+      when:
+        - _remove_by_guid.changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid.diff.before.dependencies is defined
+          - _remove_by_guid.diff.before.dependencies | length == 1
+          - _remove_by_guid.diff.before.dependencies[0].guid == _mdt_dependency_1.application.guid
+          - _remove_by_guid.diff.before.dependencies[0].name == _mdt_dependency_1.application.name
+        fail_msg: Remove By GUID did not return expected previous dependencies.
+        success_msg: Remove By GUID returned expected previous dependencies.
+
+    - name: Verify current dependencies for Remove MDT dependency by GUID
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid.application_dependencies is defined
+          - _remove_by_guid.application_dependencies | length == 0
+        fail_msg: Remove By GUID did not return expected current dependencies.
+        success_msg: Remove By GUID returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid.changed == _remove_by_guid_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Remove MDT dependency by GUID (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Remove By GUID In Folder
+        remove:
+          - guid: "{{ _mdt_dependency_3.application.guid }}"
+      register: _remove_by_guid_in_folder_check
+
+    - name: Verify previous dependencies for Remove MDT dependency by GUID # noqa no-handler
+      when:
+        - _remove_by_guid_in_folder_check.changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid_in_folder_check.diff.before.dependencies is defined
+          - _remove_by_guid_in_folder_check.diff.before.dependencies | length == 1
+          - _remove_by_guid_in_folder_check.diff.before.dependencies[0].guid == _mdt_dependency_3.application.guid
+          - _remove_by_guid_in_folder_check.diff.before.dependencies[0].name == _mdt_dependency_3.application.name
+        fail_msg: Remove By GUID In Folder did not return expected previous dependencies.
+        success_msg: Remove By GUID In Folder returned expected previous dependencies.
+
+    - name: Verify current dependencies for Remove MDT dependency by GUID
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid_in_folder_check.application_dependencies is defined
+          - _remove_by_guid_in_folder_check.application_dependencies | length == 0
+        fail_msg: Remove By GUID In Folder did not return expected current dependencies.
+        success_msg: Remove By GUID In Folder returned expected current dependencies.
+
+    - name: Remove MDT dependency by GUID
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Remove By GUID In Folder
+        remove:
+          - guid: "{{ _mdt_dependency_3.application.guid }}"
+      register: _remove_by_guid_in_folder
+
+    - name: Verify previous dependencies for Remove MDT dependency by GUID # noqa no-handler
+      when:
+        - _remove_by_guid_in_folder.changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid_in_folder.diff.before.dependencies is defined
+          - _remove_by_guid_in_folder.diff.before.dependencies | length == 1
+          - _remove_by_guid_in_folder.diff.before.dependencies[0].guid == _mdt_dependency_3.application.guid
+          - _remove_by_guid_in_folder.diff.before.dependencies[0].name == _mdt_dependency_3.application.name
+        fail_msg: Remove By GUID In Folder did not return expected previous dependencies.
+        success_msg: Remove By GUID In Folder returned expected previous dependencies.
+
+    - name: Verify current dependencies for Remove MDT dependency by GUID
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid_in_folder.application_dependencies is defined
+          - _remove_by_guid_in_folder.application_dependencies | length == 0
+        fail_msg: Remove By GUID In Folder did not return expected current dependencies.
+        success_msg: Remove By GUID In Folder returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _remove_by_guid_in_folder.changed == _remove_by_guid_in_folder_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Remove MDT dependency by name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Remove By Name
+        remove:
+          - name: Dependency 1
+      register: _remove_by_name_check
+
+    - name: Verify previous dependencies for Remove MDT dependency by name # noqa no-handler
+      when:
+        - _remove_by_name_check.changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_check.diff.before.dependencies is defined
+          - _remove_by_name_check.diff.before.dependencies | length == 1
+          - _remove_by_name_check.diff.before.dependencies[0].guid == _mdt_dependency_1.application.guid
+          - _remove_by_name_check.diff.before.dependencies[0].name == _mdt_dependency_1.application.name
+        fail_msg: Remove By Name did not return expected previous dependencies.
+        success_msg: Remove By Name returned expected previous dependencies.
+
+    - name: Verify current dependencies for Remove MDT dependency by name
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_check.application_dependencies is defined
+          - _remove_by_name_check.application_dependencies | length == 0
+        fail_msg: Remove By Name did not return expected current dependencies.
+        success_msg: Remove By Name returned expected current dependencies.
+
+    - name: Remove MDT dependency by name
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Remove By Name
+        remove:
+          - name: Dependency 1
+      register: _remove_by_name
+
+    - name: Verify previous dependencies for Remove MDT dependency by name # noqa no-handler
+      when:
+        - _remove_by_name.changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name.diff.before.dependencies is defined
+          - _remove_by_name.diff.before.dependencies | length == 1
+          - _remove_by_name.diff.before.dependencies[0].guid == _mdt_dependency_1.application.guid
+          - _remove_by_name.diff.before.dependencies[0].name == _mdt_dependency_1.application.name
+        fail_msg: Remove By Name did not return expected previous dependencies.
+        success_msg: Remove By Name returned expected previous dependencies.
+
+    - name: Verify current dependencies for Remove MDT dependency by name
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name.application_dependencies is defined
+          - _remove_by_name.application_dependencies | length == 0
+        fail_msg: Remove By Name did not return expected current dependencies.
+        success_msg: Remove By Name returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name.changed == _remove_by_name_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Remove MDT dependency by name in folder (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Remove By Name And Path
+        remove:
+          - name: Nested Dependency 3
+      register: _remove_by_name_and_path_check
+
+    - name: Verify previous dependencies for Remove MDT dependency by name in folder # noqa no-handler
+      when:
+        - _remove_by_name_and_path_check.changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_and_path_check.diff.before.dependencies is defined
+          - _remove_by_name_and_path_check.diff.before.dependencies | length == 1
+          - _remove_by_name_and_path_check.diff.before.dependencies[0].guid == _mdt_dependency_3.application.guid
+          - _remove_by_name_and_path_check.diff.before.dependencies[0].name == _mdt_dependency_3.application.name
+        fail_msg: Remove By Name And Path did not return expected previous dependencies.
+        success_msg: Remove By Name And Path returned expected previous dependencies.
+
+    - name: Verify current dependencies for Remove MDT dependency by name in folder
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_and_path_check.application_dependencies is defined
+          - _remove_by_name_and_path_check.application_dependencies | length == 0
+        fail_msg: Remove By Name And Path did not return expected current dependencies.
+        success_msg: Remove By Name And Path returned expected current dependencies.
+
+    - name: Remove MDT dependency by name in folder
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Remove By Name And Path
+        remove:
+          - name: Nested Dependency 3
+      register: _remove_by_name_and_path
+
+    - name: Verify previous dependencies for Remove MDT dependency by name in folder # noqa no-handler
+      when:
+        - _remove_by_name_and_path.changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_and_path.diff.before.dependencies is defined
+          - _remove_by_name_and_path.diff.before.dependencies | length == 1
+          - _remove_by_name_and_path.diff.before.dependencies[0].guid == _mdt_dependency_3.application.guid
+          - _remove_by_name_and_path.diff.before.dependencies[0].name == _mdt_dependency_3.application.name
+        fail_msg: Remove By Name And Path did not return expected previous dependencies.
+        success_msg: Remove By Name And Path returned expected previous dependencies.
+
+    - name: Verify current dependencies for Remove MDT dependency by name in folder
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_and_path.application_dependencies is defined
+          - _remove_by_name_and_path.application_dependencies | length == 0
+        fail_msg: Remove By Name And Path did not return expected current dependencies.
+        success_msg: Remove By Name And Path returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_and_path.changed == _remove_by_name_and_path_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Remove non-existant MDT dependency by name in folder (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Remove By Name And Path
+        remove:
+          - name: Dependency 3
+      register: _remove_by_name_and_path_no_existing_check
+
+    - name: Verify previous dependencies for Remove non-existant MDT dependency by name in folder # noqa no-handler
+      when:
+        - _remove_by_name_and_path_no_existing_check.changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_and_path_no_existing_check.diff.before.dependencies is defined
+          - _remove_by_name_and_path_no_existing_check.diff.before.dependencies | length == 0
+        fail_msg: Remove By Name And Path No Existing did not return expected previous dependencies.
+        success_msg: Remove By Name And Path No Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Remove non-existant MDT dependency by name in folder
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_and_path_no_existing_check.application_dependencies is defined
+          - _remove_by_name_and_path_no_existing_check.application_dependencies | length == 0
+        fail_msg: Remove By Name And Path No Existing did not return expected current dependencies.
+        success_msg: Remove By Name And Path No Existing returned expected current dependencies.
+
+    - name: Remove non-existant MDT dependency by name in folder
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Remove By Name And Path
+        remove:
+          - name: Dependency 3
+      register: _remove_by_name_and_path_no_existing
+
+    - name: Verify previous dependencies for Remove non-existant MDT dependency by name in folder # noqa no-handler
+      when:
+        - _remove_by_name_and_path_no_existing.changed
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_and_path_no_existing.diff.before.dependencies is defined
+          - _remove_by_name_and_path_no_existing.diff.before.dependencies | length == 0
+        fail_msg: Remove By Name And Path No Existing did not return expected previous dependencies.
+        success_msg: Remove By Name And Path No Existing returned expected previous dependencies.
+
+    - name: Verify current dependencies for Remove non-existant MDT dependency by name in folder
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_and_path_no_existing.application_dependencies is defined
+          - _remove_by_name_and_path_no_existing.application_dependencies | length == 0
+        fail_msg: Remove By Name And Path No Existing did not return expected current dependencies.
+        success_msg: Remove By Name And Path No Existing returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _remove_by_name_and_path_no_existing.changed == _remove_by_name_and_path_no_existing_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Set MDT dependency to empty (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Empty
+        set: []
+      register: _set_to_empty_check
+
+    - name: Verify previous dependencies for Set MDT dependency to empty # noqa no-handler
+      when:
+        - _set_to_empty_check.changed
+      ansible.builtin.assert:
+        that:
+          - _set_to_empty_check.diff.before.dependencies is defined
+          - _set_to_empty_check.diff.before.dependencies | length == 2
+          - _set_to_empty_check.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _set_to_empty_check.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _set_to_empty_check.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _set_to_empty_check.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Set To Empty did not return expected previous dependencies.
+        success_msg: Set To Empty returned expected previous dependencies.
+
+    - name: Verify current dependencies for Set MDT dependency to empty
+      ansible.builtin.assert:
+        that:
+          - _set_to_empty_check.application_dependencies is defined
+          - _set_to_empty_check.application_dependencies | length == 0
+        fail_msg: Set To Empty did not return expected current dependencies.
+        success_msg: Set To Empty returned expected current dependencies.
+
+    - name: Set MDT dependency to empty
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Empty
+        set: []
+      register: _set_to_empty
+
+    - name: Verify previous dependencies for Set MDT dependency to empty # noqa no-handler
+      when:
+        - _set_to_empty.changed
+      ansible.builtin.assert:
+        that:
+          - _set_to_empty.diff.before.dependencies is defined
+          - _set_to_empty.diff.before.dependencies | length == 2
+          - _set_to_empty.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _set_to_empty.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _set_to_empty.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _set_to_empty.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Set To Empty did not return expected previous dependencies.
+        success_msg: Set To Empty returned expected previous dependencies.
+
+    - name: Verify current dependencies for Set MDT dependency to empty
+      ansible.builtin.assert:
+        that:
+          - _set_to_empty.application_dependencies is defined
+          - _set_to_empty.application_dependencies | length == 0
+        fail_msg: Set To Empty did not return expected current dependencies.
+        success_msg: Set To Empty returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _set_to_empty.changed == _set_to_empty_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Set MDT dependency to GUID (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To GUID
+        set:
+          - guid: "{{ _mdt_dependency_1.application.guid }}"
+      register: _set_to_guid_check
+
+    - name: Verify previous dependencies for Set MDT dependency to GUID # noqa no-handler
+      when:
+        - _set_to_guid_check.changed
+      ansible.builtin.assert:
+        that:
+          - _set_to_guid_check.diff.before.dependencies is defined
+          - _set_to_guid_check.diff.before.dependencies | length == 2
+          - _set_to_guid_check.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _set_to_guid_check.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _set_to_guid_check.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _set_to_guid_check.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Set To GUID did not return expected previous dependencies.
+        success_msg: Set To GUID returned expected previous dependencies.
+
+    - name: Verify current dependencies for Set MDT dependency to GUID
+      ansible.builtin.assert:
+        that:
+          - _set_to_guid_check.application_dependencies is defined
+          - _set_to_guid_check.application_dependencies | length == 1
+          - _set_to_guid_check.application_dependencies[0].guid == _mdt_dependency_1.application.guid
+          - _set_to_guid_check.application_dependencies[0].name == _mdt_dependency_1.application.name
+        fail_msg: Set To GUID did not return expected current dependencies.
+        success_msg: Set To GUID returned expected current dependencies.
+
+    - name: Set MDT dependency to GUID
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To GUID
+        set:
+          - guid: "{{ _mdt_dependency_1.application.guid }}"
+      register: _set_to_guid
+
+    - name: Verify previous dependencies for Set MDT dependency to GUID # noqa no-handler
+      when:
+        - _set_to_guid.changed
+      ansible.builtin.assert:
+        that:
+          - _set_to_guid.diff.before.dependencies is defined
+          - _set_to_guid.diff.before.dependencies | length == 2
+          - _set_to_guid.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _set_to_guid.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _set_to_guid.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _set_to_guid.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Set To GUID did not return expected previous dependencies.
+        success_msg: Set To GUID returned expected previous dependencies.
+
+    - name: Verify current dependencies for Set MDT dependency to GUID
+      ansible.builtin.assert:
+        that:
+          - _set_to_guid.application_dependencies is defined
+          - _set_to_guid.application_dependencies | length == 1
+          - _set_to_guid.application_dependencies[0].guid == _mdt_dependency_1.application.guid
+          - _set_to_guid.application_dependencies[0].name == _mdt_dependency_1.application.name
+        fail_msg: Set To GUID did not return expected current dependencies.
+        success_msg: Set To GUID returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _set_to_guid.changed == _set_to_guid_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Set MDT dependency to GUID (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To GUID In Folder
+        set:
+          - guid: "{{ _mdt_dependency_3.application.guid }}"
+      register: _set_to_guid_in_folder_check
+
+    - name: Verify previous dependencies for Set MDT dependency to GUID # noqa no-handler
+      when:
+        - _set_to_guid_in_folder_check.changed
+      ansible.builtin.assert:
+        that:
+          - _set_to_guid_in_folder_check.diff.before.dependencies is defined
+          - _set_to_guid_in_folder_check.diff.before.dependencies | length == 2
+          - _set_to_guid_in_folder_check.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _set_to_guid_in_folder_check.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _set_to_guid_in_folder_check.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _set_to_guid_in_folder_check.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Set To GUID In Folder did not return expected previous dependencies.
+        success_msg: Set To GUID In Folder returned expected previous dependencies.
+
+    - name: Verify current dependencies for Set MDT dependency to GUID
+      ansible.builtin.assert:
+        that:
+          - _set_to_guid_in_folder_check.application_dependencies is defined
+          - _set_to_guid_in_folder_check.application_dependencies | length == 1
+          - _set_to_guid_in_folder_check.application_dependencies[0].guid == _mdt_dependency_3.application.guid
+          - _set_to_guid_in_folder_check.application_dependencies[0].name == _mdt_dependency_3.application.name
+        fail_msg: Set To GUID In Folder did not return expected current dependencies.
+        success_msg: Set To GUID In Folder returned expected current dependencies.
+
+    - name: Set MDT dependency to GUID
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To GUID In Folder
+        set:
+          - guid: "{{ _mdt_dependency_3.application.guid }}"
+      register: _set_to_guid_in_folder
+
+    - name: Verify previous dependencies for Set MDT dependency to GUID # noqa no-handler
+      when:
+        - _set_to_guid_in_folder.changed
+      ansible.builtin.assert:
+        that:
+          - _set_to_guid_in_folder.diff.before.dependencies is defined
+          - _set_to_guid_in_folder.diff.before.dependencies | length == 2
+          - _set_to_guid_in_folder.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _set_to_guid_in_folder.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+          - _set_to_guid_in_folder.diff.before.dependencies[1].guid == _mdt_dependency_4.application.guid
+          - _set_to_guid_in_folder.diff.before.dependencies[1].name == _mdt_dependency_4.application.name
+        fail_msg: Set To GUID In Folder did not return expected previous dependencies.
+        success_msg: Set To GUID In Folder returned expected previous dependencies.
+
+    - name: Verify current dependencies for Set MDT dependency to GUID
+      ansible.builtin.assert:
+        that:
+          - _set_to_guid_in_folder.application_dependencies is defined
+          - _set_to_guid_in_folder.application_dependencies | length == 1
+          - _set_to_guid_in_folder.application_dependencies[0].guid == _mdt_dependency_3.application.guid
+          - _set_to_guid_in_folder.application_dependencies[0].name == _mdt_dependency_3.application.name
+        fail_msg: Set To GUID In Folder did not return expected current dependencies.
+        success_msg: Set To GUID In Folder returned expected current dependencies.
+
+    - name: Set MDT dependency to name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        set:
+          - name: Dependency 1
+      register: _set_to_name_check
+
+    - name: Verify previous dependencies for Set MDT dependency to name # noqa no-handler
+      when:
+        - _set_to_name_check.changed
+      ansible.builtin.assert:
+        that:
+          - _set_to_name_check.diff.before.dependencies is defined
+          - _set_to_name_check.diff.before.dependencies | length == 1
+          - _set_to_name_check.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _set_to_name_check.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+        fail_msg: Set To Name did not return expected previous dependencies.
+        success_msg: Set To Name returned expected previous dependencies.
+
+    - name: Verify current dependencies for Set MDT dependency to name
+      ansible.builtin.assert:
+        that:
+          - _set_to_name_check.application_dependencies is defined
+          - _set_to_name_check.application_dependencies | length == 1
+          - _set_to_name_check.application_dependencies[0].guid == _mdt_dependency_1.application.guid
+          - _set_to_name_check.application_dependencies[0].name == _mdt_dependency_1.application.name
+        fail_msg: Set To Name did not return expected current dependencies.
+        success_msg: Set To Name returned expected current dependencies.
+
+    - name: Set MDT dependency to name
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name
+        set:
+          - name: Dependency 1
+      register: _set_to_name
+
+    - name: Verify previous dependencies for Set MDT dependency to name # noqa no-handler
+      when:
+        - _set_to_name.changed
+      ansible.builtin.assert:
+        that:
+          - _set_to_name.diff.before.dependencies is defined
+          - _set_to_name.diff.before.dependencies | length == 1
+          - _set_to_name.diff.before.dependencies[0].guid == _mdt_dependency_2.application.guid
+          - _set_to_name.diff.before.dependencies[0].name == _mdt_dependency_2.application.name
+        fail_msg: Set To Name did not return expected previous dependencies.
+        success_msg: Set To Name returned expected previous dependencies.
+
+    - name: Verify current dependencies for Set MDT dependency to name
+      ansible.builtin.assert:
+        that:
+          - _set_to_name.application_dependencies is defined
+          - _set_to_name.application_dependencies | length == 1
+          - _set_to_name.application_dependencies[0].guid == _mdt_dependency_1.application.guid
+          - _set_to_name.application_dependencies[0].name == _mdt_dependency_1.application.name
+        fail_msg: Set To Name did not return expected current dependencies.
+        success_msg: Set To Name returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _set_to_name.changed == _set_to_name_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.
+
+    - name: Set MDT dependency to name in folder (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name And Path
+        set:
+          - name: Nested Dependency 3
+      register: _set_to_name_and_path_check
+
+    - name: Verify previous dependencies for Set MDT dependency to name in folder # noqa no-handler
+      when:
+        - _set_to_name_and_path_check.changed
+      ansible.builtin.assert:
+        that:
+          - _set_to_name_and_path_check.diff.before.dependencies is defined
+          - _set_to_name_and_path_check.diff.before.dependencies | length == 1
+          - _set_to_name_and_path_check.diff.before.dependencies[0].guid == _mdt_dependency_4.application.guid
+          - _set_to_name_and_path_check.diff.before.dependencies[0].name == _mdt_dependency_4.application.name
+        fail_msg: Set To Name And Path did not return expected previous dependencies.
+        success_msg: Set To Name And Path returned expected previous dependencies.
+
+    - name: Verify current dependencies for Set MDT dependency to name in folder
+      ansible.builtin.assert:
+        that:
+          - _set_to_name_and_path_check.application_dependencies is defined
+          - _set_to_name_and_path_check.application_dependencies | length == 1
+          - _set_to_name_and_path_check.application_dependencies[0].guid == _mdt_dependency_3.application.guid
+          - _set_to_name_and_path_check.application_dependencies[0].name == _mdt_dependency_3.application.name
+        fail_msg: Set To Name And Path did not return expected current dependencies.
+        success_msg: Set To Name And Path returned expected current dependencies.
+
+    - name: Set MDT dependency to name in folder
+      diff: true
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Set To Name And Path
+        set:
+          - name: Nested Dependency 3
+      register: _set_to_name_and_path
+
+    - name: Verify previous dependencies for Set MDT dependency to name in folder # noqa no-handler
+      when:
+        - _set_to_name_and_path.changed
+      ansible.builtin.assert:
+        that:
+          - _set_to_name_and_path.diff.before.dependencies is defined
+          - _set_to_name_and_path.diff.before.dependencies | length == 1
+          - _set_to_name_and_path.diff.before.dependencies[0].guid == _mdt_dependency_4.application.guid
+          - _set_to_name_and_path.diff.before.dependencies[0].name == _mdt_dependency_4.application.name
+        fail_msg: Set To Name And Path did not return expected previous dependencies.
+        success_msg: Set To Name And Path returned expected previous dependencies.
+
+    - name: Verify current dependencies for Set MDT dependency to name in folder
+      ansible.builtin.assert:
+        that:
+          - _set_to_name_and_path.application_dependencies is defined
+          - _set_to_name_and_path.application_dependencies | length == 1
+          - _set_to_name_and_path.application_dependencies[0].guid == _mdt_dependency_3.application.guid
+          - _set_to_name_and_path.application_dependencies[0].name == _mdt_dependency_3.application.name
+        fail_msg: Set To Name And Path did not return expected current dependencies.
+        success_msg: Set To Name And Path returned expected current dependencies.
+
+    - name: Verify check mode is not making changes
+      ansible.builtin.assert:
+        that:
+          - _set_to_name_and_path.changed == _set_to_name_and_path_check.changed
+        fail_msg: Check mode is making changes unexpectedly.
+        success_msg: Check mode did not make changes.

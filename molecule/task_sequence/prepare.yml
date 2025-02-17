@@ -1,0 +1,161 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Create MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        mdt_share_path: C:\MDTShare
+        description: MDT Deployment Share
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare$"
+        state: present
+
+    - name: Create SMB share
+      ansible.windows.win_share:
+        name: MDTShare$
+        path: C:\MDTShare
+        full: Everyone
+        caching_mode: None
+
+    - name: Add permissions to MDT Deployment Share
+      ansible.windows.win_acl:
+        path: C:\MDTShare
+        user: vagrant
+        rights: FullControl
+        type: allow
+
+    - name: Create temporary folder
+      ansible.windows.win_file:
+        path: C:\temp\source
+        state: directory
+
+    - name: Copy Windows ISO files to temporary directory
+      ansible.windows.win_copy:
+        src: ../files/operating_system/source/
+        dest: C:\temp\source
+
+    - name: Copy WIM files to temporary directory
+      ansible.windows.win_copy:
+        src: ../files/operating_system/install.wim
+        dest: C:\temp\source\sources\install.wim
+
+    - name: Pre-create MDT Operating System
+      loop:
+        - name: Windows 11 Enterprise
+          image_index: 6
+        - name: Windows 11 Pro
+          image_index: 5
+      trippsc2.mdt.operating_system:
+        mdt_share_path: C:\MDTShare
+        name: "{{ item.name }}"
+        type: source
+        source_path: C:\temp\source
+        destination_folder: Windows 11
+        image_index: "{{ item.image_index }}"
+        state: present
+
+    - name: Pre-create MDT directory
+      trippsc2.mdt.directory:
+        mdt_share_path: C:\MDTShare
+        path: Task Sequences\Subdirectory
+        state: present
+
+    - name: Pre-create MDT Task Sequence
+      loop:
+        - id: NONE-MAK
+          name: None To MAK
+        - id: NONE-RETAIL
+          name: None To Retail
+        - id: MAK-NONE
+          name: MAK To None
+          product_key_type: mak
+          product_key: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+        - id: MAK-RETAIL
+          name: MAK To Retail
+          product_key_type: mak
+          product_key: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+        - id: RETAIL-NONE
+          name: Retail To None
+          product_key_type: retail
+          product_key: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+        - id: RETAIL-MAK
+          name: Retail To MAK
+          product_key_type: retail
+          product_key: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+        - id: MAK-KEY
+          name: Change MAK Key
+          product_key_type: mak
+          product_key: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+        - id: RETAIL-KEY
+          name: Change Retail Key
+          product_key_type: retail
+          product_key: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX
+        - id: OS-NAME
+          name: Change OS
+        - id: ADMIN-PASS1
+          name: Change Admin Password
+        - id: ADMIN-PASS2
+          name: Change Admin Password From Previous
+          admin_password: Password123!
+        - id: ADMIN-PASS3
+          name: Change Admin Password To Empty
+          admin_password: Password123!
+        - id: FULL-NAME
+          name: Change Full Name
+        - id: ORG
+          name: Change Organization
+        - id: HOME-PAGE
+          name: Change Home Page
+        - id: VERSION
+          name: Change Version
+        - id: COMMENTS1
+          name: Change Comments
+        - id: COMMENTS2
+          name: Change Comments From Previous
+          comments: Old Comments
+        - id: ENABLED
+          name: Change Enabled
+          enabled: false
+        - id: HIDDEN
+          name: Change Hidden
+          hidden: true
+        - id: RENAME
+          name: Rename
+        - id: ADD-PATHS
+          name: Add Paths
+        - id: REMOVE-PATHS
+          name: Remove Paths
+          paths:
+            add:
+              - Subdirectory
+        - id: ADD-REMOVE-PATHS
+          name: Add And Remove Paths
+        - id: SET-PATHS
+          name: Set Paths
+        - id: REMOVE1
+          name: Remove by ID
+        - id: REMOVE2
+          name: Remove by Name
+      trippsc2.mdt.task_sequence:
+        mdt_share_path: C:\MDTShare
+        id: "{{ item.id }}"
+        name: "{{ item.name }}"
+        paths: "{{ item.paths | default(omit) }}"
+        template: Client.xml
+        product_key_type: "{{ item.product_key_type | default('none') }}"
+        product_key: "{{ item.product_key | default(omit) }}"
+        admin_password: "{{ item.admin_password | default(omit) }}"
+        operating_system_name: Windows 11 Enterprise
+        full_name: Test User
+        organization: Test Organization
+        comments: "{{ item.comments | default(omit) }}"
+        enabled: "{{ item.enabled | default(omit) }}"
+        hidden: "{{ item.hidden | default(omit) }}"
+        state: present

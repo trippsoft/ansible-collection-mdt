@@ -2,12 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.0] - 2025-01-25
+## [1.1.0] - 2025-02-17
 
 ### Collection
 
+- *application* module plugin added.
+- *application_info* module plugin added.
+- *application_dependency* module plugin added.
 - *boot_image* module plugin added.
+- *deployment_share_info* module plugin added.
+- *deployment_share_settings* module plugin added.
 - *directory_info* module plugin added.
+- *driver_info* module plugin added.
+- *operating_system* module plugin added.
+- *operating_system_info* module plugin added.
+- *selection_profile* module plugin added.
+- *selection_profile_info* module plugin added.
+- *task_sequence* module plugin added.
+- *task_sequence_info* module plugin added.
+- Added action group for all module plugins.
+
+### *deployment_share* module plugin
+
+- Replaced `share_name` options with `unc_path` option that includes the entire UNC path.  This was done to allow DFS namespace usage.
+- Added diff support and added support to change description and UNC path on existing shares.
 
 ### *directory* module plugin
 

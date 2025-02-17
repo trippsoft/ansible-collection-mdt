@@ -21,25 +21,6 @@ provisioner:
   name: ansible
   inventory:
     group_vars:
-      subjects:
-        dell_mdt_share_path: C:\MDTShare
-        dell_mdt_winpe_driver_packs:
-          - os: winpe_11
-            mdt_path: WinPE11
-          - os: winpe_10
-            mdt_path: WinPE10
-        dell_mdt_operating_systems:
-          - os: win_11
-            base_mdt_path: Windows 11\Dell Inc.
-          - os: win_10
-            base_mdt_path: Windows 10\Dell Inc.
-        dell_mdt_models:
-          - catalog_name: Latitude 5550
-            mdt_name: Latitude 5550
-          - catalog_name: OptiPlex 7020 Micro
-            mdt_name: OptiPlex Micro 7020
-          - catalog_name: XPS 17 9710
-            mdt_name: XPS 17 9710
       windows:
         ansible_shell_type: powershell
         ansible_become_method: runas

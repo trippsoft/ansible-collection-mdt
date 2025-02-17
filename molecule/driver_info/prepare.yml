@@ -1,0 +1,88 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  roles:
+    - role: trippsc2.windows.install_psgallery
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Create temporary directories
+      loop:
+        - C:\Drivers
+        - C:\temp
+      ansible.windows.win_file:
+        path: "{{ item }}"
+        state: directory
+
+    - name: Create MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        mdt_share_path: C:\MDTShare
+        description: MDT Deployment Share
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare$"
+        state: present
+
+    - name: Create SMB share
+      ansible.windows.win_share:
+        name: MDTShare$
+        path: C:\MDTShare
+        full: Everyone
+        caching_mode: None
+
+    - name: Add permissions to MDT Deployment Share
+      ansible.windows.win_acl:
+        path: C:\MDTShare
+        user: vagrant
+        rights: FullControl
+        type: allow
+
+    - name: Pre-create MDT directories
+      loop:
+        - Out-of-Box Drivers\Windows 10
+        - Out-of-Box Drivers\WinPE
+      trippsc2.mdt.directory:
+        path: "{{ item }}"
+        mdt_share_path: C:\MDTShare
+        state: present
+
+    - name: Install PSCX module
+      community.windows.win_psmodule:
+        name: Pscx
+        allow_clobber: true
+        state: present
+
+    - name: Download Dell driver catalog CAB
+      ansible.windows.win_get_url:
+        url: https://downloads.dell.com/catalog/DriverPackCatalog.cab
+        dest: C:\temp\DriverPackCatalog.cab
+
+    - name: Extract Dell driver catalog CAB
+      community.windows.win_unzip:
+        src: C:\temp\DriverPackCatalog.cab
+        dest: C:\temp
+        delete_archive: true
+
+    - name: Download Dell drivers
+      trippsc2.dell.win_dell_driver_pack:
+        catalog_path: C:\temp\DriverPackCatalog.xml
+        download_path: C:\Drivers
+        os: winpe_11
+
+    - name: Import MDT drivers
+      trippsc2.mdt.import_drivers:
+        source_paths:
+          - C:\Drivers
+        path: Out-of-Box Drivers\WinPE
+        mdt_share_path: C:\MDTShare
+
+    - name: Import MDT drivers
+      trippsc2.mdt.import_drivers:
+        source_paths:
+          - C:\Drivers
+        path: Out-of-Box Drivers\Windows 10
+        mdt_share_path: C:\MDTShare

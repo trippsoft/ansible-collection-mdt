@@ -8,28 +8,21 @@ DOCUMENTATION = r"""
 module: import_drivers
 version_added: 1.0.0
 author:
-  - Jim Tarpley
+  - Jim Tarpley (@trippsc2)
 short_description: Imports drivers into an MDT deployment share
 description:
   - Imports drivers into an MDT deployment share.
   - When O(import_duplicates=false), the module is idempotent.  Otherwise, the module will always import the drivers.
   - The drivers can be imported from driver files within a source directory or from CAB files within a source directory.
-attributes:
-  check_mode:
-    support: none
-    details:
-      - Check mode is not supported.
+extends_documentation_fragment:
+  - trippsc2.mdt.action_group
+  - trippsc2.mdt.check_mode_none
+  - trippsc2.mdt.common
 options:
-  installation_path:
-    type: path
-    required: false
-    default: C:\\Program Files\\Microsoft Deployment Toolkit
-    description:
-      - The path to the MDT installation directory.
   source_paths:
     type: list
     required: true
-    elements: str
+    elements: path
     description:
       - The list of source paths containing driver files or CAB files.
   path:
@@ -43,39 +36,35 @@ options:
     default: false
     description:
       - Whether to import duplicate drivers.
-  mdt_share_path:
-    type: path
-    required: true
-    description:
-      - The path to the MDT directory.
 """
 
 EXAMPLES = r"""
 - name: Import drivers
   trippsc2.mdt.import_drivers:
     installation_path: C:\\Program Files\\Microsoft Deployment Toolkit
+    mdt_share_path: C:\\MDTShare
     source_paths:
       - C:\\Drivers1
       - C:\\Drivers2
     path: Out-of-Box Drivers
-    mdt_share_path: C:\\MDTShare
 
 - name: Import drivers
   trippsc2.mdt.import_drivers:
     installation_path: C:\\Program Files\\Microsoft Deployment Toolkit
+    mdt_share_path: C:\\MDTShare
     source_paths:
       - C:\\Drivers
     path: Out-of-Box Drivers\\WinPE
-    mdt_share_path: C:\\MDTShare
 """
 
 RETURN = r"""
 drivers:
   type: list
   elements: dict
-  returned:
-    - RV(changed=true)
-  options:
+  returned: changed
+  description:
+    - The list of imported drivers.
+  contains:
     class:
       type: str
       description:

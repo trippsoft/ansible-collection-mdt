@@ -1,0 +1,37 @@
+---
+- name: Verify
+  hosts:
+    - subjects
+  tasks:
+    - name: Attempt to not supply the MDT share path
+      trippsc2.mdt.import_drivers:
+        source_paths:
+          - C:\Drivers
+        path: Out-of-Box Drivers\WinPE
+      register: _no_mdt_share_path
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _no_mdt_share_path is failed
+          - '_no_mdt_share_path.msg == "missing required arguments: mdt_share_path"'
+        fail_msg: The task should fail when the MDT share path is not supplied.
+        success_msg: The task failed as expected when the MDT share path was not supplied.
+
+    - name: Attempt to supply non-existent MDT share path
+      trippsc2.mdt.import_drivers:
+        mdt_share_path: C:\Test
+        source_paths:
+          - C:\Drivers
+        path: Out-of-Box Drivers\WinPE
+      register: _nonexistent_mdt_share_path
+      ignore_errors: true
+
+    - name: Verify that previous task fails
+      ansible.builtin.assert:
+        that:
+          - _nonexistent_mdt_share_path is failed
+          - '_nonexistent_mdt_share_path.msg == "MDT share path ''C:\Test'' does not exist."'
+        fail_msg: The task should fail when the MDT share path does not exist.
+        success_msg: The task failed as expected when the MDT share path does not exist.

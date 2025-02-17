@@ -1,0 +1,173 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks:
+    - name: Get non-existent MDT operating system info
+      trippsc2.mdt.operating_system_info:
+        mdt_share_path: C:\MDTShare
+        name: Non-Existent Operating System
+      register: _non_existent_operating_system
+
+    - name: Verify that operating system does not exist
+      ansible.builtin.assert:
+        that:
+          - not _non_existent_operating_system.exists
+          - _non_existent_operating_system.operating_system is not defined
+        fail_msg: The operating system exists when it should not.
+        success_msg: The operating system does not exist, as expected.
+
+    - name: Get non-existent MDT operating system info by GUID
+      trippsc2.mdt.operating_system_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ '{' + ansible_date_time.iso8601_micro | to_uuid + '}' }}"
+      register: _non_existent_operating_system_by_guid
+
+    - name: Verify that operating system does not exist
+      ansible.builtin.assert:
+        that:
+          - not _non_existent_operating_system_by_guid.exists
+          - _non_existent_operating_system_by_guid.operating_system is not defined
+        fail_msg: The operating system exists when it should not.
+        success_msg: The operating system does not exist, as expected.
+
+    - name: Get Source Operating System Info by name
+      trippsc2.mdt.operating_system_info:
+        mdt_share_path: C:\MDTShare
+        name: Source Operating System
+      register: _source_operating_system_by_name
+
+    - name: Verify Source Operating System info
+      ansible.builtin.assert:
+        that:
+          - _source_operating_system_by_name.exists
+          - _source_operating_system_by_name.operating_system is defined
+          - _source_operating_system_by_name.operating_system.name == 'Source Operating System'
+          - _source_operating_system_by_name.operating_system.type == 'source'
+          - _source_operating_system_by_name.operating_system.files_path == 'C:\MDTShare\Operating Systems\Source Operating System'
+          - _source_operating_system_by_name.operating_system.build == '10.0.22631.2861'
+          - _source_operating_system_by_name.operating_system.description == 'Windows 11 Enterprise'
+          - _source_operating_system_by_name.operating_system.flags == 'Enterprise'
+          - _source_operating_system_by_name.operating_system.hal == ''
+          - _source_operating_system_by_name.operating_system.image_name == 'Windows 11 Enterprise'
+          - _source_operating_system_by_name.operating_system.image_file == '.\Operating Systems\Source Operating System\sources\install.wim'
+          - _source_operating_system_by_name.operating_system.image_index == 6
+          - _source_operating_system_by_name.operating_system.languages | length == 1
+          - _source_operating_system_by_name.operating_system.languages[0] == 'en-US'
+          - _source_operating_system_by_name.operating_system.os_type == 'Windows IBS'
+          - _source_operating_system_by_name.operating_system.platform == 'x64'
+          - _source_operating_system_by_name.operating_system.size == 18606
+          - _source_operating_system_by_name.operating_system.comments == ''
+          - _source_operating_system_by_name.operating_system.enabled
+          - not _source_operating_system_by_name.operating_system.hidden
+          - _source_operating_system_by_name.operating_system.files is defined
+          - _source_operating_system_by_name.operating_system.files | length > 1
+          - _source_operating_system_by_name.operating_system.paths is defined
+          - _source_operating_system_by_name.operating_system.paths | length == 1
+          - _source_operating_system_by_name.operating_system.paths[0] == ''
+        fail_msg: The operating system info is not as expected.
+        success_msg: The operating system info is as expected.
+
+    - name: Get WIM Operating System Info by name
+      trippsc2.mdt.operating_system_info:
+        mdt_share_path: C:\MDTShare
+        name: WIM Operating System
+      register: _wim_operating_system_by_name
+
+    - name: Verify WIM Operating System info
+      ansible.builtin.assert:
+        that:
+          - _wim_operating_system_by_name.exists
+          - _wim_operating_system_by_name.operating_system is defined
+          - _wim_operating_system_by_name.operating_system.name == 'WIM Operating System'
+          - _wim_operating_system_by_name.operating_system.type == 'wim'
+          - _wim_operating_system_by_name.operating_system.files_path == 'C:\MDTShare\Operating Systems\WIM Operating System'
+          - _wim_operating_system_by_name.operating_system.build == '10.0.22631.2861'
+          - _wim_operating_system_by_name.operating_system.description == 'Windows 11 Enterprise'
+          - _wim_operating_system_by_name.operating_system.flags == 'Enterprise'
+          - _wim_operating_system_by_name.operating_system.hal == ''
+          - _wim_operating_system_by_name.operating_system.image_name == 'Windows 11 Enterprise'
+          - _wim_operating_system_by_name.operating_system.image_file == '.\Operating Systems\WIM Operating System\install.wim'
+          - _wim_operating_system_by_name.operating_system.image_index == 6
+          - _wim_operating_system_by_name.operating_system.languages | length == 1
+          - _wim_operating_system_by_name.operating_system.languages[0] == 'en-US'
+          - _wim_operating_system_by_name.operating_system.os_type == 'Windows IBS'
+          - _wim_operating_system_by_name.operating_system.platform == 'x64'
+          - _wim_operating_system_by_name.operating_system.size == 18606
+          - _wim_operating_system_by_name.operating_system.comments == ''
+          - _wim_operating_system_by_name.operating_system.enabled
+          - not _wim_operating_system_by_name.operating_system.hidden
+          - _wim_operating_system_by_name.operating_system.files is defined
+          - _wim_operating_system_by_name.operating_system.files | length == 1
+          - _wim_operating_system_by_name.operating_system.paths is defined
+          - _wim_operating_system_by_name.operating_system.paths | length == 2
+          - ('Subdirectory' in _wim_operating_system_by_name.operating_system.paths)
+          - ('' in _wim_operating_system_by_name.operating_system.paths)
+        fail_msg: The operating system info is not as expected.
+        success_msg: The operating system info is as expected.
+
+    - name: Get Source Operating System Info by GUID
+      trippsc2.mdt.operating_system_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ 'Source Operating System' | to_uuid }}"
+      register: _source_operating_system_by_guid
+
+    - name: Verify Source Operating System info
+      ansible.builtin.assert:
+        that:
+          - _source_operating_system_by_guid.exists
+          - _source_operating_system_by_guid.operating_system is defined
+          - _source_operating_system_by_guid.operating_system.name == _source_operating_system_by_name.operating_system.name
+          - _source_operating_system_by_guid.operating_system.type == _source_operating_system_by_name.operating_system.type
+          - _source_operating_system_by_guid.operating_system.files_path == _source_operating_system_by_name.operating_system.files_path
+          - _source_operating_system_by_guid.operating_system.build == _source_operating_system_by_name.operating_system.build
+          - _source_operating_system_by_guid.operating_system.description == _source_operating_system_by_name.operating_system.description
+          - _source_operating_system_by_guid.operating_system.flags == _source_operating_system_by_name.operating_system.flags
+          - _source_operating_system_by_guid.operating_system.hal == _source_operating_system_by_name.operating_system.hal
+          - _source_operating_system_by_guid.operating_system.image_name == _source_operating_system_by_name.operating_system.image_name
+          - _source_operating_system_by_guid.operating_system.image_file == _source_operating_system_by_name.operating_system.image_file
+          - _source_operating_system_by_guid.operating_system.image_index == _source_operating_system_by_name.operating_system.image_index
+          - _source_operating_system_by_guid.operating_system.languages == _source_operating_system_by_name.operating_system.languages
+          - _source_operating_system_by_guid.operating_system.os_type == _source_operating_system_by_name.operating_system.os_type
+          - _source_operating_system_by_guid.operating_system.platform == _source_operating_system_by_name.operating_system.platform
+          - _source_operating_system_by_guid.operating_system.size == _source_operating_system_by_name.operating_system.size
+          - _source_operating_system_by_guid.operating_system.comments == _source_operating_system_by_name.operating_system.comments
+          - _source_operating_system_by_guid.operating_system.enabled == _source_operating_system_by_name.operating_system.enabled
+          - _source_operating_system_by_guid.operating_system.hidden == _source_operating_system_by_name.operating_system.hidden
+          - _source_operating_system_by_guid.operating_system.files == _source_operating_system_by_name.operating_system.files
+          - _source_operating_system_by_guid.operating_system.paths == _source_operating_system_by_name.operating_system.paths
+        fail_msg: The operating system info is not as expected.
+        success_msg: The operating system info is as expected
+
+    - name: Get WIM Operating System Info by GUID
+      trippsc2.mdt.operating_system_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ 'WIM Operating System' | to_uuid }}"
+      register: _wim_operating_system_by_guid
+
+    - name: Verify WIM Operating System info
+      ansible.builtin.assert:
+        that:
+          - _wim_operating_system_by_guid.exists
+          - _wim_operating_system_by_guid.operating_system is defined
+          - _wim_operating_system_by_guid.operating_system.name == _wim_operating_system_by_name.operating_system.name
+          - _wim_operating_system_by_guid.operating_system.type == _wim_operating_system_by_name.operating_system.type
+          - _wim_operating_system_by_guid.operating_system.files_path == _wim_operating_system_by_name.operating_system.files_path
+          - _wim_operating_system_by_guid.operating_system.build == _wim_operating_system_by_name.operating_system.build
+          - _wim_operating_system_by_guid.operating_system.description == _wim_operating_system_by_name.operating_system.description
+          - _wim_operating_system_by_guid.operating_system.flags == _wim_operating_system_by_name.operating_system.flags
+          - _wim_operating_system_by_guid.operating_system.hal == _wim_operating_system_by_name.operating_system.hal
+          - _wim_operating_system_by_guid.operating_system.image_name == _wim_operating_system_by_name.operating_system.image_name
+          - _wim_operating_system_by_guid.operating_system.image_file == _wim_operating_system_by_name.operating_system.image_file
+          - _wim_operating_system_by_guid.operating_system.image_index == _wim_operating_system_by_name.operating_system.image_index
+          - _wim_operating_system_by_guid.operating_system.languages == _wim_operating_system_by_name.operating_system.languages
+          - _wim_operating_system_by_guid.operating_system.os_type == _wim_operating_system_by_name.operating_system.os_type
+          - _wim_operating_system_by_guid.operating_system.platform == _wim_operating_system_by_name.operating_system.platform
+          - _wim_operating_system_by_guid.operating_system.size == _wim_operating_system_by_name.operating_system.size
+          - _wim_operating_system_by_guid.operating_system.comments == _wim_operating_system_by_name.operating_system.comments
+          - _wim_operating_system_by_guid.operating_system.enabled == _wim_operating_system_by_name.operating_system.enabled
+          - _wim_operating_system_by_guid.operating_system.hidden == _wim_operating_system_by_name.operating_system.hidden
+          - _wim_operating_system_by_guid.operating_system.files == _wim_operating_system_by_name.operating_system.files
+          - _wim_operating_system_by_guid.operating_system.paths == _wim_operating_system_by_name.operating_system.paths
+        fail_msg: The operating system info is not as expected.
+        success_msg: The operating system info is as expected

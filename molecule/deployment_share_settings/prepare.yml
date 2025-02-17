@@ -1,0 +1,77 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  roles:
+    - role: trippsc2.windows.deployment_services
+      vars:
+        wds_path: C:\RemoteInstall
+        wds_standalone: true
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Pre-create MDT Deployment Share
+      loop: "{{ range(1, 10) | list }}"
+      trippsc2.mdt.deployment_share:
+        mdt_share_path: "C:\\MDTShare{{ item }}"
+        description: "MDT Deployment Share {{ item }}"
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare{{ item }}$"
+        state: present
+
+    - name: Create SMB share
+      loop: "{{ range(1, 10) | list }}"
+      ansible.windows.win_share:
+        name: "MDTShare{{ item }}$"
+        path: "C:\\MDTShare{{ item }}"
+        full: Everyone
+        caching_mode: None
+
+    - name: Add permissions to MDT Deployment Share
+      loop: "{{ range(1, 10) | list }}"
+      ansible.windows.win_acl:
+        path: "C:\\MDTShare{{ item }}"
+        user: vagrant
+        rights: FullControl
+        type: allow
+
+    - name: Pre-configure MDT deployment share
+      loop:
+        - mdt_share_path: C:\MDTShare2
+          comments: Old Comments
+        - mdt_share_path: C:\MDTShare5
+          x86:
+            enabled: false
+          x64:
+            enabled: false
+        - mdt_share_path: C:\MDTShare6
+          x86:
+            enabled: true
+            generic_iso:
+              enabled: true
+            generic_wim:
+              enabled: true
+          x64:
+            enabled: true
+            generic_iso:
+              enabled: true
+            generic_wim:
+              enabled: true
+        - mdt_share_path: C:\MDTShare8
+          x86:
+            enabled: true
+            litetouch_iso:
+              enabled: false
+          x64:
+            enabled: true
+            litetouch_iso:
+              enabled: false
+      trippsc2.mdt.deployment_share_settings:
+        mdt_share_path: "{{ item.mdt_share_path }}"
+        comments: "{{ item.comments | default(omit) }}"
+        x86: "{{ item.x86 | default(omit) }}"
+        x64: "{{ item.x64 | default(omit) }}"

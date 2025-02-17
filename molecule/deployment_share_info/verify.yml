@@ -1,0 +1,17 @@
+---
+- name: Verify
+  hosts:
+    - subjects
+  tasks:
+    - name: Attempt to not supply MDT share path
+      trippsc2.mdt.deployment_share_info:
+      register: _no_mdt_share_path
+      ignore_errors: true
+
+    - name: Verify that MDT share path is required
+      ansible.builtin.assert:
+        that:
+          - _no_mdt_share_path is failed
+          - '_no_mdt_share_path.msg == "missing required arguments: mdt_share_path"'
+        fail_msg: MDT share path is required.
+        success_msg: MDT share path is required.

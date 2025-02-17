@@ -1,0 +1,33 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+  provider:
+    name: libvirt
+  cachier: machine
+  parallel: true
+platforms:
+  - name: win
+    box: jtarpley/${MOLECULE_BOX:-w2022_cis}
+    memory: 2048
+    cpus: 2
+    provider_options:
+      default_prefix: mdt_operating_system_info_
+    groups:
+      - subjects
+      - windows
+provisioner:
+  name: ansible
+  inventory:
+    group_vars:
+      windows:
+        ansible_shell_type: powershell
+        ansible_become_method: runas
+        ansible_become_user: SYSTEM
+        ansible_password: vagrant
+    host_vars:
+      win:
+        ansible_ssh_common_args: '-o PreferredAuthentications=password -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o ControlMaster=auto -o ControlPersist=60s -o ForwardX11=no -o LogLevel=ERROR -o StrictHostKeyChecking=no'
+verifier:
+  name: ansible

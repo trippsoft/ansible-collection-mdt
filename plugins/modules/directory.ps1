@@ -1,7 +1,138 @@
 #!powershell
 
 #AnsibleRequires -CSharpUtil Ansible.Basic
-#AnsibleRequires -PowerShell ansible_collections.trippsc2.mdt.plugins.module_utils.SharedFunctions
+#AnsibleRequires -PowerShell ansible_collections.trippsc2.mdt.plugins.module_utils.Common
+
+function Confirm-DirectoryParamsAreValid {
+    <#
+    .SYNOPSIS
+    Confirms that the parameters are valid.
+
+    .DESCRIPTION
+    This function confirms that the parameters are valid.
+
+    .PARAMETER Module
+    The Ansible module.
+
+    .EXAMPLE
+    Confirm-DirectoryParamsAreValid -Module $module
+    #>
+
+    [OutputType([System.Void])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [Ansible.Basic.AnsibleModule]$Module
+    )
+
+    $Module.Params.path = $Module.Params.path | Format-MDTPath
+
+    if ([string]::IsNullOrEmpty($Module.Params.path)) {
+        $Module.FailJson("The 'path' parameter cannot be empty.")
+    }
+
+    $Module.Params.path |
+        Confirm-MDTPathIsValid -Module $Module -ParameterName "path" |
+        Out-Null
+}
+
+function Add-MDTDirectory {
+    <#
+    .SYNOPSIS
+    Adds a directory to the MDT drive.
+
+    .DESCRIPTION
+    This function adds a directory to the MDT drive.
+
+    .PARAMETER Module
+    The Ansible module.
+
+    .PARAMETER MDTDriveName
+    The name of the MDT drive.
+
+    .EXAMPLE
+    Add-MDTDirectory -Module $module -MDTDriveName 'DS001'
+    #>
+
+    [OutputType([System.Void])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [Ansible.Basic.AnsibleModule]$Module,
+        [Parameter(Mandatory = $true)]
+        [string]$MDTDriveName
+    )
+
+    $path = $Module.Params.path
+    $pathSegments = $path.Split('\')
+
+    $fullPath = "$($MDTDriveName):"
+
+    foreach ($segment in $pathSegments) {
+
+        $fullPath = "$($fullPath)\$($segment)"
+
+        if (Test-Path -LiteralPath $fullPath -PathType Container) {
+            continue
+        }
+
+        $Module.Result.changed = $true
+
+        if ($Module.CheckMode) {
+            continue
+        }
+
+        New-Item -Path $fullPath -ItemType Directory | Out-Null
+
+        if (-not (Test-Path -LiteralPath $fullPath -PathType Container)) {
+            $Module.FailJson("Failed to create directory '$($fullPath)'.")
+        }
+    }
+}
+
+function Remove-MDTDirectory {
+    <#
+    .SYNOPSIS
+    Removes a directory from the MDT drive.
+
+    .DESCRIPTION
+    This function removes a directory from the MDT drive.
+
+    .PARAMETER Module
+    The Ansible module.
+
+    .PARAMETER MDTDriveName
+    The name of the MDT drive.
+
+    .EXAMPLE
+    Remove-MDTDirectory -Module $module -MDTDriveName 'DS001'
+    #>
+
+    [OutputType([System.Void])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [Ansible.Basic.AnsibleModule]$Module,
+        [Parameter(Mandatory = $true)]
+        [string]$MDTDriveName
+    )
+
+    $path = $Module.Params.path
+    $fullPath = "$($MDTDriveName):\$($path)"
+
+    if (-not (Test-Path -LiteralPath $fullPath -PathType Container)) {
+        return
+    }
+
+    $Module.Result.changed = $true
+
+    if ($Module.CheckMode) {
+        return
+    }
+
+    Remove-Item -LiteralPath $fullPath -Recurse -Force | Out-Null
+
+    if (Test-Path -LiteralPath $fullPath -PathType Container) {
+        $Module.FailJson("Failed to remove directory '$($fullPath)'.")
+    }
+}
 
 $spec = @{
     options = @{
@@ -10,11 +141,11 @@ $spec = @{
             required = $false
             default = 'C:\Program Files\Microsoft Deployment Toolkit'
         }
-        path = @{
-            type = 'str'
+        mdt_share_path = @{
+            type = 'path'
             required = $true
         }
-        mdt_share_path = @{
+        path = @{
             type = 'str'
             required = $true
         }
@@ -33,79 +164,24 @@ $spec = @{
 
 $module = [Ansible.Basic.AnsibleModule]::Create($args, $spec)
 
-Import-MDTModule -InstallationPath $module.Params.installation_path
+Confirm-DirectoryParamsAreValid -Module $module | Out-Null
+Import-MDTModule -Module $module | Out-Null
+
+$mdtDrive = Get-MDTPSDrive -Module $module -ReadWrite
 
 $path = $module.Params.path
-$mdtSharePath = $module.Params.mdt_share_path
 $state = $module.Params.state
 
-if (-not (Test-Path -Path $mdtSharePath))
-{
-    $module.FailJson("MDT share path '$mdtSharePath' does not exist.")
+$module.Result.changed = $false
+
+if ($state -eq 'present') {
+    Add-MDTDirectory -Module $module -MDTDriveName $mdtDrive.Name
 }
-
-$mdtDrive = Get-MDTPSDrive -Path $mdtSharePath
-
-if ($null -eq $mdtDrive)
-{
-    $module.FailJson("Failed to find or create MDT PowerShell drive for '$mdtSharePath'.")
+elseif ($state -eq 'absent') {
+    Remove-MDTDirectory -Module $module -MDTDriveName $mdtDrive.Name
 }
-
-if ($mdtDrive.ReadOnly)
-{
-    $module.FailJson("MDT drive '$($mdtDrive.Name)' is read-only.")
-}
-
-$path = $path.TrimStart('\')
-$path = $path.TrimEnd('\')
-$path = $path.Replace('/', '\')
-
-$module.Result['changed'] = $false
-
-if ($state -eq 'present')
-{
-    $pathSegments = $path.Split('\')
-
-    $fullPath = "$($mdtDrive.Name):"
-
-    foreach ($segment in $pathSegments)
-    {
-        $fullPath = "$($fullPath)\$($segment)"
-
-        if (-not (Test-Path -LiteralPath $fullPath))
-        {
-            $module.Result['changed'] = $true
-            
-            if (-not $module.CheckMode)
-            {
-                New-Item -Path $fullPath -ItemType Directory | Out-Null
-
-                if (-not (Test-Path -LiteralPath $fullPath))
-                {
-                    $module.FailJson("Failed to create directory '$fullPath'.")
-                }
-            }
-        }
-    }
-}
-elseif ($state -eq 'absent')
-{
-    $fullPath = "$($mdtDrive.Name):\$path"
-
-    if (Test-Path -LiteralPath $fullPath)
-    {
-        $module.Result['changed'] = $true
-
-        if (-not $module.CheckMode)
-        {
-            Remove-Item -Path $fullPath -Recurse -Force | Out-Null
-
-            if (Test-Path -LiteralPath $fullPath)
-            {
-                $module.FailJson("Failed to remove directory '$fullPath'.")
-            }
-        }
-    }
+else {
+    $module.FailJson("Invalid state '$state'.")
 }
 
 $mdtDrive | Remove-PSDrive | Out-Null

@@ -4,5 +4,24 @@
     - subjects
   tasks:
     - name: Generate Boot image
+      diff: true
       trippsc2.mdt.boot_image:
-        mdt_share_path: C:\MDTShare
+        mdt_share_path: C:\MDTShare1
+
+    - name: Generate compressed Boot image
+      diff: true
+      trippsc2.mdt.boot_image:
+        mdt_share_path: C:\MDTShare2
+        compress: true
+      tags:
+        - always
+        - molecule-idempotence-notest
+
+    - name: Generate Boot image
+      diff: true
+      trippsc2.mdt.boot_image:
+        mdt_share_path: C:\MDTShare3
+        force: true
+      tags:
+        - always
+        - molecule-idempotence-notest

@@ -1,0 +1,90 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Create MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        mdt_share_path: C:\MDTShare
+        description: MDT Deployment Share
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare"
+        state: present
+
+    - name: Create SMB share
+      ansible.windows.win_share:
+        name: MDTShare
+        path: C:\MDTShare
+        full: Everyone
+        caching_mode: None
+
+    - name: Add permissions to MDT Deployment Share
+      ansible.windows.win_acl:
+        path: C:\MDTShare
+        user: vagrant
+        rights: FullControl
+        type: allow
+
+    - name: Create application folder
+      ansible.windows.win_file:
+        path: C:\temp\source
+        state: directory
+
+    - name: Create application file
+      ansible.windows.win_copy:
+        content: '1'
+        dest: C:\temp\source\file.txt
+
+    - name: Create MDT directory
+      trippsc2.mdt.directory:
+        mdt_share_path: C:\MDTShare
+        path: Applications\Subdirectory
+        state: present
+
+    - name: Pre-create MDT applications
+      loop:
+        - type: bundle
+          name: Dependency
+        - type: source
+          name: Source Application
+          command_line: 'echo "Source Application"'
+          source_path: C:\temp\source
+        - type: no_source
+          name: No Source Application
+          command_line: 'echo "No Source Application"'
+        - type: bundle
+          name: Application Bundle
+        - type: source
+          name: Nested Source Application
+          paths:
+            set:
+              - Subdirectory
+          command_line: 'echo "Nested Source Application"'
+          source_path: C:\temp\source
+        - type: no_source
+          name: Nested No Source Application
+          command_line: 'echo "Nested No Source Application"'
+        - type: bundle
+          name: Nested Application Bundle
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        name: "{{ item.name | default(omit) }}"
+        type: "{{ item.type }}"
+        short_name: "{{ item.name }}"
+        paths: "{{ item.paths | default(omit) }}"
+        command_line: "{{ item.command_line | default(omit) }}"
+        source_path: "{{ item.source_path | default(omit) }}"
+        state: present
+
+    - name: Pre-add MDT application dependency
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: Application Bundle
+        add:
+          - name: Dependency

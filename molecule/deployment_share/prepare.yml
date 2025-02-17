@@ -6,6 +6,7 @@
     - name: Install MDT
       chocolatey.chocolatey.win_chocolatey:
         name:
+          - windows-adk-all
           - mdt
         state: present
 
@@ -13,23 +14,42 @@
       loop:
         - path: C:\MDTShare1
           description: MDT Deployment Share 1
-          share_name: MDTShare1
+          unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare1$"
         - path: C:\MDTShare2
           description: MDT Deployment Share 2
-          share_name: MDTShare2
+          unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare2$"
         - path: C:\MDTShare3
           description: MDT Deployment Share 3
-          share_name: MDTShare3
-        - path: C:\MDTShare4
-          description: MDT Deployment Share 4
-          share_name: MDTShare4
+          unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare3$"
       trippsc2.mdt.deployment_share:
-        path: "{{ item.path }}"
+        mdt_share_path: "{{ item.path }}"
         description: "{{ item.description }}"
-        share_name: "{{ item.share_name }}"
+        unc_path: "{{ item.unc_path }}"
         state: present
+
+    - name: Create SMB share
+      loop:
+        - MDTShare1
+        - MDTShare2
+        - MDTShare3
+      ansible.windows.win_share:
+        name: "{{ item }}$"
+        path: "C:\\{{ item }}"
+        full: Everyone
+        caching_mode: None
+
+    - name: Add permissions to MDT Deployment Share
+      loop:
+        - C:\MDTShare1
+        - C:\MDTShare2
+        - C:\MDTShare3
+      ansible.windows.win_acl:
+        path: "{{ item }}"
+        user: vagrant
+        rights: FullControl
+        type: allow
 
     - name: Remove MDT Deployment Share
       trippsc2.mdt.deployment_share:
-        path: C:\MDTShare2
+        mdt_share_path: C:\MDTShare2
         state: absent

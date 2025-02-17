@@ -1,0 +1,123 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Create MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        mdt_share_path: C:\MDTShare
+        description: MDT Deployment Share
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare"
+        state: present
+
+    - name: Create SMB share
+      ansible.windows.win_share:
+        name: MDTShare
+        path: C:\MDTShare
+        full: Everyone
+        caching_mode: None
+
+    - name: Add permissions to MDT Deployment Share
+      ansible.windows.win_acl:
+        path: C:\MDTShare
+        user: vagrant
+        rights: FullControl
+        type: allow
+
+    - name: Create MDT directory
+      trippsc2.mdt.directory:
+        mdt_share_path: C:\MDTShare
+        path: Applications\Subdirectory
+        state: present
+
+    - name: Pre-create MDT applications
+      loop:
+        - name: Dependency 1
+        - name: Dependency 2
+        - name: Nested Dependency 3
+          paths:
+            set:
+              - Subdirectory
+        - name: Nested Dependency 4
+          paths:
+            set:
+              - Subdirectory
+        - name: Add By GUID No Existing
+        - name: Add By GUID Existing
+        - name: Add By GUID In Folder No Existing
+        - name: Add By GUID In Folder Existing
+        - name: Add By Name No Existing
+        - name: Add By Name Existing
+        - name: Add By Name In Folder No Existing
+        - name: Add By Name And Path Existing
+        - name: Remove By GUID
+        - name: Remove By GUID In Folder
+        - name: Remove By Name
+        - name: Remove By Name And Path
+        - name: Set To Empty
+        - name: Set To GUID
+        - name: Set To GUID In Folder
+        - name: Set To Name
+        - name: Set To Name And Path
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        name: "{{ item.name }}"
+        type: bundle
+        short_name: "{{ item.name }}"
+        paths: "{{ item.paths | default(omit) }}"
+        state: present
+
+    - name: Pre-add MDT application dependency
+      loop:
+        - name: Add By GUID Existing
+          dependency: Dependency 2
+        - name: Add By GUID Existing
+          dependency: Nested Dependency 4
+        - name: Add By GUID In Folder Existing
+          dependency: Dependency 2
+        - name: Add By GUID In Folder Existing
+          dependency: Nested Dependency 4
+        - name: Add By Name Existing
+          dependency: Dependency 2
+        - name: Add By Name Existing
+          dependency: Nested Dependency 4
+        - name: Add By Name And Path Existing
+          dependency: Dependency 2
+        - name: Add By Name And Path Existing
+          dependency: Nested Dependency 4
+        - name: Remove By GUID
+          dependency: Dependency 1
+        - name: Remove By GUID In Folder
+          dependency: Nested Dependency 3
+        - name: Remove By Name
+          dependency: Dependency 1
+        - name: Remove By Name And Path
+          dependency: Nested Dependency 3
+        - name: Set To Empty
+          dependency: Dependency 2
+        - name: Set To Empty
+          dependency: Nested Dependency 4
+        - name: Set To GUID
+          dependency: Dependency 2
+        - name: Set To GUID
+          dependency: Nested Dependency 4
+        - name: Set To GUID In Folder
+          dependency: Dependency 2
+        - name: Set To GUID In Folder
+          dependency: Nested Dependency 4
+        - name: Set To Name
+          dependency: Dependency 2
+        - name: Set To Name And Path
+          dependency: Nested Dependency 4
+      trippsc2.mdt.application_dependency:
+        mdt_share_path: C:\MDTShare
+        name: "{{ item.name }}"
+        add:
+          - name: "{{ item.dependency }}"

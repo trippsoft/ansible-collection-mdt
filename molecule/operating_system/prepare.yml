@@ -1,0 +1,158 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Initialize disk
+      community.windows.win_initialize_disk:
+        disk_number: 1
+        style: gpt
+
+    - name: Create partition
+      community.windows.win_partition:
+        disk_number: 1
+        partition_size: -1
+        drive_letter: D
+        state: present
+
+    - name: Format partition
+      community.windows.win_format:
+        drive_letter: D
+        file_system: NTFS
+        new_label: MDT
+
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Create MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        mdt_share_path: D:\MDTShare
+        description: MDT Deployment Share
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare$"
+        state: present
+
+    - name: Create SMB share
+      ansible.windows.win_share:
+        name: MDTShare$
+        path: D:\MDTShare
+        full: Everyone
+        caching_mode: None
+
+    - name: Add permissions to MDT Deployment Share
+      ansible.windows.win_acl:
+        path: D:\MDTShare
+        user: vagrant
+        rights: FullControl
+        type: allow
+
+    - name: Create MDT directory
+      trippsc2.mdt.directory:
+        mdt_share_path: D:\MDTShare
+        path: Operating Systems\Subdirectory
+        state: present
+
+    - name: Create temporary directories
+      loop:
+        - C:\temp\source
+        - C:\temp\source2
+      ansible.windows.win_file:
+        path: "{{ item }}"
+        state: directory
+
+    - name: Copy Windows ISO files to temporary directory
+      loop:
+        - C:\temp\source
+        - C:\temp\source2
+      ansible.windows.win_copy:
+        src: ../files/operating_system/source/
+        dest: "{{ item }}"
+
+    - name: Copy WIM files to temporary directory
+      loop:
+        - src: ../files/operating_system/install.wim
+          dest: C:\temp\source\sources\install.wim
+        - src: ../files/operating_system/modified.wim
+          dest: C:\temp\source2\sources\install.wim
+      ansible.windows.win_copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+
+    - name: Pre-create MDT Operating Systems
+      loop:
+        - name: Add Paths
+          type: wim
+          source_path: C:\temp\source\sources\install.wim
+          image_index: 6
+        - name: Remove Paths
+          type: wim
+          source_path: C:\temp\source\sources\install.wim
+          image_index: 6
+          paths:
+            add:
+              - Subdirectory
+        - name: Add And Remove Paths
+          type: wim
+          source_path: C:\temp\source\sources\install.wim
+          image_index: 6
+        - name: Set Paths
+          type: wim
+          source_path: C:\temp\source\sources\install.wim
+          image_index: 6
+        - name: Change Comments
+          type: wim
+          source_path: C:\temp\source\sources\install.wim
+          image_index: 6
+        - name: Change Enabled
+          type: wim
+          source_path: C:\temp\source\sources\install.wim
+          image_index: 6
+          enabled: false
+        - name: Change Hidden
+          type: wim
+          source_path: C:\temp\source\sources\install.wim
+          image_index: 6
+          hidden: true
+        - guid: "{{ 'Rename Source' | to_uuid }}"
+          name: Rename Source
+          type: source
+          source_path: C:\temp\source
+          image_index: 6
+        - guid: "{{ 'Rename WIM' | to_uuid }}"
+          name: Rename WIM
+          type: wim
+          source_path: C:\temp\source\sources\install.wim
+          image_index: 6
+        - name: Remove Source By Name
+          type: source
+          source_path: C:\temp\source
+          image_index: 6
+        - name: Remove WIM By Name
+          type: wim
+          source_path: C:\temp\source\sources\install.wim
+          image_index: 6
+        - guid: "{{ 'Remove Source By GUID' | to_uuid }}"
+          name: Remove Source By GUID
+          type: source
+          source_path: C:\temp\source
+          image_index: 6
+        - guid: "{{ 'Remove WIM By GUID' | to_uuid }}"
+          name: Remove WIM By GUID
+          type: wim
+          source_path: C:\temp\source\sources\install.wim
+          image_index: 6
+      trippsc2.mdt.operating_system:
+        mdt_share_path: D:\MDTShare
+        guid: "{{ item.guid | default(omit) }}"
+        name: "{{ item.name }}"
+        type: "{{ item.type }}"
+        source_path: "{{ item.source_path }}"
+        destination_folder: "{{ item.name }}"
+        image_index: "{{ item.image_index }}"
+        enabled: "{{ item.enabled | default(omit) }}"
+        hidden: "{{ item.hidden | default(omit) }}"
+        paths: "{{ item.paths | default(omit) }}"
+        state: present

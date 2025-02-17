@@ -8,101 +8,77 @@ DOCUMENTATION = r"""
 module: directory_info
 version_added: 1.1.0
 author:
-  - Jim Tarpley
+  - Jim Tarpley (@trippsc2)
 short_description: Gets information about an MDT deployment share directory
 description:
   - Gets information about an MDT deployment share directory.
-attributes:
-  check_mode:
-    support: full
-    details:
-      - Fully supports check mode, as it only reads data.
+extends_documentation_fragment:
+  - trippsc2.mdt.action_group
+  - trippsc2.mdt.check_mode_read_only
+  - trippsc2.mdt.common
 options:
-  installation_path:
-    type: path
-    required: false
-    default: C:\\Program Files\\Microsoft Deployment Toolkit
-    description:
-      - The path to the MDT installation directory.
   path:
     type: str
     required: true
     description:
       - The path of the directory within the MDT deployment share.
-  mdt_share_path:
-    type: path
-    required: true
+  recurse:
+    type: bool
+    required: false
+    default: false
     description:
-      - The path to the MDT directory.
+      - Whether to recurse into subdirectories.
 """
 
 EXAMPLES = r"""
 - name: Get directory info
   trippsc2.mdt.directory_info:
-    installation_path: C:\\Program Files\\Microsoft Deployment Toolkit
-    path: Operating Systems\Windows10
     mdt_share_path: C:\\MDTShare
+    path: Operating Systems\\Windows10
+
+- name: Get directory info with recursion
+  trippsc2.mdt.directory_info:
+    mdt_share_path: C:\\MDTShare
+    path: Operating Systems
+    recurse: true
 """
 
 RETURN = r"""
 exists:
   type: bool
-  returned:
-    - success
+  returned: success
   description:
     - Whether the directory exists.
-info:
+directory:
   type: dict
-  returned:
-    - RV(exists=true)
+  returned: RV(exists=true)
   description:
     - The directory information.
-  options:
-    enabled:
-      type: bool
+  contains:
+    type:
+      type: str
       description:
-        - Whether the directory is enabled.
+        - The type of the directory.
     guid:
       type: str
       description:
         - The directory GUID.
-    is_directory:
-      type: bool
-      description:
-        - Whether the path is a directory.
-        - This will always be true.
     name:
       type: str
       description:
         - The directory name.
-    node_type:
+    enabled:
+      type: bool
+      description:
+        - Whether the directory is enabled.
+    comments:
       type: str
       description:
-        - The node type.
-    children:
+        - Comments about the directory.
+    contents:
       type: list
       elements: dict
       description:
-        - The children of the directory.
-      options:
-        enabled:
-          type: bool
-          description:
-            - Whether the child is enabled.
-        guid:
-          type: str
-          description:
-            - The child GUID.
-        is_directory:
-          type: bool
-          description:
-            - Whether the child is a directory.
-        name:
-          type: str
-          description:
-            - The child name.
-        node_type:
-          type: str
-          description:
-            - The child node type.
+        - The contents of the directory.
+        - The structure of the data depends on the type of data in the directory.
 """

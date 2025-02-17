@@ -1,0 +1,119 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks:
+    - name: Get non-existent MDT selection profile info
+      trippsc2.mdt.selection_profile_info:
+        mdt_share_path: C:\MDTShare
+        name: Non-Existent Selection Profile
+      register: _non_existent_selection_profile_by_name
+
+    - name: Verify that selection profile does not exist
+      ansible.builtin.assert:
+        that:
+          - not _non_existent_selection_profile_by_name.exists
+          - _non_existent_selection_profile_by_name.selection_profile is not defined
+        fail_msg: The selection profile exists when it should not.
+        success_msg: The selection profile does not exist, as expected.
+
+    - name: Get non-existent MDT selection profile info by GUID
+      trippsc2.mdt.selection_profile_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ '{' + ansible_date_time.iso8601_micro | to_uuid + '}' }}"
+      register: _non_existent_selection_profile_by_guid
+
+    - name: Verify that selection profile does not exist
+      ansible.builtin.assert:
+        that:
+          - not _non_existent_selection_profile_by_guid.exists
+          - _non_existent_selection_profile_by_guid.selection_profile is not defined
+        fail_msg: The selection profile exists when it should not.
+        success_msg: The selection profile does not exist, as expected.
+
+    - name: Get Everything selection profile info by name
+      trippsc2.mdt.selection_profile_info:
+        mdt_share_path: C:\MDTShare
+        name: Everything
+      register: _everything_by_name
+
+    - name: Verify Everything selection profile info
+      ansible.builtin.assert:
+        that:
+          - _everything_by_name.exists
+          - _everything_by_name.selection_profile is defined
+          - _everything_by_name.selection_profile.name == 'Everything'
+          - _everything_by_name.selection_profile.read_only
+          - _everything_by_name.selection_profile.comments == 'All folders should be included.'
+          - _everything_by_name.selection_profile.enabled
+          - not _everything_by_name.selection_profile.hidden
+          - _everything_by_name.selection_profile.definition is defined
+          - _everything_by_name.selection_profile.definition | length == 5
+          - ('Applications' in _everything_by_name.selection_profile.definition)
+          - ('Operating Systems' in _everything_by_name.selection_profile.definition)
+          - ('Out-of-Box Drivers' in _everything_by_name.selection_profile.definition)
+          - ('Packages' in _everything_by_name.selection_profile.definition)
+          - ('Task Sequences' in _everything_by_name.selection_profile.definition)
+        fail_msg: The selection profile info is not as expected.
+        success_msg: The selection profile info is as expected.
+
+    - name: Get Nothing selection profile info by name
+      trippsc2.mdt.selection_profile_info:
+        mdt_share_path: C:\MDTShare
+        name: Nothing
+      register: _nothing_by_name
+
+    - name: Verify WIM Selection Profile info
+      ansible.builtin.assert:
+        that:
+          - _nothing_by_name.exists
+          - _nothing_by_name.selection_profile is defined
+          - _nothing_by_name.selection_profile.name == 'Nothing'
+          - _nothing_by_name.selection_profile.read_only
+          - _nothing_by_name.selection_profile.comments == 'Exclude all folders.'
+          - _nothing_by_name.selection_profile.enabled
+          - not _nothing_by_name.selection_profile.hidden
+          - _nothing_by_name.selection_profile.definition is defined
+          - _nothing_by_name.selection_profile.definition | length == 0
+        fail_msg: The selection profile info is not as expected.
+        success_msg: The selection profile info is as expected.
+
+    - name: Get Everything selection profile info by GUID
+      trippsc2.mdt.selection_profile_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ _everything_by_name.selection_profile.guid }}"
+      register: _everything_by_guid
+
+    - name: Verify Source Selection Profile info
+      ansible.builtin.assert:
+        that:
+          - _everything_by_guid.exists
+          - _everything_by_guid.selection_profile is defined
+          - _everything_by_guid.selection_profile.name == _everything_by_name.selection_profile.name
+          - _everything_by_guid.selection_profile.read_only == _everything_by_name.selection_profile.read_only
+          - _everything_by_guid.selection_profile.comments == _everything_by_name.selection_profile.comments
+          - _everything_by_guid.selection_profile.enabled == _everything_by_name.selection_profile.enabled
+          - _everything_by_guid.selection_profile.hidden == _everything_by_name.selection_profile.hidden
+          - _everything_by_guid.selection_profile.definition == _everything_by_name.selection_profile.definition
+        fail_msg: The selection profile info is not as expected.
+        success_msg: The selection profile info is as expected
+
+    - name: Get Nothing selection profile info by GUID
+      trippsc2.mdt.selection_profile_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ _nothing_by_name.selection_profile.guid }}"
+      register: _nothing_by_guid
+
+    - name: Verify Source Selection Profile info
+      ansible.builtin.assert:
+        that:
+          - _nothing_by_guid.exists
+          - _nothing_by_guid.selection_profile is defined
+          - _nothing_by_guid.selection_profile.name == _nothing_by_name.selection_profile.name
+          - _nothing_by_guid.selection_profile.read_only == _nothing_by_name.selection_profile.read_only
+          - _nothing_by_guid.selection_profile.comments == _nothing_by_name.selection_profile.comments
+          - _nothing_by_guid.selection_profile.enabled == _nothing_by_name.selection_profile.enabled
+          - _nothing_by_guid.selection_profile.hidden == _nothing_by_name.selection_profile.hidden
+          - _nothing_by_guid.selection_profile.definition == _nothing_by_name.selection_profile.definition
+        fail_msg: The selection profile info is not as expected.
+        success_msg: The selection profile info is as expected

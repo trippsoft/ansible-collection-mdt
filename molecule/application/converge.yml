@@ -1,0 +1,3882 @@
+---
+- name: Converge # noqa complexity[play]
+  hosts:
+    - subjects
+  tasks:
+    - name: Get Change Name MDT application info
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Change Name
+      register: _change_name_info
+
+    - name: Set GUID to variable
+      when:
+        - _change_name_info.exists
+      ansible.builtin.set_fact:
+        _change_name_guid: "{{ _change_name_info.application.guid }}"
+
+    - name: Get New Name MDT application info
+      when:
+        _change_name_guid is not defined
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: New Name
+      register: _new_name_info
+
+    - name: Set GUID to variable
+      when:
+        - _change_name_guid is not defined
+      ansible.builtin.set_fact:
+        _change_name_guid: "{{ _new_name_info.application.guid }}"
+
+    - name: Set test GUID
+      ansible.builtin.set_fact:
+        _create_by_guid_guid: "{{ '{' + ('test' | to_uuid | lower) + '}' }}"
+
+    - name: Create MDT application by GUID (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        guid: "{{ _create_by_guid_guid }}"
+        name: Create By GUID
+        short_name: Create By GUID
+        state: present
+      register: _create_by_guid_check
+
+    - name: Verify Create By GUID previous output # noqa no-handler
+      when:
+        - _create_by_guid_check is changed
+      ansible.builtin.assert:
+        that:
+          - _create_by_guid_check.diff.before == None
+        fail_msg: Task output included previous value.
+        success_msg: Task output did not include previous value.
+
+    - name: Verify Create By GUID output
+      ansible.builtin.assert:
+        that:
+          - _create_by_guid_check.application is defined
+          - _create_by_guid_check.application.guid == _create_by_guid_guid
+          - _create_by_guid_check.application.type == 'bundle'
+          - _create_by_guid_check.application.name == 'Create By GUID'
+          - _create_by_guid_check.application.publisher == ''
+          - _create_by_guid_check.application.short_name == 'Create By GUID'
+          - _create_by_guid_check.application.version == ''
+          - _create_by_guid_check.application.language == ''
+          - _create_by_guid_check.application.comments == ''
+          - _create_by_guid_check.application.enabled
+          - not _create_by_guid_check.application.hidden
+          - not _create_by_guid_check.application.reboot
+          - _create_by_guid_check.application.paths is defined
+          - _create_by_guid_check.application.paths | length == 1
+          - _create_by_guid_check.application.paths[0] == ''
+          - _create_by_guid_check.application.command_line is not defined
+          - _create_by_guid_check.application.working_directory is not defined
+          - _create_by_guid_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application by GUID
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        guid: "{{ _create_by_guid_guid }}"
+        name: Create By GUID
+        short_name: Create By GUID
+        state: present
+      register: _create_by_guid
+
+    - name: Verify Create By GUID previous output # noqa no-handler
+      when:
+        - _create_by_guid is changed
+      ansible.builtin.assert:
+        that:
+          - _create_by_guid.diff.before == None
+        fail_msg: Task output included previous value.
+        success_msg: Task output did not include previous value.
+
+    - name: Verify Create By GUID output
+      ansible.builtin.assert:
+        that:
+          - _create_by_guid.application is defined
+          - _create_by_guid.application.guid == _create_by_guid_guid
+          - _create_by_guid.application.type == 'bundle'
+          - _create_by_guid.application.name == 'Create By GUID'
+          - _create_by_guid.application.publisher == ''
+          - _create_by_guid.application.short_name == 'Create By GUID'
+          - _create_by_guid.application.version == ''
+          - _create_by_guid.application.language == ''
+          - _create_by_guid.application.comments == ''
+          - _create_by_guid.application.enabled
+          - not _create_by_guid.application.hidden
+          - not _create_by_guid.application.reboot
+          - _create_by_guid.application.paths is defined
+          - _create_by_guid.application.paths | length == 1
+          - _create_by_guid.application.paths[0] == ''
+          - _create_by_guid.application.command_line is not defined
+          - _create_by_guid.application.working_directory is not defined
+          - _create_by_guid.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _create_by_guid_check.changed == _create_by_guid.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create source MDT application (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: Source Application
+        short_name: Source Application
+        command_line: 'echo "Source Application"'
+        source_path: C:\temp\source
+        state: present
+      register: _source_application_check
+
+    - name: Verify Source Application previous output # noqa no-handler
+      when:
+        - _source_application_check is changed
+      ansible.builtin.assert:
+        that:
+          - _source_application_check.diff.before == None
+        fail_msg: Task output included previous value.
+        success_msg: Task output did not include previous value.
+
+    - name: Verify Source Application output
+      ansible.builtin.assert:
+        that:
+          - _source_application_check.application is defined
+          - _source_application_check.application.type == 'source'
+          - _source_application_check.application.name == 'Source Application'
+          - _source_application_check.application.publisher == ''
+          - _source_application_check.application.short_name == 'Source Application'
+          - _source_application_check.application.version == ''
+          - _source_application_check.application.language == ''
+          - _source_application_check.application.comments == ''
+          - _source_application_check.application.enabled
+          - not _source_application_check.application.hidden
+          - not _source_application_check.application.reboot
+          - _source_application_check.application.command_line == 'echo "Source Application"'
+          - _source_application_check.application.working_directory == '.\Applications\Source Application'
+          - _source_application_check.application.files_path == 'C:\MDTShare\Applications\Source Application'
+          - _source_application_check.application.paths is defined
+          - _source_application_check.application.paths | length == 1
+          - _source_application_check.application.paths[0] == ''
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create source MDT application
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: Source Application
+        short_name: Source Application
+        command_line: 'echo "Source Application"'
+        source_path: C:\temp\source
+        state: present
+      register: _source_application
+
+    - name: Verify Source Application previous output # noqa no-handler
+      when:
+        - _source_application is changed
+      ansible.builtin.assert:
+        that:
+          - _source_application.diff.before == None
+        fail_msg: Task output included previous value.
+        success_msg: Task output did not include previous value.
+
+    - name: Verify Source Application output
+      ansible.builtin.assert:
+        that:
+          - _source_application.application is defined
+          - _source_application.application.type == 'source'
+          - _source_application.application.name == 'Source Application'
+          - _source_application.application.publisher == ''
+          - _source_application.application.short_name == 'Source Application'
+          - _source_application.application.version == ''
+          - _source_application.application.language == ''
+          - _source_application.application.comments == ''
+          - _source_application.application.enabled
+          - not _source_application.application.hidden
+          - not _source_application.application.reboot
+          - _source_application.application.command_line == 'echo "Source Application"'
+          - _source_application.application.working_directory == '.\Applications\Source Application'
+          - _source_application.application.files_path == 'C:\MDTShare\Applications\Source Application'
+          - _source_application.application.paths is defined
+          - _source_application.application.paths | length == 1
+          - _source_application.application.paths[0] == ''
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _source_application_check.changed == _source_application.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create no source MDT application (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: no_source
+        name: No Source Application
+        short_name: No Source Application
+        command_line: 'echo "No Source Application"'
+        state: present
+      register: _no_source_application_check
+
+    - name: Verify No Source Application previous output # noqa no-handler
+      when:
+        - _no_source_application_check is changed
+      ansible.builtin.assert:
+        that:
+          - _no_source_application_check.diff.before == None
+        fail_msg: Task output included previous value.
+        success_msg: Task output did not include previous value.
+
+    - name: Verify No Source Application output
+      ansible.builtin.assert:
+        that:
+          - _no_source_application_check.application is defined
+          - _no_source_application_check.application.type == 'no_source'
+          - _no_source_application_check.application.name == 'No Source Application'
+          - _no_source_application_check.application.publisher == ''
+          - _no_source_application_check.application.short_name == 'No Source Application'
+          - _no_source_application_check.application.version == ''
+          - _no_source_application_check.application.language == ''
+          - _no_source_application_check.application.comments == ''
+          - _no_source_application_check.application.enabled
+          - not _no_source_application_check.application.hidden
+          - not _no_source_application_check.application.reboot
+          - _no_source_application_check.application.command_line == 'echo "No Source Application"'
+          - _no_source_application_check.application.working_directory == ''
+          - _no_source_application_check.application.paths is defined
+          - _no_source_application_check.application.paths | length == 1
+          - _no_source_application_check.application.paths[0] == ''
+          - _no_source_application_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create no source MDT application
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: no_source
+        name: No Source Application
+        short_name: No Source Application
+        command_line: 'echo "No Source Application"'
+        state: present
+      register: _no_source_application
+
+    - name: Verify No Source Application previous output # noqa no-handler
+      when:
+        - _no_source_application is changed
+      ansible.builtin.assert:
+        that:
+          - _no_source_application.diff.before == None
+        fail_msg: Task output included previous value.
+        success_msg: Task output did not include previous value.
+
+    - name: Verify No Source Application output
+      ansible.builtin.assert:
+        that:
+          - _no_source_application.application is defined
+          - _no_source_application.application.type == 'no_source'
+          - _no_source_application.application.name == 'No Source Application'
+          - _no_source_application.application.publisher == ''
+          - _no_source_application.application.short_name == 'No Source Application'
+          - _no_source_application.application.version == ''
+          - _no_source_application.application.language == ''
+          - _no_source_application.application.comments == ''
+          - _no_source_application.application.enabled
+          - not _no_source_application.application.hidden
+          - not _no_source_application.application.reboot
+          - _no_source_application.application.command_line == 'echo "No Source Application"'
+          - _no_source_application.application.working_directory == ''
+          - _no_source_application.application.paths is defined
+          - _no_source_application.application.paths | length == 1
+          - _no_source_application.application.paths[0] == ''
+          - _no_source_application.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _no_source_application_check.changed == _no_source_application.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application bundle (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Application Bundle
+        short_name: Application Bundle
+        state: present
+      register: _application_bundle_check
+
+    - name: Verify Application Bundle previous output # noqa no-handler
+      when:
+        - _application_bundle_check is changed
+      ansible.builtin.assert:
+        that:
+          - _application_bundle_check.diff.before == None
+        fail_msg: Task output included previous value.
+        success_msg: Task output did not include previous value.
+
+    - name: Verify Application Bundle output
+      ansible.builtin.assert:
+        that:
+          - _application_bundle_check.application is defined
+          - _application_bundle_check.application.type == 'bundle'
+          - _application_bundle_check.application.name == 'Application Bundle'
+          - _application_bundle_check.application.publisher == ''
+          - _application_bundle_check.application.short_name == 'Application Bundle'
+          - _application_bundle_check.application.version == ''
+          - _application_bundle_check.application.language == ''
+          - _application_bundle_check.application.comments == ''
+          - _application_bundle_check.application.enabled
+          - not _application_bundle_check.application.hidden
+          - not _application_bundle_check.application.reboot
+          - _application_bundle_check.application.paths is defined
+          - _application_bundle_check.application.paths | length == 1
+          - _application_bundle_check.application.paths[0] == ''
+          - _application_bundle_check.application.command_line is not defined
+          - _application_bundle_check.application.working_directory is not defined
+          - _application_bundle_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application bundle
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Application Bundle
+        short_name: Application Bundle
+        state: present
+      register: _application_bundle
+
+    - name: Verify Application Bundle previous output # noqa no-handler
+      when:
+        - _application_bundle is changed
+      ansible.builtin.assert:
+        that:
+          - _application_bundle.diff.before == None
+        fail_msg: Task output included previous value.
+        success_msg: Task output did not include previous value.
+
+    - name: Verify Application Bundle output
+      ansible.builtin.assert:
+        that:
+          - _application_bundle.application is defined
+          - _application_bundle.application.type == 'bundle'
+          - _application_bundle.application.name == 'Application Bundle'
+          - _application_bundle.application.publisher == ''
+          - _application_bundle.application.short_name == 'Application Bundle'
+          - _application_bundle.application.version == ''
+          - _application_bundle.application.language == ''
+          - _application_bundle.application.comments == ''
+          - _application_bundle.application.enabled
+          - not _application_bundle.application.hidden
+          - not _application_bundle.application.reboot
+          - _application_bundle.application.paths is defined
+          - _application_bundle.application.paths | length == 1
+          - _application_bundle.application.paths[0] == ''
+          - _application_bundle.application.command_line is not defined
+          - _application_bundle.application.working_directory is not defined
+          - _application_bundle.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _application_bundle_check.changed == _application_bundle.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Change source MDT application to no source application (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: no_source
+        name: Source To No Source
+        short_name: Source To No Source
+        command_line: 'echo "Source To No Source"'
+        state: present
+      register: _source_to_no_source_check
+
+    - name: Verify Source To No Source previous output # noqa no-handler
+      when:
+        - _source_to_no_source_check is changed
+      ansible.builtin.assert:
+        that:
+          - _source_to_no_source_check.diff.before is defined
+          - _source_to_no_source_check.diff.before.type == 'source'
+          - _source_to_no_source_check.diff.before.name == 'Source To No Source'
+          - _source_to_no_source_check.diff.before.publisher == ''
+          - _source_to_no_source_check.diff.before.short_name == 'Source To No Source'
+          - _source_to_no_source_check.diff.before.version == ''
+          - _source_to_no_source_check.diff.before.language == ''
+          - _source_to_no_source_check.diff.before.comments == ''
+          - _source_to_no_source_check.diff.before.enabled
+          - not _source_to_no_source_check.diff.before.hidden
+          - not _source_to_no_source_check.diff.before.reboot
+          - _source_to_no_source_check.diff.before.command_line == 'echo "Source To No Source"'
+          - _source_to_no_source_check.diff.before.working_directory == '.\Applications\Source To No Source'
+          - _source_to_no_source_check.diff.before.files_path == 'C:\MDTShare\Applications\Source To No Source'
+          - _source_to_no_source_check.diff.before.paths is defined
+          - _source_to_no_source_check.diff.before.paths | length == 1
+          - _source_to_no_source_check.diff.before.paths[0] == ''
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Source To No Source output
+      ansible.builtin.assert:
+        that:
+          - _source_to_no_source_check.application is defined
+          - _source_to_no_source_check.application.type == 'no_source'
+          - _source_to_no_source_check.application.name == 'Source To No Source'
+          - _source_to_no_source_check.application.publisher == ''
+          - _source_to_no_source_check.application.short_name == 'Source To No Source'
+          - _source_to_no_source_check.application.version == ''
+          - _source_to_no_source_check.application.language == ''
+          - _source_to_no_source_check.application.comments == ''
+          - _source_to_no_source_check.application.enabled
+          - not _source_to_no_source_check.application.hidden
+          - not _source_to_no_source_check.application.reboot
+          - _source_to_no_source_check.application.command_line == 'echo "Source To No Source"'
+          - _source_to_no_source_check.application.working_directory == ''
+          - _source_to_no_source_check.application.paths is defined
+          - _source_to_no_source_check.application.paths | length == 1
+          - _source_to_no_source_check.application.paths[0] == ''
+          - _source_to_no_source_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Change source MDT application to no source application
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: no_source
+        name: Source To No Source
+        short_name: Source To No Source
+        command_line: 'echo "Source To No Source"'
+        state: present
+      register: _source_to_no_source
+
+    - name: Verify Source To No Source previous output # noqa no-handler
+      when:
+        - _source_to_no_source is changed
+      ansible.builtin.assert:
+        that:
+          - _source_to_no_source.diff.before is defined
+          - _source_to_no_source.diff.before.type == 'source'
+          - _source_to_no_source.diff.before.name == 'Source To No Source'
+          - _source_to_no_source.diff.before.publisher == ''
+          - _source_to_no_source.diff.before.short_name == 'Source To No Source'
+          - _source_to_no_source.diff.before.version == ''
+          - _source_to_no_source.diff.before.language == ''
+          - _source_to_no_source.diff.before.comments == ''
+          - _source_to_no_source.diff.before.enabled
+          - not _source_to_no_source.diff.before.hidden
+          - not _source_to_no_source.diff.before.reboot
+          - _source_to_no_source.diff.before.command_line == 'echo "Source To No Source"'
+          - _source_to_no_source.diff.before.working_directory == '.\Applications\Source To No Source'
+          - _source_to_no_source.diff.before.files_path == 'C:\MDTShare\Applications\Source To No Source'
+          - _source_to_no_source.diff.before.paths is defined
+          - _source_to_no_source.diff.before.paths | length == 1
+          - _source_to_no_source.diff.before.paths[0] == ''
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Source To No Source output
+      ansible.builtin.assert:
+        that:
+          - _source_to_no_source.application is defined
+          - _source_to_no_source.application.type == 'no_source'
+          - _source_to_no_source.application.name == 'Source To No Source'
+          - _source_to_no_source.application.publisher == ''
+          - _source_to_no_source.application.short_name == 'Source To No Source'
+          - _source_to_no_source.application.version == ''
+          - _source_to_no_source.application.language == ''
+          - _source_to_no_source.application.comments == ''
+          - _source_to_no_source.application.enabled
+          - not _source_to_no_source.application.hidden
+          - not _source_to_no_source.application.reboot
+          - _source_to_no_source.application.command_line == 'echo "Source To No Source"'
+          - _source_to_no_source.application.working_directory == ''
+          - _source_to_no_source.application.paths is defined
+          - _source_to_no_source.application.paths | length == 1
+          - _source_to_no_source.application.paths[0] == ''
+          - _source_to_no_source.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _source_to_no_source_check.changed == _source_to_no_source.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Change source application to application bundle (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Source To Bundle
+        short_name: Source To Bundle
+        state: present
+      register: _source_to_bundle_check
+
+    - name: Verify Source To Bundle previous output # noqa no-handler
+      when:
+        - _source_to_bundle_check is changed
+      ansible.builtin.assert:
+        that:
+          - _source_to_bundle_check.diff.before is defined
+          - _source_to_bundle_check.diff.before.type == 'source'
+          - _source_to_bundle_check.diff.before.name == 'Source To Bundle'
+          - _source_to_bundle_check.diff.before.publisher == ''
+          - _source_to_bundle_check.diff.before.short_name == 'Source To Bundle'
+          - _source_to_bundle_check.diff.before.version == ''
+          - _source_to_bundle_check.diff.before.language == ''
+          - _source_to_bundle_check.diff.before.comments == ''
+          - _source_to_bundle_check.diff.before.enabled
+          - not _source_to_bundle_check.diff.before.hidden
+          - not _source_to_bundle_check.diff.before.reboot
+          - _source_to_bundle_check.diff.before.command_line == 'echo "Source To Bundle"'
+          - _source_to_bundle_check.diff.before.working_directory == '.\Applications\Source To Bundle'
+          - _source_to_bundle_check.diff.before.files_path == 'C:\MDTShare\Applications\Source To Bundle'
+          - _source_to_bundle_check.diff.before.paths is defined
+          - _source_to_bundle_check.diff.before.paths | length == 1
+          - _source_to_bundle_check.diff.before.paths[0] == ''
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Source To Bundle output
+      ansible.builtin.assert:
+        that:
+          - _source_to_bundle_check.application is defined
+          - _source_to_bundle_check.application.type == 'bundle'
+          - _source_to_bundle_check.application.name == 'Source To Bundle'
+          - _source_to_bundle_check.application.publisher == ''
+          - _source_to_bundle_check.application.short_name == 'Source To Bundle'
+          - _source_to_bundle_check.application.version == ''
+          - _source_to_bundle_check.application.language == ''
+          - _source_to_bundle_check.application.comments == ''
+          - _source_to_bundle_check.application.enabled
+          - not _source_to_bundle_check.application.hidden
+          - not _source_to_bundle_check.application.reboot
+          - _source_to_bundle_check.application.paths is defined
+          - _source_to_bundle_check.application.paths | length == 1
+          - _source_to_bundle_check.application.paths[0] == ''
+          - _source_to_bundle_check.application.command_line is not defined
+          - _source_to_bundle_check.application.working_directory is not defined
+          - _source_to_bundle_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Change source application to application bundle
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Source To Bundle
+        short_name: Source To Bundle
+        state: present
+      register: _source_to_bundle
+
+    - name: Verify Source To Bundle previous output # noqa no-handler
+      when:
+        - _source_to_bundle is changed
+      ansible.builtin.assert:
+        that:
+          - _source_to_bundle.diff.before is defined
+          - _source_to_bundle.diff.before.type == 'source'
+          - _source_to_bundle.diff.before.name == 'Source To Bundle'
+          - _source_to_bundle.diff.before.publisher == ''
+          - _source_to_bundle.diff.before.short_name == 'Source To Bundle'
+          - _source_to_bundle.diff.before.version == ''
+          - _source_to_bundle.diff.before.language == ''
+          - _source_to_bundle.diff.before.comments == ''
+          - _source_to_bundle.diff.before.enabled
+          - not _source_to_bundle.diff.before.hidden
+          - not _source_to_bundle.diff.before.reboot
+          - _source_to_bundle.diff.before.command_line == 'echo "Source To Bundle"'
+          - _source_to_bundle.diff.before.working_directory == '.\Applications\Source To Bundle'
+          - _source_to_bundle.diff.before.files_path == 'C:\MDTShare\Applications\Source To Bundle'
+          - _source_to_bundle.diff.before.paths is defined
+          - _source_to_bundle.diff.before.paths | length == 1
+          - _source_to_bundle.diff.before.paths[0] == ''
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Source To Bundle output
+      ansible.builtin.assert:
+        that:
+          - _source_to_bundle.application is defined
+          - _source_to_bundle.application.type == 'bundle'
+          - _source_to_bundle.application.name == 'Source To Bundle'
+          - _source_to_bundle.application.publisher == ''
+          - _source_to_bundle.application.short_name == 'Source To Bundle'
+          - _source_to_bundle.application.version == ''
+          - _source_to_bundle.application.language == ''
+          - _source_to_bundle.application.comments == ''
+          - _source_to_bundle.application.enabled
+          - not _source_to_bundle.application.hidden
+          - not _source_to_bundle.application.reboot
+          - _source_to_bundle.application.paths is defined
+          - _source_to_bundle.application.paths | length == 1
+          - _source_to_bundle.application.paths[0] == ''
+          - _source_to_bundle.application.command_line is not defined
+          - _source_to_bundle.application.working_directory is not defined
+          - _source_to_bundle.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _source_to_bundle_check.changed == _source_to_bundle.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Change no source application to source application (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: No Source To Source
+        short_name: No Source To Source
+        command_line: 'echo "No Source To Source"'
+        source_path: C:\temp\source
+        state: present
+      register: _no_source_to_source_check
+
+    - name: Verify No Source To Source previous output # noqa no-handler
+      when:
+        - _no_source_to_source_check is changed
+      ansible.builtin.assert:
+        that:
+          - _no_source_to_source_check.diff.before is defined
+          - _no_source_to_source_check.diff.before.type == 'no_source'
+          - _no_source_to_source_check.diff.before.name == 'No Source To Source'
+          - _no_source_to_source_check.diff.before.publisher == ''
+          - _no_source_to_source_check.diff.before.short_name == 'No Source To Source'
+          - _no_source_to_source_check.diff.before.version == ''
+          - _no_source_to_source_check.diff.before.language == ''
+          - _no_source_to_source_check.diff.before.comments == ''
+          - _no_source_to_source_check.diff.before.enabled
+          - not _no_source_to_source_check.diff.before.hidden
+          - not _no_source_to_source_check.diff.before.reboot
+          - _no_source_to_source_check.diff.before.command_line == 'echo "No Source To Source"'
+          - _no_source_to_source_check.diff.before.working_directory == ''
+          - _no_source_to_source_check.diff.before.paths is defined
+          - _no_source_to_source_check.diff.before.paths | length == 1
+          - _no_source_to_source_check.diff.before.paths[0] == ''
+          - _no_source_to_source_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify No Source To Source output
+      ansible.builtin.assert:
+        that:
+          - _no_source_to_source_check.application is defined
+          - _no_source_to_source_check.application.type == 'source'
+          - _no_source_to_source_check.application.name == 'No Source To Source'
+          - _no_source_to_source_check.application.publisher == ''
+          - _no_source_to_source_check.application.short_name == 'No Source To Source'
+          - _no_source_to_source_check.application.version == ''
+          - _no_source_to_source_check.application.language == ''
+          - _no_source_to_source_check.application.comments == ''
+          - _no_source_to_source_check.application.enabled
+          - not _no_source_to_source_check.application.hidden
+          - not _no_source_to_source_check.application.reboot
+          - _no_source_to_source_check.application.command_line == 'echo "No Source To Source"'
+          - _no_source_to_source_check.application.working_directory == '.\Applications\\No Source To Source'
+          - _no_source_to_source_check.application.files_path == 'C:\MDTShare\Applications\\No Source To Source'
+          - _no_source_to_source_check.application.paths is defined
+          - _no_source_to_source_check.application.paths | length == 1
+          - _no_source_to_source_check.application.paths[0] == ''
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Change no source application to source application
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: No Source To Source
+        short_name: No Source To Source
+        command_line: 'echo "No Source To Source"'
+        source_path: C:\temp\source
+        state: present
+      register: _no_source_to_source
+
+    - name: Verify No Source To Source previous output # noqa no-handler
+      when:
+        - _no_source_to_source is changed
+      ansible.builtin.assert:
+        that:
+          - _no_source_to_source.diff.before is defined
+          - _no_source_to_source.diff.before.type == 'no_source'
+          - _no_source_to_source.diff.before.name == 'No Source To Source'
+          - _no_source_to_source.diff.before.publisher == ''
+          - _no_source_to_source.diff.before.short_name == 'No Source To Source'
+          - _no_source_to_source.diff.before.version == ''
+          - _no_source_to_source.diff.before.language == ''
+          - _no_source_to_source.diff.before.comments == ''
+          - _no_source_to_source.diff.before.enabled
+          - not _no_source_to_source.diff.before.hidden
+          - not _no_source_to_source.diff.before.reboot
+          - _no_source_to_source.diff.before.command_line == 'echo "No Source To Source"'
+          - _no_source_to_source.diff.before.working_directory == ''
+          - _no_source_to_source.diff.before.paths is defined
+          - _no_source_to_source.diff.before.paths | length == 1
+          - _no_source_to_source.diff.before.paths[0] == ''
+          - _no_source_to_source.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _no_source_to_source_check.changed == _no_source_to_source.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Change no source application to application bundle (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: No Source To Bundle
+        short_name: No Source To Bundle
+        state: present
+      register: _no_source_to_bundle_check
+
+    - name: Verify No Source To Bundle previous output # noqa no-handler
+      when:
+        - _no_source_to_bundle_check is changed
+      ansible.builtin.assert:
+        that:
+          - _no_source_to_bundle_check.diff.before is defined
+          - _no_source_to_bundle_check.diff.before.type == 'no_source'
+          - _no_source_to_bundle_check.diff.before.name == 'No Source To Bundle'
+          - _no_source_to_bundle_check.diff.before.publisher == ''
+          - _no_source_to_bundle_check.diff.before.short_name == 'No Source To Bundle'
+          - _no_source_to_bundle_check.diff.before.version == ''
+          - _no_source_to_bundle_check.diff.before.language == ''
+          - _no_source_to_bundle_check.diff.before.comments == ''
+          - _no_source_to_bundle_check.diff.before.enabled
+          - not _no_source_to_bundle_check.diff.before.hidden
+          - not _no_source_to_bundle_check.diff.before.reboot
+          - _no_source_to_bundle_check.diff.before.command_line == 'echo "No Source To Bundle"'
+          - _no_source_to_bundle_check.diff.before.working_directory == ''
+          - _no_source_to_bundle_check.diff.before.paths is defined
+          - _no_source_to_bundle_check.diff.before.paths | length == 1
+          - _no_source_to_bundle_check.diff.before.paths[0] == ''
+          - _no_source_to_bundle_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify No Source To Bundle output
+      ansible.builtin.assert:
+        that:
+          - _no_source_to_bundle_check.application is defined
+          - _no_source_to_bundle_check.application.type == 'bundle'
+          - _no_source_to_bundle_check.application.name == 'No Source To Bundle'
+          - _no_source_to_bundle_check.application.publisher == ''
+          - _no_source_to_bundle_check.application.short_name == 'No Source To Bundle'
+          - _no_source_to_bundle_check.application.version == ''
+          - _no_source_to_bundle_check.application.language == ''
+          - _no_source_to_bundle_check.application.comments == ''
+          - _no_source_to_bundle_check.application.enabled
+          - not _no_source_to_bundle_check.application.hidden
+          - not _no_source_to_bundle_check.application.reboot
+          - _no_source_to_bundle_check.application.paths is defined
+          - _no_source_to_bundle_check.application.paths | length == 1
+          - _no_source_to_bundle_check.application.paths[0] == ''
+          - _no_source_to_bundle_check.application.command_line is not defined
+          - _no_source_to_bundle_check.application.working_directory is not defined
+          - _no_source_to_bundle_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Change no source application to application bundle
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: No Source To Bundle
+        short_name: No Source To Bundle
+        state: present
+      register: _no_source_to_bundle
+
+    - name: Verify No Source To Bundle previous output # noqa no-handler
+      when:
+        - _no_source_to_bundle is changed
+      ansible.builtin.assert:
+        that:
+          - _no_source_to_bundle.diff.before is defined
+          - _no_source_to_bundle.diff.before.type == 'no_source'
+          - _no_source_to_bundle.diff.before.name == 'No Source To Bundle'
+          - _no_source_to_bundle.diff.before.publisher == ''
+          - _no_source_to_bundle.diff.before.short_name == 'No Source To Bundle'
+          - _no_source_to_bundle.diff.before.version == ''
+          - _no_source_to_bundle.diff.before.language == ''
+          - _no_source_to_bundle.diff.before.comments == ''
+          - _no_source_to_bundle.diff.before.enabled
+          - not _no_source_to_bundle.diff.before.hidden
+          - not _no_source_to_bundle.diff.before.reboot
+          - _no_source_to_bundle.diff.before.command_line == 'echo "No Source To Bundle"'
+          - _no_source_to_bundle.diff.before.working_directory == ''
+          - _no_source_to_bundle.diff.before.paths is defined
+          - _no_source_to_bundle.diff.before.paths | length == 1
+          - _no_source_to_bundle.diff.before.paths[0] == ''
+          - _no_source_to_bundle.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify No Source To Bundle output
+      ansible.builtin.assert:
+        that:
+          - _no_source_to_bundle.application is defined
+          - _no_source_to_bundle.application.type == 'bundle'
+          - _no_source_to_bundle.application.name == 'No Source To Bundle'
+          - _no_source_to_bundle.application.publisher == ''
+          - _no_source_to_bundle.application.short_name == 'No Source To Bundle'
+          - _no_source_to_bundle.application.version == ''
+          - _no_source_to_bundle.application.language == ''
+          - _no_source_to_bundle.application.comments == ''
+          - _no_source_to_bundle.application.enabled
+          - not _no_source_to_bundle.application.hidden
+          - not _no_source_to_bundle.application.reboot
+          - _no_source_to_bundle.application.paths is defined
+          - _no_source_to_bundle.application.paths | length == 1
+          - _no_source_to_bundle.application.paths[0] == ''
+          - _no_source_to_bundle.application.command_line is not defined
+          - _no_source_to_bundle.application.working_directory is not defined
+          - _no_source_to_bundle.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _no_source_to_bundle_check.changed == _no_source_to_bundle.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Change application bundle to source application (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: Bundle To Source
+        short_name: Bundle To Source
+        command_line: 'echo "Bundle To Source"'
+        source_path: C:\temp\source
+        state: present
+      register: _bundle_to_source_check
+
+    - name: Verify Bundle To Source previous output # noqa no-handler
+      when:
+        - _bundle_to_source_check is changed
+      ansible.builtin.assert:
+        that:
+          - _bundle_to_source_check.diff.before is defined
+          - _bundle_to_source_check.diff.before.type == 'bundle'
+          - _bundle_to_source_check.diff.before.name == 'Bundle To Source'
+          - _bundle_to_source_check.diff.before.publisher == ''
+          - _bundle_to_source_check.diff.before.short_name == 'Bundle To Source'
+          - _bundle_to_source_check.diff.before.version == ''
+          - _bundle_to_source_check.diff.before.language == ''
+          - _bundle_to_source_check.diff.before.comments == ''
+          - _bundle_to_source_check.diff.before.enabled
+          - not _bundle_to_source_check.diff.before.hidden
+          - not _bundle_to_source_check.diff.before.reboot
+          - _bundle_to_source_check.diff.before.paths is defined
+          - _bundle_to_source_check.diff.before.paths | length == 1
+          - _bundle_to_source_check.diff.before.paths[0] == ''
+          - _bundle_to_source_check.diff.before.command_line is not defined
+          - _bundle_to_source_check.diff.before.working_directory is not defined
+          - _bundle_to_source_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Bundle To Source output
+      ansible.builtin.assert:
+        that:
+          - _bundle_to_source_check.application is defined
+          - _bundle_to_source_check.application.type == 'source'
+          - _bundle_to_source_check.application.name == 'Bundle To Source'
+          - _bundle_to_source_check.application.publisher == ''
+          - _bundle_to_source_check.application.short_name == 'Bundle To Source'
+          - _bundle_to_source_check.application.version == ''
+          - _bundle_to_source_check.application.language == ''
+          - _bundle_to_source_check.application.comments == ''
+          - _bundle_to_source_check.application.enabled
+          - not _bundle_to_source_check.application.hidden
+          - not _bundle_to_source_check.application.reboot
+          - _bundle_to_source_check.application.command_line == 'echo "Bundle To Source"'
+          - _bundle_to_source_check.application.working_directory == '.\Applications\Bundle To Source'
+          - _bundle_to_source_check.application.files_path == 'C:\MDTShare\Applications\Bundle To Source'
+          - _bundle_to_source_check.application.paths is defined
+          - _bundle_to_source_check.application.paths | length == 1
+          - _bundle_to_source_check.application.paths[0] == ''
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Change application bundle to source application
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: Bundle To Source
+        short_name: Bundle To Source
+        command_line: 'echo "Bundle To Source"'
+        source_path: C:\temp\source
+        state: present
+      register: _bundle_to_source
+
+    - name: Verify Bundle To Source previous output # noqa no-handler
+      when:
+        - _bundle_to_source is changed
+      ansible.builtin.assert:
+        that:
+          - _bundle_to_source.diff.before is defined
+          - _bundle_to_source.diff.before.type == 'bundle'
+          - _bundle_to_source.diff.before.name == 'Bundle To Source'
+          - _bundle_to_source.diff.before.publisher == ''
+          - _bundle_to_source.diff.before.short_name == 'Bundle To Source'
+          - _bundle_to_source.diff.before.version == ''
+          - _bundle_to_source.diff.before.language == ''
+          - _bundle_to_source.diff.before.comments == ''
+          - _bundle_to_source.diff.before.enabled
+          - not _bundle_to_source.diff.before.hidden
+          - not _bundle_to_source.diff.before.reboot
+          - _bundle_to_source.diff.before.paths is defined
+          - _bundle_to_source.diff.before.paths | length == 1
+          - _bundle_to_source.diff.before.paths[0] == ''
+          - _bundle_to_source.diff.before.command_line is not defined
+          - _bundle_to_source.diff.before.working_directory is not defined
+          - _bundle_to_source.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _bundle_to_source_check.changed == _bundle_to_source.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Change application bundle to no source application (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: no_source
+        name: Bundle To No Source
+        short_name: Bundle To No Source
+        command_line: 'echo "Bundle To No Source"'
+        state: present
+      register: _bundle_to_no_source_check
+
+    - name: Verify Bundle To No Source previous output # noqa no-handler
+      when:
+        - _bundle_to_no_source_check is changed
+      ansible.builtin.assert:
+        that:
+          - _bundle_to_no_source_check.diff.before is defined
+          - _bundle_to_no_source_check.diff.before.type == 'bundle'
+          - _bundle_to_no_source_check.diff.before.name == 'Bundle To No Source'
+          - _bundle_to_no_source_check.diff.before.publisher == ''
+          - _bundle_to_no_source_check.diff.before.short_name == 'Bundle To No Source'
+          - _bundle_to_no_source_check.diff.before.version == ''
+          - _bundle_to_no_source_check.diff.before.language == ''
+          - _bundle_to_no_source_check.diff.before.comments == ''
+          - _bundle_to_no_source_check.diff.before.enabled
+          - not _bundle_to_no_source_check.diff.before.hidden
+          - not _bundle_to_no_source_check.diff.before.reboot
+          - _bundle_to_no_source_check.diff.before.paths is defined
+          - _bundle_to_no_source_check.diff.before.paths | length == 1
+          - _bundle_to_no_source_check.diff.before.paths[0] == ''
+          - _bundle_to_no_source_check.diff.before.command_line is not defined
+          - _bundle_to_no_source_check.diff.before.working_directory is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Bundle To No Source output
+      ansible.builtin.assert:
+        that:
+          - _bundle_to_no_source_check.application is defined
+          - _bundle_to_no_source_check.application.type == 'no_source'
+          - _bundle_to_no_source_check.application.name == 'Bundle To No Source'
+          - _bundle_to_no_source_check.application.publisher == ''
+          - _bundle_to_no_source_check.application.short_name == 'Bundle To No Source'
+          - _bundle_to_no_source_check.application.version == ''
+          - _bundle_to_no_source_check.application.language == ''
+          - _bundle_to_no_source_check.application.comments == ''
+          - _bundle_to_no_source_check.application.enabled
+          - not _bundle_to_no_source_check.application.hidden
+          - not _bundle_to_no_source_check.application.reboot
+          - _bundle_to_no_source_check.application.command_line == 'echo "Bundle To No Source"'
+          - _bundle_to_no_source_check.application.working_directory == ''
+          - _bundle_to_no_source_check.application.paths is defined
+          - _bundle_to_no_source_check.application.paths | length == 1
+          - _bundle_to_no_source_check.application.paths[0] == ''
+          - _bundle_to_no_source_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Change application bundle to no source application
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: no_source
+        name: Bundle To No Source
+        short_name: Bundle To No Source
+        command_line: 'echo "Bundle To No Source"'
+        state: present
+      register: _bundle_to_no_source
+
+    - name: Verify Bundle To No Source previous output # noqa no-handler
+      when:
+        - _bundle_to_no_source is changed
+      ansible.builtin.assert:
+        that:
+          - _bundle_to_no_source.diff.before is defined
+          - _bundle_to_no_source.diff.before.type == 'bundle'
+          - _bundle_to_no_source.diff.before.name == 'Bundle To No Source'
+          - _bundle_to_no_source.diff.before.publisher == ''
+          - _bundle_to_no_source.diff.before.short_name == 'Bundle To No Source'
+          - _bundle_to_no_source.diff.before.version == ''
+          - _bundle_to_no_source.diff.before.language == ''
+          - _bundle_to_no_source.diff.before.comments == ''
+          - _bundle_to_no_source.diff.before.enabled
+          - not _bundle_to_no_source.diff.before.hidden
+          - not _bundle_to_no_source.diff.before.reboot
+          - _bundle_to_no_source.diff.before.paths is defined
+          - _bundle_to_no_source.diff.before.paths | length == 1
+          - _bundle_to_no_source.diff.before.paths[0] == ''
+          - _bundle_to_no_source.diff.before.command_line is not defined
+          - _bundle_to_no_source.diff.before.working_directory is not defined
+          - _bundle_to_no_source.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Bundle To No Source output
+      ansible.builtin.assert:
+        that:
+          - _bundle_to_no_source.application is defined
+          - _bundle_to_no_source.application.type == 'no_source'
+          - _bundle_to_no_source.application.name == 'Bundle To No Source'
+          - _bundle_to_no_source.application.publisher == ''
+          - _bundle_to_no_source.application.short_name == 'Bundle To No Source'
+          - _bundle_to_no_source.application.version == ''
+          - _bundle_to_no_source.application.language == ''
+          - _bundle_to_no_source.application.comments == ''
+          - _bundle_to_no_source.application.enabled
+          - not _bundle_to_no_source.application.hidden
+          - not _bundle_to_no_source.application.reboot
+          - _bundle_to_no_source.application.command_line == 'echo "Bundle To No Source"'
+          - _bundle_to_no_source.application.working_directory == ''
+          - _bundle_to_no_source.application.paths is defined
+          - _bundle_to_no_source.application.paths | length == 1
+          - _bundle_to_no_source.application.paths[0] == ''
+          - _bundle_to_no_source.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _bundle_to_no_source_check.changed == _bundle_to_no_source.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with additional files (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: Add Files
+        short_name: Add Files
+        command_line: 'echo "Add Files"'
+        source_path: C:\temp\extra_files
+        state: present
+      register: _add_files_check
+
+    - name: Verify Add Files previous output # noqa no-handler
+      when:
+        - _add_files_check is changed
+      ansible.builtin.assert:
+        that:
+          - _add_files_check.diff.before is defined
+          - _add_files_check.diff.before.type == 'source'
+          - _add_files_check.diff.before.name == 'Add Files'
+          - _add_files_check.diff.before.publisher == ''
+          - _add_files_check.diff.before.short_name == 'Add Files'
+          - _add_files_check.diff.before.version == ''
+          - _add_files_check.diff.before.language == ''
+          - _add_files_check.diff.before.comments == ''
+          - _add_files_check.diff.before.enabled
+          - not _add_files_check.diff.before.hidden
+          - not _add_files_check.diff.before.reboot
+          - _add_files_check.diff.before.command_line == 'echo "Add Files"'
+          - _add_files_check.diff.before.working_directory == '.\Applications\Add Files'
+          - _add_files_check.diff.before.files_path == 'C:\MDTShare\Applications\Add Files'
+          - _add_files_check.diff.before.paths is defined
+          - _add_files_check.diff.before.paths | length == 1
+          - _add_files_check.diff.before.paths[0] == ''
+          - _add_files_check.diff.before.files | length == 1
+          - _add_files_check.diff.before.files[0].path == 'file.txt'
+          - _add_files_check.diff.before.files[0].sha256_checksum is defined
+          - _add_files_check.diff.before.files[0].path == _add_files_check.application.files[0].path
+          - _add_files_check.diff.before.files[0].sha256_checksum == _add_files_check.application.files[0].sha256_checksum
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Add Files output
+      ansible.builtin.assert:
+        that:
+          - _add_files_check.application is defined
+          - _add_files_check.application.type == 'source'
+          - _add_files_check.application.name == 'Add Files'
+          - _add_files_check.application.publisher == ''
+          - _add_files_check.application.short_name == 'Add Files'
+          - _add_files_check.application.version == ''
+          - _add_files_check.application.language == ''
+          - _add_files_check.application.comments == ''
+          - _add_files_check.application.enabled
+          - not _add_files_check.application.hidden
+          - not _add_files_check.application.reboot
+          - _add_files_check.application.command_line == 'echo "Add Files"'
+          - _add_files_check.application.working_directory == '.\Applications\Add Files'
+          - _add_files_check.application.files_path == 'C:\MDTShare\Applications\Add Files'
+          - _add_files_check.application.paths is defined
+          - _add_files_check.application.paths | length == 1
+          - _add_files_check.application.paths[0] == ''
+          - _add_files_check.application.files | length == 2
+          - _add_files_check.application.files[0].path == 'file.txt'
+          - _add_files_check.application.files[0].sha256_checksum is defined
+          - _add_files_check.application.files[1].path == 'nested\\file2.txt'
+          - _add_files_check.application.files[1].sha256_checksum is defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with additional files
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: Add Files
+        short_name: Add Files
+        command_line: 'echo "Add Files"'
+        source_path: C:\temp\extra_files
+        state: present
+      register: _add_files
+
+    - name: Verify Add Files previous output # noqa no-handler
+      when:
+        - _add_files is changed
+      ansible.builtin.assert:
+        that:
+          - _add_files.diff.before is defined
+          - _add_files.diff.before.type == 'source'
+          - _add_files.diff.before.name == 'Add Files'
+          - _add_files.diff.before.publisher == ''
+          - _add_files.diff.before.short_name == 'Add Files'
+          - _add_files.diff.before.version == ''
+          - _add_files.diff.before.language == ''
+          - _add_files.diff.before.comments == ''
+          - _add_files.diff.before.enabled
+          - not _add_files.diff.before.hidden
+          - not _add_files.diff.before.reboot
+          - _add_files.diff.before.command_line == 'echo "Add Files"'
+          - _add_files.diff.before.working_directory == '.\Applications\Add Files'
+          - _add_files.diff.before.files_path == 'C:\MDTShare\Applications\Add Files'
+          - _add_files.diff.before.paths is defined
+          - _add_files.diff.before.paths | length == 1
+          - _add_files.diff.before.paths[0] == ''
+          - _add_files.diff.before.files | length == 1
+          - _add_files.diff.before.files[0].path == 'file.txt'
+          - _add_files.diff.before.files[0].sha256_checksum is defined
+          - _add_files.diff.before.files[0].path == _add_files.application.files[0].path
+          - _add_files.diff.before.files[0].sha256_checksum == _add_files.application.files[0].sha256_checksum
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Add Files output
+      ansible.builtin.assert:
+        that:
+          - _add_files.application is defined
+          - _add_files.application.type == 'source'
+          - _add_files.application.name == 'Add Files'
+          - _add_files.application.publisher == ''
+          - _add_files.application.short_name == 'Add Files'
+          - _add_files.application.version == ''
+          - _add_files.application.language == ''
+          - _add_files.application.comments == ''
+          - _add_files.application.enabled
+          - not _add_files.application.hidden
+          - not _add_files.application.reboot
+          - _add_files.application.command_line == 'echo "Add Files"'
+          - _add_files.application.working_directory == '.\Applications\Add Files'
+          - _add_files.application.files_path == 'C:\MDTShare\Applications\Add Files'
+          - _add_files.application.paths is defined
+          - _add_files.application.paths | length == 1
+          - _add_files.application.paths[0] == ''
+          - _add_files.application.files | length == 2
+          - _add_files.application.files[0].path == 'file.txt'
+          - _add_files.application.files[0].sha256_checksum is defined
+          - _add_files.application.files[1].path == 'nested\\file2.txt'
+          - _add_files.application.files[1].sha256_checksum is defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _add_files_check.changed == _add_files.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with changed files (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: Change Files
+        short_name: Change Files
+        command_line: 'echo "Change Files"'
+        source_path: C:\temp\different_files
+        state: present
+      register: _change_files_check
+
+    - name: Verify Change Files previous output # noqa no-handler
+      when:
+        - _change_files_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_files_check.diff.before is defined
+          - _change_files_check.diff.before.type == 'source'
+          - _change_files_check.diff.before.name == 'Change Files'
+          - _change_files_check.diff.before.publisher == ''
+          - _change_files_check.diff.before.short_name == 'Change Files'
+          - _change_files_check.diff.before.version == ''
+          - _change_files_check.diff.before.language == ''
+          - _change_files_check.diff.before.comments == ''
+          - _change_files_check.diff.before.enabled
+          - not _change_files_check.diff.before.hidden
+          - not _change_files_check.diff.before.reboot
+          - _change_files_check.diff.before.command_line == 'echo "Change Files"'
+          - _change_files_check.diff.before.working_directory == '.\Applications\Change Files'
+          - _change_files_check.diff.before.files_path == 'C:\MDTShare\Applications\Change Files'
+          - _change_files_check.diff.before.paths is defined
+          - _change_files_check.diff.before.paths | length == 1
+          - _change_files_check.diff.before.paths[0] == ''
+          - _change_files_check.diff.before.files | length == 1
+          - _change_files_check.diff.before.files[0].path == 'file.txt'
+          - _change_files_check.diff.before.files[0].sha256_checksum is defined
+          - _change_files_check.diff.before.files[0].path == _change_files_check.application.files[0].path
+          - _change_files_check.diff.before.files[0].sha256_checksum != _change_files_check.application.files[0].sha256_checksum
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Files output
+      ansible.builtin.assert:
+        that:
+          - _change_files_check.application is defined
+          - _change_files_check.application.type == 'source'
+          - _change_files_check.application.name == 'Change Files'
+          - _change_files_check.application.publisher == ''
+          - _change_files_check.application.short_name == 'Change Files'
+          - _change_files_check.application.version == ''
+          - _change_files_check.application.language == ''
+          - _change_files_check.application.comments == ''
+          - _change_files_check.application.enabled
+          - not _change_files_check.application.hidden
+          - not _change_files_check.application.reboot
+          - _change_files_check.application.command_line == 'echo "Change Files"'
+          - _change_files_check.application.working_directory == '.\Applications\Change Files'
+          - _change_files_check.application.files_path == 'C:\MDTShare\Applications\Change Files'
+          - _change_files_check.application.paths is defined
+          - _change_files_check.application.paths | length == 1
+          - _change_files_check.application.paths[0] == ''
+          - _change_files_check.application.files | length == 1
+          - _change_files_check.application.files[0].path == 'file.txt'
+          - _change_files_check.application.files[0].sha256_checksum is defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with changed files
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: Change Files
+        short_name: Change Files
+        command_line: 'echo "Change Files"'
+        source_path: C:\temp\different_files
+        state: present
+      register: _change_files
+
+    - name: Verify Change Files previous output # noqa no-handler
+      when:
+        - _change_files is changed
+      ansible.builtin.assert:
+        that:
+          - _change_files.diff.before is defined
+          - _change_files.diff.before.type == 'source'
+          - _change_files.diff.before.name == 'Change Files'
+          - _change_files.diff.before.publisher == ''
+          - _change_files.diff.before.short_name == 'Change Files'
+          - _change_files.diff.before.version == ''
+          - _change_files.diff.before.language == ''
+          - _change_files.diff.before.comments == ''
+          - _change_files.diff.before.enabled
+          - not _change_files.diff.before.hidden
+          - not _change_files.diff.before.reboot
+          - _change_files.diff.before.command_line == 'echo "Change Files"'
+          - _change_files.diff.before.working_directory == '.\Applications\Change Files'
+          - _change_files.diff.before.files_path == 'C:\MDTShare\Applications\Change Files'
+          - _change_files.diff.before.paths is defined
+          - _change_files.diff.before.paths | length == 1
+          - _change_files.diff.before.paths[0] == ''
+          - _change_files.diff.before.files | length == 1
+          - _change_files.diff.before.files[0].path == 'file.txt'
+          - _change_files.diff.before.files[0].sha256_checksum is defined
+          - _change_files.diff.before.files[0].path == _change_files.application.files[0].path
+          - _change_files.diff.before.files[0].sha256_checksum != _change_files.application.files[0].sha256_checksum
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Files output
+      ansible.builtin.assert:
+        that:
+          - _change_files.application is defined
+          - _change_files.application.type == 'source'
+          - _change_files.application.name == 'Change Files'
+          - _change_files.application.publisher == ''
+          - _change_files.application.short_name == 'Change Files'
+          - _change_files.application.version == ''
+          - _change_files.application.language == ''
+          - _change_files.application.comments == ''
+          - _change_files.application.enabled
+          - not _change_files.application.hidden
+          - not _change_files.application.reboot
+          - _change_files.application.command_line == 'echo "Change Files"'
+          - _change_files.application.working_directory == '.\Applications\Change Files'
+          - _change_files.application.files_path == 'C:\MDTShare\Applications\Change Files'
+          - _change_files.application.paths is defined
+          - _change_files.application.paths | length == 1
+          - _change_files.application.paths[0] == ''
+          - _change_files.application.files | length == 1
+          - _change_files.application.files[0].path == 'file.txt'
+          - _change_files.application.files[0].sha256_checksum is defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_files_check.changed == _change_files.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with missing files (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: Remove Files
+        short_name: Remove Files
+        command_line: 'echo "Remove Files"'
+        source_path: C:\temp\missing_files
+        state: present
+      register: _remove_files_check
+
+    - name: Verify Remove Files previous output # noqa no-handler
+      when:
+        - _remove_files_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_files_check.diff.before is defined
+          - _remove_files_check.diff.before.type == 'source'
+          - _remove_files_check.diff.before.name == 'Remove Files'
+          - _remove_files_check.diff.before.publisher == ''
+          - _remove_files_check.diff.before.short_name == 'Remove Files'
+          - _remove_files_check.diff.before.version == ''
+          - _remove_files_check.diff.before.language == ''
+          - _remove_files_check.diff.before.comments == ''
+          - _remove_files_check.diff.before.enabled
+          - not _remove_files_check.diff.before.hidden
+          - not _remove_files_check.diff.before.reboot
+          - _remove_files_check.diff.before.command_line == 'echo "Remove Files"'
+          - _remove_files_check.diff.before.working_directory == '.\Applications\Remove Files'
+          - _remove_files_check.diff.before.files_path == 'C:\MDTShare\Applications\Remove Files'
+          - _remove_files_check.diff.before.paths is defined
+          - _remove_files_check.diff.before.paths | length == 1
+          - _remove_files_check.diff.before.paths[0] == ''
+          - _remove_files_check.diff.before.files | length == 1
+          - _remove_files_check.diff.before.files[0].path == 'file.txt'
+          - _remove_files_check.diff.before.files[0].sha256_checksum is defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Remove Files output
+      ansible.builtin.assert:
+        that:
+          - _remove_files_check.application is defined
+          - _remove_files_check.application.type == 'source'
+          - _remove_files_check.application.name == 'Remove Files'
+          - _remove_files_check.application.publisher == ''
+          - _remove_files_check.application.short_name == 'Remove Files'
+          - _remove_files_check.application.version == ''
+          - _remove_files_check.application.language == ''
+          - _remove_files_check.application.comments == ''
+          - _remove_files_check.application.enabled
+          - not _remove_files_check.application.hidden
+          - not _remove_files_check.application.reboot
+          - _remove_files_check.application.command_line == 'echo "Remove Files"'
+          - _remove_files_check.application.working_directory == '.\Applications\Remove Files'
+          - _remove_files_check.application.files_path == 'C:\MDTShare\Applications\Remove Files'
+          - _remove_files_check.application.paths is defined
+          - _remove_files_check.application.paths | length == 1
+          - _remove_files_check.application.paths[0] == ''
+          - _remove_files_check.application.files | length == 0
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with missing files
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: Remove Files
+        short_name: Remove Files
+        command_line: 'echo "Remove Files"'
+        source_path: C:\temp\missing_files
+        state: present
+      register: _remove_files
+
+    - name: Verify Remove Files previous output # noqa no-handler
+      when:
+        - _remove_files is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_files.diff.before is defined
+          - _remove_files.diff.before.type == 'source'
+          - _remove_files.diff.before.name == 'Remove Files'
+          - _remove_files.diff.before.publisher == ''
+          - _remove_files.diff.before.short_name == 'Remove Files'
+          - _remove_files.diff.before.version == ''
+          - _remove_files.diff.before.language == ''
+          - _remove_files.diff.before.comments == ''
+          - _remove_files.diff.before.enabled
+          - not _remove_files.diff.before.hidden
+          - not _remove_files.diff.before.reboot
+          - _remove_files.diff.before.command_line == 'echo "Remove Files"'
+          - _remove_files.diff.before.working_directory == '.\Applications\Remove Files'
+          - _remove_files.diff.before.files_path == 'C:\MDTShare\Applications\Remove Files'
+          - _remove_files.diff.before.paths is defined
+          - _remove_files.diff.before.paths | length == 1
+          - _remove_files.diff.before.paths[0] == ''
+          - _remove_files.diff.before.files | length == 1
+          - _remove_files.diff.before.files[0].path == 'file.txt'
+          - _remove_files.diff.before.files[0].sha256_checksum is defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Remove Files output
+      ansible.builtin.assert:
+        that:
+          - _remove_files.application is defined
+          - _remove_files.application.type == 'source'
+          - _remove_files.application.name == 'Remove Files'
+          - _remove_files.application.publisher == ''
+          - _remove_files.application.short_name == 'Remove Files'
+          - _remove_files.application.version == ''
+          - _remove_files.application.language == ''
+          - _remove_files.application.comments == ''
+          - _remove_files.application.enabled
+          - not _remove_files.application.hidden
+          - not _remove_files.application.reboot
+          - _remove_files.application.command_line == 'echo "Remove Files"'
+          - _remove_files.application.working_directory == '.\Applications\Remove Files'
+          - _remove_files.application.files_path == 'C:\MDTShare\Applications\Remove Files'
+          - _remove_files.application.paths is defined
+          - _remove_files.application.paths | length == 1
+          - _remove_files.application.paths[0] == ''
+          - _remove_files.application.files | length == 0
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _remove_files_check.changed == _remove_files.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with changed name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        guid: "{{ _change_name_guid }}"
+        name: New Name
+        short_name: Change Name
+        state: present
+      register: _change_name_check
+
+    - name: Verify Change Name previous output # noqa no-handler
+      when:
+        - _change_name_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_name_check.diff.before is defined
+          - _change_name_check.diff.before.type == 'bundle'
+          - _change_name_check.diff.before.name == 'Change Name'
+          - _change_name_check.diff.before.publisher == ''
+          - _change_name_check.diff.before.short_name == 'Change Name'
+          - _change_name_check.diff.before.version == ''
+          - _change_name_check.diff.before.language == ''
+          - _change_name_check.diff.before.comments == ''
+          - _change_name_check.diff.before.enabled
+          - not _change_name_check.diff.before.hidden
+          - not _change_name_check.diff.before.reboot
+          - _change_name_check.diff.before.paths is defined
+          - _change_name_check.diff.before.paths | length == 1
+          - _change_name_check.diff.before.paths[0] == ''
+          - _change_name_check.diff.before.command_line is not defined
+          - _change_name_check.diff.before.working_directory is not defined
+          - _change_name_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Name output
+      ansible.builtin.assert:
+        that:
+          - _change_name_check.application is defined
+          - _change_name_check.application.type == 'bundle'
+          - _change_name_check.application.name == 'New Name'
+          - _change_name_check.application.publisher == ''
+          - _change_name_check.application.short_name == 'Change Name'
+          - _change_name_check.application.version == ''
+          - _change_name_check.application.language == ''
+          - _change_name_check.application.comments == ''
+          - _change_name_check.application.enabled
+          - not _change_name_check.application.hidden
+          - not _change_name_check.application.reboot
+          - _change_name_check.application.paths is defined
+          - _change_name_check.application.paths | length == 1
+          - _change_name_check.application.paths[0] == ''
+          - _change_name_check.application.command_line is not defined
+          - _change_name_check.application.working_directory is not defined
+          - _change_name_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with changed name
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        guid: "{{ _change_name_guid }}"
+        name: New Name
+        short_name: Change Name
+        state: present
+      register: _change_name
+
+    - name: Verify Change Name previous output # noqa no-handler
+      when:
+        - _change_name is changed
+      ansible.builtin.assert:
+        that:
+          - _change_name.diff.before is defined
+          - _change_name.diff.before.type == 'bundle'
+          - _change_name.diff.before.name == 'Change Name'
+          - _change_name.diff.before.publisher == ''
+          - _change_name.diff.before.short_name == 'Change Name'
+          - _change_name.diff.before.version == ''
+          - _change_name.diff.before.language == ''
+          - _change_name.diff.before.comments == ''
+          - _change_name.diff.before.enabled
+          - not _change_name.diff.before.hidden
+          - not _change_name.diff.before.reboot
+          - _change_name.diff.before.paths is defined
+          - _change_name.diff.before.paths | length == 1
+          - _change_name.diff.before.paths[0] == ''
+          - _change_name.diff.before.command_line is not defined
+          - _change_name.diff.before.working_directory is not defined
+          - _change_name.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Name output
+      ansible.builtin.assert:
+        that:
+          - _change_name.application is defined
+          - _change_name.application.type == 'bundle'
+          - _change_name.application.name == 'New Name'
+          - _change_name.application.publisher == ''
+          - _change_name.application.short_name == 'Change Name'
+          - _change_name.application.version == ''
+          - _change_name.application.language == ''
+          - _change_name.application.comments == ''
+          - _change_name.application.enabled
+          - not _change_name.application.hidden
+          - not _change_name.application.reboot
+          - _change_name.application.paths is defined
+          - _change_name.application.paths | length == 1
+          - _change_name.application.paths[0] == ''
+          - _change_name.application.command_line is not defined
+          - _change_name.application.working_directory is not defined
+          - _change_name.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_name_check.changed == _change_name.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with changed publisher (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Publisher
+        short_name: Change Publisher
+        publisher: New Publisher
+        state: present
+      register: _change_publisher_check
+
+    - name: Verify Change Publisher previous output # noqa no-handler
+      when:
+        - _change_publisher_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_publisher_check.diff.before is defined
+          - _change_publisher_check.diff.before.type == 'bundle'
+          - _change_publisher_check.diff.before.name == 'Change Publisher'
+          - _change_publisher_check.diff.before.publisher == 'Old Publisher'
+          - _change_publisher_check.diff.before.short_name == 'Change Publisher'
+          - _change_publisher_check.diff.before.version == ''
+          - _change_publisher_check.diff.before.language == ''
+          - _change_publisher_check.diff.before.comments == ''
+          - _change_publisher_check.diff.before.enabled
+          - not _change_publisher_check.diff.before.hidden
+          - not _change_publisher_check.diff.before.reboot
+          - _change_publisher_check.diff.before.paths is defined
+          - _change_publisher_check.diff.before.paths | length == 1
+          - _change_publisher_check.diff.before.paths[0] == ''
+          - _change_publisher_check.diff.before.command_line is not defined
+          - _change_publisher_check.diff.before.working_directory is not defined
+          - _change_publisher_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Publisher output
+      ansible.builtin.assert:
+        that:
+          - _change_publisher_check.application is defined
+          - _change_publisher_check.application.type == 'bundle'
+          - _change_publisher_check.application.name == 'Change Publisher'
+          - _change_publisher_check.application.publisher == 'New Publisher'
+          - _change_publisher_check.application.short_name == 'Change Publisher'
+          - _change_publisher_check.application.version == ''
+          - _change_publisher_check.application.language == ''
+          - _change_publisher_check.application.comments == ''
+          - _change_publisher_check.application.enabled
+          - not _change_publisher_check.application.hidden
+          - not _change_publisher_check.application.reboot
+          - _change_publisher_check.application.paths is defined
+          - _change_publisher_check.application.paths | length == 1
+          - _change_publisher_check.application.paths[0] == ''
+          - _change_publisher_check.application.command_line is not defined
+          - _change_publisher_check.application.working_directory is not defined
+          - _change_publisher_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with changed publisher
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Publisher
+        short_name: Change Publisher
+        publisher: New Publisher
+        state: present
+      register: _change_publisher
+
+    - name: Verify Change Publisher previous output # noqa no-handler
+      when:
+        - _change_publisher is changed
+      ansible.builtin.assert:
+        that:
+          - _change_publisher.diff.before is defined
+          - _change_publisher.diff.before.type == 'bundle'
+          - _change_publisher.diff.before.name == 'Change Publisher'
+          - _change_publisher.diff.before.publisher == 'Old Publisher'
+          - _change_publisher.diff.before.short_name == 'Change Publisher'
+          - _change_publisher.diff.before.version == ''
+          - _change_publisher.diff.before.language == ''
+          - _change_publisher.diff.before.comments == ''
+          - _change_publisher.diff.before.enabled
+          - not _change_publisher.diff.before.hidden
+          - not _change_publisher.diff.before.reboot
+          - _change_publisher.diff.before.paths is defined
+          - _change_publisher.diff.before.paths | length == 1
+          - _change_publisher.diff.before.paths[0] == ''
+          - _change_publisher.diff.before.command_line is not defined
+          - _change_publisher.diff.before.working_directory is not defined
+          - _change_publisher.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Publisher output
+      ansible.builtin.assert:
+        that:
+          - _change_publisher.application is defined
+          - _change_publisher.application.type == 'bundle'
+          - _change_publisher.application.name == 'Change Publisher'
+          - _change_publisher.application.publisher == 'New Publisher'
+          - _change_publisher.application.short_name == 'Change Publisher'
+          - _change_publisher.application.version == ''
+          - _change_publisher.application.language == ''
+          - _change_publisher.application.comments == ''
+          - _change_publisher.application.enabled
+          - not _change_publisher.application.hidden
+          - not _change_publisher.application.reboot
+          - _change_publisher.application.paths is defined
+          - _change_publisher.application.paths | length == 1
+          - _change_publisher.application.paths[0] == ''
+          - _change_publisher.application.command_line is not defined
+          - _change_publisher.application.working_directory is not defined
+          - _change_publisher.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_publisher_check.changed == _change_publisher.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with changed short name (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Short Name
+        short_name: New Short Name
+        state: present
+      register: _change_short_name_check
+
+    - name: Verify Change Short Name previous output # noqa no-handler
+      when:
+        - _change_short_name_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_short_name_check.diff.before is defined
+          - _change_short_name_check.diff.before.type == 'bundle'
+          - _change_short_name_check.diff.before.name == 'Change Short Name'
+          - _change_short_name_check.diff.before.publisher == ''
+          - _change_short_name_check.diff.before.short_name == 'Change Short Name'
+          - _change_short_name_check.diff.before.version == ''
+          - _change_short_name_check.diff.before.language == ''
+          - _change_short_name_check.diff.before.comments == ''
+          - _change_short_name_check.diff.before.enabled
+          - not _change_short_name_check.diff.before.hidden
+          - not _change_short_name_check.diff.before.reboot
+          - _change_short_name_check.diff.before.paths is defined
+          - _change_short_name_check.diff.before.paths | length == 1
+          - _change_short_name_check.diff.before.paths[0] == ''
+          - _change_short_name_check.diff.before.command_line is not defined
+          - _change_short_name_check.diff.before.working_directory is not defined
+          - _change_short_name_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Short Name output
+      ansible.builtin.assert:
+        that:
+          - _change_short_name_check.application is defined
+          - _change_short_name_check.application.type == 'bundle'
+          - _change_short_name_check.application.name == 'Change Short Name'
+          - _change_short_name_check.application.publisher == ''
+          - _change_short_name_check.application.short_name == 'New Short Name'
+          - _change_short_name_check.application.version == ''
+          - _change_short_name_check.application.language == ''
+          - _change_short_name_check.application.comments == ''
+          - _change_short_name_check.application.enabled
+          - not _change_short_name_check.application.hidden
+          - not _change_short_name_check.application.reboot
+          - _change_short_name_check.application.paths is defined
+          - _change_short_name_check.application.paths | length == 1
+          - _change_short_name_check.application.paths[0] == ''
+          - _change_short_name_check.application.command_line is not defined
+          - _change_short_name_check.application.working_directory is not defined
+          - _change_short_name_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with changed short name
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Short Name
+        short_name: New Short Name
+        state: present
+      register: _change_short_name
+
+
+    - name: Verify Change Short Name previous output # noqa no-handler
+      when:
+        - _change_short_name is changed
+      ansible.builtin.assert:
+        that:
+          - _change_short_name.diff.before is defined
+          - _change_short_name.diff.before.type == 'bundle'
+          - _change_short_name.diff.before.name == 'Change Short Name'
+          - _change_short_name.diff.before.publisher == ''
+          - _change_short_name.diff.before.short_name == 'Change Short Name'
+          - _change_short_name.diff.before.version == ''
+          - _change_short_name.diff.before.language == ''
+          - _change_short_name.diff.before.comments == ''
+          - _change_short_name.diff.before.enabled
+          - not _change_short_name.diff.before.hidden
+          - not _change_short_name.diff.before.reboot
+          - _change_short_name.diff.before.paths is defined
+          - _change_short_name.diff.before.paths | length == 1
+          - _change_short_name.diff.before.paths[0] == ''
+          - _change_short_name.diff.before.command_line is not defined
+          - _change_short_name.diff.before.working_directory is not defined
+          - _change_short_name.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Short Name output
+      ansible.builtin.assert:
+        that:
+          - _change_short_name.application is defined
+          - _change_short_name.application.type == 'bundle'
+          - _change_short_name.application.name == 'Change Short Name'
+          - _change_short_name.application.publisher == ''
+          - _change_short_name.application.short_name == 'New Short Name'
+          - _change_short_name.application.version == ''
+          - _change_short_name.application.language == ''
+          - _change_short_name.application.comments == ''
+          - _change_short_name.application.enabled
+          - not _change_short_name.application.hidden
+          - not _change_short_name.application.reboot
+          - _change_short_name.application.paths is defined
+          - _change_short_name.application.paths | length == 1
+          - _change_short_name.application.paths[0] == ''
+          - _change_short_name.application.command_line is not defined
+          - _change_short_name.application.working_directory is not defined
+          - _change_short_name.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_short_name_check.changed == _change_short_name.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with changed version (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Version
+        short_name: Change Version
+        version: NewVersion
+        state: present
+      register: _change_version_check
+
+    - name: Verify Change Version previous output # noqa no-handler
+      when:
+        - _change_version_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_version_check.diff.before is defined
+          - _change_version_check.diff.before.type == 'bundle'
+          - _change_version_check.diff.before.name == 'Change Version'
+          - _change_version_check.diff.before.publisher == ''
+          - _change_version_check.diff.before.short_name == 'Change Version'
+          - _change_version_check.diff.before.version == 'OldVersion'
+          - _change_version_check.diff.before.language == ''
+          - _change_version_check.diff.before.comments == ''
+          - _change_version_check.diff.before.enabled
+          - not _change_version_check.diff.before.hidden
+          - not _change_version_check.diff.before.reboot
+          - _change_version_check.diff.before.paths is defined
+          - _change_version_check.diff.before.paths | length == 1
+          - _change_version_check.diff.before.paths[0] == ''
+          - _change_version_check.diff.before.command_line is not defined
+          - _change_version_check.diff.before.working_directory is not defined
+          - _change_version_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Version output
+      ansible.builtin.assert:
+        that:
+          - _change_version_check.application is defined
+          - _change_version_check.application.type == 'bundle'
+          - _change_version_check.application.name == 'Change Version'
+          - _change_version_check.application.publisher == ''
+          - _change_version_check.application.short_name == 'Change Version'
+          - _change_version_check.application.version == 'NewVersion'
+          - _change_version_check.application.language == ''
+          - _change_version_check.application.comments == ''
+          - _change_version_check.application.enabled
+          - not _change_version_check.application.hidden
+          - not _change_version_check.application.reboot
+          - _change_version_check.application.paths is defined
+          - _change_version_check.application.paths | length == 1
+          - _change_version_check.application.paths[0] == ''
+          - _change_version_check.application.command_line is not defined
+          - _change_version_check.application.working_directory is not defined
+          - _change_version_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with changed version
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Version
+        short_name: Change Version
+        version: NewVersion
+        state: present
+      register: _change_version
+
+    - name: Verify Change Version previous output # noqa no-handler
+      when:
+        - _change_version is changed
+      ansible.builtin.assert:
+        that:
+          - _change_version.diff.before is defined
+          - _change_version.diff.before.type == 'bundle'
+          - _change_version.diff.before.name == 'Change Version'
+          - _change_version.diff.before.publisher == ''
+          - _change_version.diff.before.short_name == 'Change Version'
+          - _change_version.diff.before.version == 'OldVersion'
+          - _change_version.diff.before.language == ''
+          - _change_version.diff.before.comments == ''
+          - _change_version.diff.before.enabled
+          - not _change_version.diff.before.hidden
+          - not _change_version.diff.before.reboot
+          - _change_version.diff.before.paths is defined
+          - _change_version.diff.before.paths | length == 1
+          - _change_version.diff.before.paths[0] == ''
+          - _change_version.diff.before.command_line is not defined
+          - _change_version.diff.before.working_directory is not defined
+          - _change_version.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Version output
+      ansible.builtin.assert:
+        that:
+          - _change_version.application is defined
+          - _change_version.application.type == 'bundle'
+          - _change_version.application.name == 'Change Version'
+          - _change_version.application.publisher == ''
+          - _change_version.application.short_name == 'Change Version'
+          - _change_version.application.version == 'NewVersion'
+          - _change_version.application.language == ''
+          - _change_version.application.comments == ''
+          - _change_version.application.enabled
+          - not _change_version.application.hidden
+          - not _change_version.application.reboot
+          - _change_version.application.paths is defined
+          - _change_version.application.paths | length == 1
+          - _change_version.application.paths[0] == ''
+          - _change_version.application.command_line is not defined
+          - _change_version.application.working_directory is not defined
+          - _change_version.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_version_check.changed == _change_version.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with changed language (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Language
+        short_name: Change Language
+        language: NewLanguage
+        state: present
+      register: _change_language_check
+
+    - name: Verify Change Language previous output # noqa no-handler
+      when:
+        - _change_language_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_language_check.diff.before is defined
+          - _change_language_check.diff.before.type == 'bundle'
+          - _change_language_check.diff.before.name == 'Change Language'
+          - _change_language_check.diff.before.publisher == ''
+          - _change_language_check.diff.before.short_name == 'Change Language'
+          - _change_language_check.diff.before.version == ''
+          - _change_language_check.diff.before.language == 'OldLanguage'
+          - _change_language_check.diff.before.comments == ''
+          - _change_language_check.diff.before.enabled
+          - not _change_language_check.diff.before.hidden
+          - not _change_language_check.diff.before.reboot
+          - _change_language_check.diff.before.paths is defined
+          - _change_language_check.diff.before.paths | length == 1
+          - _change_language_check.diff.before.paths[0] == ''
+          - _change_language_check.diff.before.command_line is not defined
+          - _change_language_check.diff.before.working_directory is not defined
+          - _change_language_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Language output
+      ansible.builtin.assert:
+        that:
+          - _change_language_check.application is defined
+          - _change_language_check.application.type == 'bundle'
+          - _change_language_check.application.name == 'Change Language'
+          - _change_language_check.application.publisher == ''
+          - _change_language_check.application.short_name == 'Change Language'
+          - _change_language_check.application.version == ''
+          - _change_language_check.application.language == 'NewLanguage'
+          - _change_language_check.application.comments == ''
+          - _change_language_check.application.enabled
+          - not _change_language_check.application.hidden
+          - not _change_language_check.application.reboot
+          - _change_language_check.application.paths is defined
+          - _change_language_check.application.paths | length == 1
+          - _change_language_check.application.paths[0] == ''
+          - _change_language_check.application.command_line is not defined
+          - _change_language_check.application.working_directory is not defined
+          - _change_language_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with changed language
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Language
+        short_name: Change Language
+        language: NewLanguage
+        state: present
+      register: _change_language
+
+    - name: Verify Change Language previous output # noqa no-handler
+      when:
+        - _change_language is changed
+      ansible.builtin.assert:
+        that:
+          - _change_language.diff.before is defined
+          - _change_language.diff.before.type == 'bundle'
+          - _change_language.diff.before.name == 'Change Language'
+          - _change_language.diff.before.publisher == ''
+          - _change_language.diff.before.short_name == 'Change Language'
+          - _change_language.diff.before.version == ''
+          - _change_language.diff.before.language == 'OldLanguage'
+          - _change_language.diff.before.comments == ''
+          - _change_language.diff.before.enabled
+          - not _change_language.diff.before.hidden
+          - not _change_language.diff.before.reboot
+          - _change_language.diff.before.paths is defined
+          - _change_language.diff.before.paths | length == 1
+          - _change_language.diff.before.paths[0] == ''
+          - _change_language.diff.before.command_line is not defined
+          - _change_language.diff.before.working_directory is not defined
+          - _change_language.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Language output
+      ansible.builtin.assert:
+        that:
+          - _change_language.application is defined
+          - _change_language.application.type == 'bundle'
+          - _change_language.application.name == 'Change Language'
+          - _change_language.application.publisher == ''
+          - _change_language.application.short_name == 'Change Language'
+          - _change_language.application.version == ''
+          - _change_language.application.language == 'NewLanguage'
+          - _change_language.application.comments == ''
+          - _change_language.application.enabled
+          - not _change_language.application.hidden
+          - not _change_language.application.reboot
+          - _change_language.application.paths is defined
+          - _change_language.application.paths | length == 1
+          - _change_language.application.paths[0] == ''
+          - _change_language.application.command_line is not defined
+          - _change_language.application.working_directory is not defined
+          - _change_language.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_language_check.changed == _change_language.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with changed comments (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Comments
+        short_name: Change Comments
+        comments: New Comments
+        state: present
+      register: _change_comments_check
+
+    - name: Verify Change Comments previous output # noqa no-handler
+      when:
+        - _change_comments_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_comments_check.diff.before is defined
+          - _change_comments_check.diff.before.type == 'bundle'
+          - _change_comments_check.diff.before.name == 'Change Comments'
+          - _change_comments_check.diff.before.publisher == ''
+          - _change_comments_check.diff.before.short_name == 'Change Comments'
+          - _change_comments_check.diff.before.version == ''
+          - _change_comments_check.diff.before.language == ''
+          - _change_comments_check.diff.before.comments == 'Old Comments'
+          - _change_comments_check.diff.before.enabled
+          - not _change_comments_check.diff.before.hidden
+          - not _change_comments_check.diff.before.reboot
+          - _change_comments_check.diff.before.paths is defined
+          - _change_comments_check.diff.before.paths | length == 1
+          - _change_comments_check.diff.before.paths[0] == ''
+          - _change_comments_check.diff.before.command_line is not defined
+          - _change_comments_check.diff.before.working_directory is not defined
+          - _change_comments_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Comments output
+      ansible.builtin.assert:
+        that:
+          - _change_comments_check.application is defined
+          - _change_comments_check.application.type == 'bundle'
+          - _change_comments_check.application.name == 'Change Comments'
+          - _change_comments_check.application.publisher == ''
+          - _change_comments_check.application.short_name == 'Change Comments'
+          - _change_comments_check.application.version == ''
+          - _change_comments_check.application.language == ''
+          - _change_comments_check.application.comments == 'New Comments'
+          - _change_comments_check.application.enabled
+          - not _change_comments_check.application.hidden
+          - not _change_comments_check.application.reboot
+          - _change_comments_check.application.paths is defined
+          - _change_comments_check.application.paths | length == 1
+          - _change_comments_check.application.paths[0] == ''
+          - _change_comments_check.application.command_line is not defined
+          - _change_comments_check.application.working_directory is not defined
+          - _change_comments_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with changed comments
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Comments
+        short_name: Change Comments
+        comments: New Comments
+        state: present
+      register: _change_comments
+
+    - name: Verify Change Comments previous output # noqa no-handler
+      when:
+        - _change_comments is changed
+      ansible.builtin.assert:
+        that:
+          - _change_comments.diff.before is defined
+          - _change_comments.diff.before.type == 'bundle'
+          - _change_comments.diff.before.name == 'Change Comments'
+          - _change_comments.diff.before.publisher == ''
+          - _change_comments.diff.before.short_name == 'Change Comments'
+          - _change_comments.diff.before.version == ''
+          - _change_comments.diff.before.language == ''
+          - _change_comments.diff.before.comments == 'Old Comments'
+          - _change_comments.diff.before.enabled
+          - not _change_comments.diff.before.hidden
+          - not _change_comments.diff.before.reboot
+          - _change_comments.diff.before.paths is defined
+          - _change_comments.diff.before.paths | length == 1
+          - _change_comments.diff.before.paths[0] == ''
+          - _change_comments.diff.before.command_line is not defined
+          - _change_comments.diff.before.working_directory is not defined
+          - _change_comments.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Comments output
+      ansible.builtin.assert:
+        that:
+          - _change_comments.application is defined
+          - _change_comments.application.type == 'bundle'
+          - _change_comments.application.name == 'Change Comments'
+          - _change_comments.application.publisher == ''
+          - _change_comments.application.short_name == 'Change Comments'
+          - _change_comments.application.version == ''
+          - _change_comments.application.language == ''
+          - _change_comments.application.comments == 'New Comments'
+          - _change_comments.application.enabled
+          - not _change_comments.application.hidden
+          - not _change_comments.application.reboot
+          - _change_comments.application.paths is defined
+          - _change_comments.application.paths | length == 1
+          - _change_comments.application.paths[0] == ''
+          - _change_comments.application.command_line is not defined
+          - _change_comments.application.working_directory is not defined
+          - _change_comments.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_comments_check.changed == _change_comments.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with changed command line (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: no_source
+        name: Change Command Line
+        short_name: Change Command Line
+        command_line: 'echo "New Command Line"'
+        state: present
+      register: _change_command_line_check
+
+    - name: Verify Change Command Line previous output # noqa no-handler
+      when:
+        - _change_command_line_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_command_line_check.diff.before is defined
+          - _change_command_line_check.diff.before.type == 'no_source'
+          - _change_command_line_check.diff.before.name == 'Change Command Line'
+          - _change_command_line_check.diff.before.publisher == ''
+          - _change_command_line_check.diff.before.short_name == 'Change Command Line'
+          - _change_command_line_check.diff.before.version == ''
+          - _change_command_line_check.diff.before.language == ''
+          - _change_command_line_check.diff.before.comments == ''
+          - _change_command_line_check.diff.before.command_line == 'echo "Change Command Line"'
+          - _change_command_line_check.diff.before.working_directory == ''
+          - _change_command_line_check.diff.before.enabled
+          - not _change_command_line_check.diff.before.hidden
+          - not _change_command_line_check.diff.before.reboot
+          - _change_command_line_check.diff.before.paths is defined
+          - _change_command_line_check.diff.before.paths | length == 1
+          - _change_command_line_check.diff.before.paths[0] == ''
+          - _change_command_line_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Command Line output
+      ansible.builtin.assert:
+        that:
+          - _change_command_line_check.application is defined
+          - _change_command_line_check.application.type == 'no_source'
+          - _change_command_line_check.application.name == 'Change Command Line'
+          - _change_command_line_check.application.publisher == ''
+          - _change_command_line_check.application.short_name == 'Change Command Line'
+          - _change_command_line_check.application.version == ''
+          - _change_command_line_check.application.language == ''
+          - _change_command_line_check.application.comments == ''
+          - _change_command_line_check.application.command_line == 'echo "New Command Line"'
+          - _change_command_line_check.application.working_directory == ''
+          - _change_command_line_check.application.enabled
+          - not _change_command_line_check.application.hidden
+          - not _change_command_line_check.application.reboot
+          - _change_command_line_check.application.paths is defined
+          - _change_command_line_check.application.paths | length == 1
+          - _change_command_line_check.application.paths[0] == ''
+          - _change_command_line_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with changed command line
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: no_source
+        name: Change Command Line
+        short_name: Change Command Line
+        command_line: 'echo "New Command Line"'
+        state: present
+      register: _change_command_line
+
+    - name: Verify Change Command Line previous output # noqa no-handler
+      when:
+        - _change_command_line is changed
+      ansible.builtin.assert:
+        that:
+          - _change_command_line.diff.before is defined
+          - _change_command_line.diff.before.type == 'no_source'
+          - _change_command_line.diff.before.name == 'Change Command Line'
+          - _change_command_line.diff.before.publisher == ''
+          - _change_command_line.diff.before.short_name == 'Change Command Line'
+          - _change_command_line.diff.before.version == ''
+          - _change_command_line.diff.before.language == ''
+          - _change_command_line.diff.before.comments == ''
+          - _change_command_line.diff.before.command_line == 'echo "Change Command Line"'
+          - _change_command_line.diff.before.working_directory == ''
+          - _change_command_line.diff.before.enabled
+          - not _change_command_line.diff.before.hidden
+          - not _change_command_line.diff.before.reboot
+          - _change_command_line.diff.before.paths is defined
+          - _change_command_line.diff.before.paths | length == 1
+          - _change_command_line.diff.before.paths[0] == ''
+          - _change_command_line.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Command Line output
+      ansible.builtin.assert:
+        that:
+          - _change_command_line.application is defined
+          - _change_command_line.application.type == 'no_source'
+          - _change_command_line.application.name == 'Change Command Line'
+          - _change_command_line.application.publisher == ''
+          - _change_command_line.application.short_name == 'Change Command Line'
+          - _change_command_line.application.version == ''
+          - _change_command_line.application.language == ''
+          - _change_command_line.application.comments == ''
+          - _change_command_line.application.command_line == 'echo "New Command Line"'
+          - _change_command_line.application.working_directory == ''
+          - _change_command_line.application.enabled
+          - not _change_command_line.application.hidden
+          - not _change_command_line.application.reboot
+          - _change_command_line.application.paths is defined
+          - _change_command_line.application.paths | length == 1
+          - _change_command_line.application.paths[0] == ''
+          - _change_command_line.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_command_line_check.changed == _change_command_line.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with changed working directory (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: no_source
+        name: Change Working Directory
+        short_name: Change Working Directory
+        command_line: 'echo "Change Working Directory"'
+        working_directory: C:\temp\source
+        state: present
+      register: _change_working_directory_check
+
+    - name: Verify Change Working Directory previous output # noqa no-handler
+      when:
+        - _change_working_directory_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_working_directory_check.diff.before is defined
+          - _change_working_directory_check.diff.before.type == 'no_source'
+          - _change_working_directory_check.diff.before.name == 'Change Working Directory'
+          - _change_working_directory_check.diff.before.publisher == ''
+          - _change_working_directory_check.diff.before.short_name == 'Change Working Directory'
+          - _change_working_directory_check.diff.before.version == ''
+          - _change_working_directory_check.diff.before.language == ''
+          - _change_working_directory_check.diff.before.comments == ''
+          - _change_working_directory_check.diff.before.command_line == 'echo "Change Working Directory"'
+          - _change_working_directory_check.diff.before.working_directory == ''
+          - _change_working_directory_check.diff.before.enabled
+          - not _change_working_directory_check.diff.before.hidden
+          - not _change_working_directory_check.diff.before.reboot
+          - _change_working_directory_check.diff.before.paths is defined
+          - _change_working_directory_check.diff.before.paths | length == 1
+          - _change_working_directory_check.diff.before.paths[0] == ''
+          - _change_working_directory_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Working Directory output
+      ansible.builtin.assert:
+        that:
+          - _change_working_directory_check.application is defined
+          - _change_working_directory_check.application.type == 'no_source'
+          - _change_working_directory_check.application.name == 'Change Working Directory'
+          - _change_working_directory_check.application.publisher == ''
+          - _change_working_directory_check.application.short_name == 'Change Working Directory'
+          - _change_working_directory_check.application.version == ''
+          - _change_working_directory_check.application.language == ''
+          - _change_working_directory_check.application.comments == ''
+          - _change_working_directory_check.application.command_line == 'echo "Change Working Directory"'
+          - _change_working_directory_check.application.working_directory == 'C:\\temp\\source'
+          - _change_working_directory_check.application.enabled
+          - not _change_working_directory_check.application.hidden
+          - not _change_working_directory_check.application.reboot
+          - _change_working_directory_check.application.paths is defined
+          - _change_working_directory_check.application.paths | length == 1
+          - _change_working_directory_check.application.paths[0] == ''
+          - _change_working_directory_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with changed working directory
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: no_source
+        name: Change Working Directory
+        short_name: Change Working Directory
+        command_line: 'echo "Change Working Directory"'
+        working_directory: C:\temp\source
+        state: present
+      register: _change_working_directory
+
+    - name: Verify Change Working Directory previous output # noqa no-handler
+      when:
+        - _change_working_directory is changed
+      ansible.builtin.assert:
+        that:
+          - _change_working_directory.diff.before is defined
+          - _change_working_directory.diff.before.type == 'no_source'
+          - _change_working_directory.diff.before.name == 'Change Working Directory'
+          - _change_working_directory.diff.before.publisher == ''
+          - _change_working_directory.diff.before.short_name == 'Change Working Directory'
+          - _change_working_directory.diff.before.version == ''
+          - _change_working_directory.diff.before.language == ''
+          - _change_working_directory.diff.before.comments == ''
+          - _change_working_directory.diff.before.command_line == 'echo "Change Working Directory"'
+          - _change_working_directory.diff.before.working_directory == ''
+          - _change_working_directory.diff.before.enabled
+          - not _change_working_directory.diff.before.hidden
+          - not _change_working_directory.diff.before.reboot
+          - _change_working_directory.diff.before.paths is defined
+          - _change_working_directory.diff.before.paths | length == 1
+          - _change_working_directory.diff.before.paths[0] == ''
+          - _change_working_directory.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Working Directory output
+      ansible.builtin.assert:
+        that:
+          - _change_working_directory.application is defined
+          - _change_working_directory.application.type == 'no_source'
+          - _change_working_directory.application.name == 'Change Working Directory'
+          - _change_working_directory.application.publisher == ''
+          - _change_working_directory.application.short_name == 'Change Working Directory'
+          - _change_working_directory.application.version == ''
+          - _change_working_directory.application.language == ''
+          - _change_working_directory.application.comments == ''
+          - _change_working_directory.application.command_line == 'echo "Change Working Directory"'
+          - _change_working_directory.application.working_directory == 'C:\\temp\\source'
+          - _change_working_directory.application.enabled
+          - not _change_working_directory.application.hidden
+          - not _change_working_directory.application.reboot
+          - _change_working_directory.application.paths is defined
+          - _change_working_directory.application.paths | length == 1
+          - _change_working_directory.application.paths[0] == ''
+          - _change_working_directory.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_working_directory_check.changed == _change_working_directory.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with changed enabled (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Enabled
+        short_name: Change Enabled
+        enabled: true
+        state: present
+      register: _change_enabled_check
+
+    - name: Verify Change Enabled previous output # noqa no-handler
+      when:
+        - _change_enabled_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_enabled_check.diff.before is defined
+          - _change_enabled_check.diff.before.type == 'bundle'
+          - _change_enabled_check.diff.before.name == 'Change Enabled'
+          - _change_enabled_check.diff.before.publisher == ''
+          - _change_enabled_check.diff.before.short_name == 'Change Enabled'
+          - _change_enabled_check.diff.before.version == ''
+          - _change_enabled_check.diff.before.language == ''
+          - _change_enabled_check.diff.before.comments == ''
+          - not _change_enabled_check.diff.before.enabled
+          - not _change_enabled_check.diff.before.hidden
+          - not _change_enabled_check.diff.before.reboot
+          - _change_enabled_check.diff.before.paths is defined
+          - _change_enabled_check.diff.before.paths | length == 1
+          - _change_enabled_check.diff.before.paths[0] == ''
+          - _change_enabled_check.diff.before.command_line is not defined
+          - _change_enabled_check.diff.before.working_directory is not defined
+          - _change_enabled_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Enabled output
+      ansible.builtin.assert:
+        that:
+          - _change_enabled_check.application is defined
+          - _change_enabled_check.application.type == 'bundle'
+          - _change_enabled_check.application.name == 'Change Enabled'
+          - _change_enabled_check.application.publisher == ''
+          - _change_enabled_check.application.short_name == 'Change Enabled'
+          - _change_enabled_check.application.version == ''
+          - _change_enabled_check.application.language == ''
+          - _change_enabled_check.application.comments == ''
+          - _change_enabled_check.application.enabled
+          - not _change_enabled_check.application.hidden
+          - not _change_enabled_check.application.reboot
+          - _change_enabled_check.application.paths is defined
+          - _change_enabled_check.application.paths | length == 1
+          - _change_enabled_check.application.paths[0] == ''
+          - _change_enabled_check.application.command_line is not defined
+          - _change_enabled_check.application.working_directory is not defined
+          - _change_enabled_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with changed enabled
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Enabled
+        short_name: Change Enabled
+        enabled: true
+        state: present
+      register: _change_enabled
+
+    - name: Verify Change Enabled previous output # noqa no-handler
+      when:
+        - _change_enabled is changed
+      ansible.builtin.assert:
+        that:
+          - _change_enabled.diff.before is defined
+          - _change_enabled.diff.before.type == 'bundle'
+          - _change_enabled.diff.before.name == 'Change Enabled'
+          - _change_enabled.diff.before.publisher == ''
+          - _change_enabled.diff.before.short_name == 'Change Enabled'
+          - _change_enabled.diff.before.version == ''
+          - _change_enabled.diff.before.language == ''
+          - _change_enabled.diff.before.comments == ''
+          - not _change_enabled.diff.before.enabled
+          - not _change_enabled.diff.before.hidden
+          - not _change_enabled.diff.before.reboot
+          - _change_enabled.diff.before.paths is defined
+          - _change_enabled.diff.before.paths | length == 1
+          - _change_enabled.diff.before.paths[0] == ''
+          - _change_enabled.diff.before.command_line is not defined
+          - _change_enabled.diff.before.working_directory is not defined
+          - _change_enabled.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Enabled output
+      ansible.builtin.assert:
+        that:
+          - _change_enabled.application is defined
+          - _change_enabled.application.type == 'bundle'
+          - _change_enabled.application.name == 'Change Enabled'
+          - _change_enabled.application.publisher == ''
+          - _change_enabled.application.short_name == 'Change Enabled'
+          - _change_enabled.application.version == ''
+          - _change_enabled.application.language == ''
+          - _change_enabled.application.comments == ''
+          - _change_enabled.application.enabled
+          - not _change_enabled.application.hidden
+          - not _change_enabled.application.reboot
+          - _change_enabled.application.paths is defined
+          - _change_enabled.application.paths | length == 1
+          - _change_enabled.application.paths[0] == ''
+          - _change_enabled.application.command_line is not defined
+          - _change_enabled.application.working_directory is not defined
+          - _change_enabled.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_enabled_check.changed == _change_enabled.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with changed hidden (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Hidden
+        short_name: Change Hidden
+        hidden: false
+        state: present
+      register: _change_hidden_check
+
+    - name: Verify Change Hidden previous output # noqa no-handler
+      when:
+        - _change_hidden_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_hidden_check.diff.before is defined
+          - _change_hidden_check.diff.before.type == 'bundle'
+          - _change_hidden_check.diff.before.name == 'Change Hidden'
+          - _change_hidden_check.diff.before.publisher == ''
+          - _change_hidden_check.diff.before.short_name == 'Change Hidden'
+          - _change_hidden_check.diff.before.version == ''
+          - _change_hidden_check.diff.before.language == ''
+          - _change_hidden_check.diff.before.comments == ''
+          - _change_hidden_check.diff.before.enabled
+          - _change_hidden_check.diff.before.hidden
+          - not _change_hidden_check.diff.before.reboot
+          - _change_hidden_check.diff.before.paths is defined
+          - _change_hidden_check.diff.before.paths | length == 1
+          - _change_hidden_check.diff.before.paths[0] == ''
+          - _change_hidden_check.diff.before.command_line is not defined
+          - _change_hidden_check.diff.before.working_directory is not defined
+          - _change_hidden_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Hidden output
+      ansible.builtin.assert:
+        that:
+          - _change_hidden_check.application is defined
+          - _change_hidden_check.application.type == 'bundle'
+          - _change_hidden_check.application.name == 'Change Hidden'
+          - _change_hidden_check.application.publisher == ''
+          - _change_hidden_check.application.short_name == 'Change Hidden'
+          - _change_hidden_check.application.version == ''
+          - _change_hidden_check.application.language == ''
+          - _change_hidden_check.application.comments == ''
+          - _change_hidden_check.application.enabled
+          - not _change_hidden_check.application.hidden
+          - not _change_hidden_check.application.reboot
+          - _change_hidden_check.application.paths is defined
+          - _change_hidden_check.application.paths | length == 1
+          - _change_hidden_check.application.paths[0] == ''
+          - _change_hidden_check.application.command_line is not defined
+          - _change_hidden_check.application.working_directory is not defined
+          - _change_hidden_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with changed hidden
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Hidden
+        short_name: Change Hidden
+        hidden: false
+        state: present
+      register: _change_hidden
+
+    - name: Verify Change Hidden previous output # noqa no-handler
+      when:
+        - _change_hidden is changed
+      ansible.builtin.assert:
+        that:
+          - _change_hidden.diff.before is defined
+          - _change_hidden.diff.before.type == 'bundle'
+          - _change_hidden.diff.before.name == 'Change Hidden'
+          - _change_hidden.diff.before.publisher == ''
+          - _change_hidden.diff.before.short_name == 'Change Hidden'
+          - _change_hidden.diff.before.version == ''
+          - _change_hidden.diff.before.language == ''
+          - _change_hidden.diff.before.comments == ''
+          - _change_hidden.diff.before.enabled
+          - _change_hidden.diff.before.hidden
+          - not _change_hidden.diff.before.reboot
+          - _change_hidden.diff.before.paths is defined
+          - _change_hidden.diff.before.paths | length == 1
+          - _change_hidden.diff.before.paths[0] == ''
+          - _change_hidden.diff.before.command_line is not defined
+          - _change_hidden.diff.before.working_directory is not defined
+          - _change_hidden.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Hidden output
+      ansible.builtin.assert:
+        that:
+          - _change_hidden.application is defined
+          - _change_hidden.application.type == 'bundle'
+          - _change_hidden.application.name == 'Change Hidden'
+          - _change_hidden.application.publisher == ''
+          - _change_hidden.application.short_name == 'Change Hidden'
+          - _change_hidden.application.version == ''
+          - _change_hidden.application.language == ''
+          - _change_hidden.application.comments == ''
+          - _change_hidden.application.enabled
+          - not _change_hidden.application.hidden
+          - not _change_hidden.application.reboot
+          - _change_hidden.application.paths is defined
+          - _change_hidden.application.paths | length == 1
+          - _change_hidden.application.paths[0] == ''
+          - _change_hidden.application.command_line is not defined
+          - _change_hidden.application.working_directory is not defined
+          - _change_hidden.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_hidden_check.changed == _change_hidden.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with changed reboot (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Reboot
+        short_name: Change Reboot
+        reboot: false
+        state: present
+      register: _change_reboot_check
+
+    - name: Verify Change Reboot previous output # noqa no-handler
+      when:
+        - _change_reboot_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_reboot_check.diff.before is defined
+          - _change_reboot_check.diff.before.type == 'bundle'
+          - _change_reboot_check.diff.before.name == 'Change Reboot'
+          - _change_reboot_check.diff.before.publisher == ''
+          - _change_reboot_check.diff.before.short_name == 'Change Reboot'
+          - _change_reboot_check.diff.before.version == ''
+          - _change_reboot_check.diff.before.language == ''
+          - _change_reboot_check.diff.before.comments == ''
+          - _change_reboot_check.diff.before.enabled
+          - not _change_reboot_check.diff.before.hidden
+          - _change_reboot_check.diff.before.reboot
+          - _change_reboot_check.diff.before.paths is defined
+          - _change_reboot_check.diff.before.paths | length == 1
+          - _change_reboot_check.diff.before.paths[0] == ''
+          - _change_reboot_check.diff.before.command_line is not defined
+          - _change_reboot_check.diff.before.working_directory is not defined
+          - _change_reboot_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Reboot output
+      ansible.builtin.assert:
+        that:
+          - _change_reboot_check.application is defined
+          - _change_reboot_check.application.type == 'bundle'
+          - _change_reboot_check.application.name == 'Change Reboot'
+          - _change_reboot_check.application.publisher == ''
+          - _change_reboot_check.application.short_name == 'Change Reboot'
+          - _change_reboot_check.application.version == ''
+          - _change_reboot_check.application.language == ''
+          - _change_reboot_check.application.comments == ''
+          - _change_reboot_check.application.enabled
+          - not _change_reboot_check.application.hidden
+          - not _change_reboot_check.application.reboot
+          - _change_reboot_check.application.paths is defined
+          - _change_reboot_check.application.paths | length == 1
+          - _change_reboot_check.application.paths[0] == ''
+          - _change_reboot_check.application.command_line is not defined
+          - _change_reboot_check.application.working_directory is not defined
+          - _change_reboot_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with changed reboot
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Change Reboot
+        short_name: Change Reboot
+        reboot: false
+        state: present
+      register: _change_reboot
+
+    - name: Verify Change Reboot previous output # noqa no-handler
+      when:
+        - _change_reboot is changed
+      ansible.builtin.assert:
+        that:
+          - _change_reboot.diff.before is defined
+          - _change_reboot.diff.before.type == 'bundle'
+          - _change_reboot.diff.before.name == 'Change Reboot'
+          - _change_reboot.diff.before.publisher == ''
+          - _change_reboot.diff.before.short_name == 'Change Reboot'
+          - _change_reboot.diff.before.version == ''
+          - _change_reboot.diff.before.language == ''
+          - _change_reboot.diff.before.comments == ''
+          - _change_reboot.diff.before.enabled
+          - not _change_reboot.diff.before.hidden
+          - _change_reboot.diff.before.reboot
+          - _change_reboot.diff.before.paths is defined
+          - _change_reboot.diff.before.paths | length == 1
+          - _change_reboot.diff.before.paths[0] == ''
+          - _change_reboot.diff.before.command_line is not defined
+          - _change_reboot.diff.before.working_directory is not defined
+          - _change_reboot.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Reboot output
+      ansible.builtin.assert:
+        that:
+          - _change_reboot.application is defined
+          - _change_reboot.application.type == 'bundle'
+          - _change_reboot.application.name == 'Change Reboot'
+          - _change_reboot.application.publisher == ''
+          - _change_reboot.application.short_name == 'Change Reboot'
+          - _change_reboot.application.version == ''
+          - _change_reboot.application.language == ''
+          - _change_reboot.application.comments == ''
+          - _change_reboot.application.enabled
+          - not _change_reboot.application.hidden
+          - not _change_reboot.application.reboot
+          - _change_reboot.application.paths is defined
+          - _change_reboot.application.paths | length == 1
+          - _change_reboot.application.paths[0] == ''
+          - _change_reboot.application.command_line is not defined
+          - _change_reboot.application.working_directory is not defined
+          - _change_reboot.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_reboot_check.changed == _change_reboot.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application at another path (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: Change Files Path
+        short_name: Change Files Path
+        command_line: 'echo "Change Files Path"'
+        source_path: C:\temp\source
+        destination_folder: AnotherPath
+        state: present
+      register: _change_files_path_check
+
+    - name: Verify Change Files Path previous output # noqa no-handler
+      when:
+        - _change_files_path_check is changed
+      ansible.builtin.assert:
+        that:
+          - _change_files_path_check.diff.before is defined
+          - _change_files_path_check.diff.before.type == 'source'
+          - _change_files_path_check.diff.before.name == 'Change Files Path'
+          - _change_files_path_check.diff.before.publisher == ''
+          - _change_files_path_check.diff.before.short_name == 'Change Files Path'
+          - _change_files_path_check.diff.before.version == ''
+          - _change_files_path_check.diff.before.language == ''
+          - _change_files_path_check.diff.before.comments == ''
+          - _change_files_path_check.diff.before.command_line == 'echo "Change Files Path"'
+          - _change_files_path_check.diff.before.working_directory == '.\Applications\Change Files Path'
+          - _change_files_path_check.diff.before.files_path == 'C:\MDTShare\Applications\Change Files Path'
+          - _change_files_path_check.diff.before.enabled
+          - not _change_files_path_check.diff.before.hidden
+          - not _change_files_path_check.diff.before.reboot
+          - _change_files_path_check.diff.before.paths is defined
+          - _change_files_path_check.diff.before.paths | length == 1
+          - _change_files_path_check.diff.before.paths[0] == ''
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Files Path output
+      ansible.builtin.assert:
+        that:
+          - _change_files_path_check.application is defined
+          - _change_files_path_check.application.type == 'source'
+          - _change_files_path_check.application.name == 'Change Files Path'
+          - _change_files_path_check.application.publisher == ''
+          - _change_files_path_check.application.short_name == 'Change Files Path'
+          - _change_files_path_check.application.version == ''
+          - _change_files_path_check.application.language == ''
+          - _change_files_path_check.application.comments == ''
+          - _change_files_path_check.application.command_line == 'echo "Change Files Path"'
+          - _change_files_path_check.application.working_directory == '.\Applications\Change Files Path'
+          - _change_files_path_check.application.files_path == 'C:\MDTShare\Applications\AnotherPath'
+          - _change_files_path_check.application.enabled
+          - not _change_files_path_check.application.hidden
+          - not _change_files_path_check.application.reboot
+          - _change_files_path_check.application.paths is defined
+          - _change_files_path_check.application.paths | length == 1
+          - _change_files_path_check.application.paths[0] == ''
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application at another path
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: source
+        name: Change Files Path
+        short_name: Change Files Path
+        command_line: 'echo "Change Files Path"'
+        source_path: C:\temp\source
+        destination_folder: AnotherPath
+        state: present
+      register: _change_files_path
+
+    - name: Verify Change Files Path previous output # noqa no-handler
+      when:
+        - _change_files_path is changed
+      ansible.builtin.assert:
+        that:
+          - _change_files_path.diff.before is defined
+          - _change_files_path.diff.before.type == 'source'
+          - _change_files_path.diff.before.name == 'Change Files Path'
+          - _change_files_path.diff.before.publisher == ''
+          - _change_files_path.diff.before.short_name == 'Change Files Path'
+          - _change_files_path.diff.before.version == ''
+          - _change_files_path.diff.before.language == ''
+          - _change_files_path.diff.before.comments == ''
+          - _change_files_path.diff.before.command_line == 'echo "Change Files Path"'
+          - _change_files_path.diff.before.working_directory == '.\Applications\Change Files Path'
+          - _change_files_path.diff.before.files_path == 'C:\MDTShare\Applications\Change Files Path'
+          - _change_files_path.diff.before.enabled
+          - not _change_files_path.diff.before.hidden
+          - not _change_files_path.diff.before.reboot
+          - _change_files_path.diff.before.paths is defined
+          - _change_files_path.diff.before.paths | length == 1
+          - _change_files_path.diff.before.paths[0] == ''
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Change Files Path output
+      ansible.builtin.assert:
+        that:
+          - _change_files_path.application is defined
+          - _change_files_path.application.type == 'source'
+          - _change_files_path.application.name == 'Change Files Path'
+          - _change_files_path.application.publisher == ''
+          - _change_files_path.application.short_name == 'Change Files Path'
+          - _change_files_path.application.version == ''
+          - _change_files_path.application.language == ''
+          - _change_files_path.application.comments == ''
+          - _change_files_path.application.command_line == 'echo "Change Files Path"'
+          - _change_files_path.application.working_directory == '.\Applications\Change Files Path'
+          - _change_files_path.application.files_path == 'C:\MDTShare\Applications\AnotherPath'
+          - _change_files_path.application.enabled
+          - not _change_files_path.application.hidden
+          - not _change_files_path.application.reboot
+          - _change_files_path.application.paths is defined
+          - _change_files_path.application.paths | length == 1
+          - _change_files_path.application.paths[0] == ''
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _change_files_path_check.changed == _change_files_path.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with added path (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Add Paths
+        paths:
+          add:
+            - Subdirectory
+        short_name: Add Paths
+        state: present
+      register: add_paths_check
+
+    - name: Verify Add Paths previous output # noqa no-handler
+      when:
+        - add_paths_check is changed
+      ansible.builtin.assert:
+        that:
+          - add_paths_check.diff.before is defined
+          - add_paths_check.diff.before.type == 'bundle'
+          - add_paths_check.diff.before.name == 'Add Paths'
+          - add_paths_check.diff.before.publisher == ''
+          - add_paths_check.diff.before.short_name == 'Add Paths'
+          - add_paths_check.diff.before.version == ''
+          - add_paths_check.diff.before.language == ''
+          - add_paths_check.diff.before.comments == ''
+          - add_paths_check.diff.before.enabled
+          - not add_paths_check.diff.before.hidden
+          - not add_paths_check.diff.before.reboot
+          - add_paths_check.diff.before.paths is defined
+          - add_paths_check.diff.before.paths | length == 1
+          - add_paths_check.diff.before.paths[0] == ''
+          - add_paths_check.diff.before.command_line is not defined
+          - add_paths_check.diff.before.working_directory is not defined
+          - add_paths_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Add Paths output
+      ansible.builtin.assert:
+        that:
+          - add_paths_check.application is defined
+          - add_paths_check.application.type == 'bundle'
+          - add_paths_check.application.name == 'Add Paths'
+          - add_paths_check.application.publisher == ''
+          - add_paths_check.application.short_name == 'Add Paths'
+          - add_paths_check.application.version == ''
+          - add_paths_check.application.language == ''
+          - add_paths_check.application.comments == ''
+          - add_paths_check.application.enabled
+          - not add_paths_check.application.hidden
+          - not add_paths_check.application.reboot
+          - add_paths_check.application.paths is defined
+          - add_paths_check.application.paths | length == 2
+          - ('' in add_paths_check.application.paths)
+          - ('Subdirectory' in add_paths_check.application.paths)
+          - add_paths_check.application.command_line is not defined
+          - add_paths_check.application.working_directory is not defined
+          - add_paths_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with added path
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Add Paths
+        paths:
+          add:
+            - Subdirectory
+        short_name: Add Paths
+        state: present
+      register: add_paths
+
+    - name: Verify Add Paths previous output # noqa no-handler
+      when:
+        - add_paths is changed
+      ansible.builtin.assert:
+        that:
+          - add_paths.diff.before is defined
+          - add_paths.diff.before.type == 'bundle'
+          - add_paths.diff.before.name == 'Add Paths'
+          - add_paths.diff.before.publisher == ''
+          - add_paths.diff.before.short_name == 'Add Paths'
+          - add_paths.diff.before.version == ''
+          - add_paths.diff.before.language == ''
+          - add_paths.diff.before.comments == ''
+          - add_paths.diff.before.enabled
+          - not add_paths.diff.before.hidden
+          - not add_paths.diff.before.reboot
+          - add_paths.diff.before.paths is defined
+          - add_paths.diff.before.paths | length == 1
+          - add_paths.diff.before.paths[0] == ''
+          - add_paths.diff.before.command_line is not defined
+          - add_paths.diff.before.working_directory is not defined
+          - add_paths.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Add Paths output
+      ansible.builtin.assert:
+        that:
+          - add_paths.application is defined
+          - add_paths.application.type == 'bundle'
+          - add_paths.application.name == 'Add Paths'
+          - add_paths.application.publisher == ''
+          - add_paths.application.short_name == 'Add Paths'
+          - add_paths.application.version == ''
+          - add_paths.application.language == ''
+          - add_paths.application.comments == ''
+          - add_paths.application.enabled
+          - not add_paths.application.hidden
+          - not add_paths.application.reboot
+          - add_paths.application.paths is defined
+          - add_paths.application.paths | length == 2
+          - ('' in add_paths.application.paths)
+          - ('Subdirectory' in add_paths.application.paths)
+          - add_paths.application.command_line is not defined
+          - add_paths.application.working_directory is not defined
+          - add_paths.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - add_paths_check.changed == add_paths.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with removed path (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Remove Paths
+        paths:
+          remove:
+            - Subdirectory
+        short_name: Remove Paths
+        state: present
+      register: _remove_paths_check
+
+    - name: Verify Remove Paths previous output # noqa no-handler
+      when:
+        - _remove_paths_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_paths_check.diff.before is defined
+          - _remove_paths_check.diff.before.type == 'bundle'
+          - _remove_paths_check.diff.before.name == 'Remove Paths'
+          - _remove_paths_check.diff.before.publisher == ''
+          - _remove_paths_check.diff.before.short_name == 'Remove Paths'
+          - _remove_paths_check.diff.before.version == ''
+          - _remove_paths_check.diff.before.language == ''
+          - _remove_paths_check.diff.before.comments == ''
+          - _remove_paths_check.diff.before.enabled
+          - not _remove_paths_check.diff.before.hidden
+          - not _remove_paths_check.diff.before.reboot
+          - _remove_paths_check.diff.before.paths is defined
+          - _remove_paths_check.diff.before.paths | length == 2
+          - ('' in _remove_paths_check.diff.before.paths)
+          - ('Subdirectory' in _remove_paths_check.diff.before.paths)
+          - _remove_paths_check.diff.before.command_line is not defined
+          - _remove_paths_check.diff.before.working_directory is not defined
+          - _remove_paths_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Remove Paths output
+      ansible.builtin.assert:
+        that:
+          - _remove_paths_check.application is defined
+          - _remove_paths_check.application.type == 'bundle'
+          - _remove_paths_check.application.name == 'Remove Paths'
+          - _remove_paths_check.application.publisher == ''
+          - _remove_paths_check.application.short_name == 'Remove Paths'
+          - _remove_paths_check.application.version == ''
+          - _remove_paths_check.application.language == ''
+          - _remove_paths_check.application.comments == ''
+          - _remove_paths_check.application.enabled
+          - not _remove_paths_check.application.hidden
+          - not _remove_paths_check.application.reboot
+          - _remove_paths_check.application.paths is defined
+          - _remove_paths_check.application.paths | length == 1
+          - _remove_paths_check.application.paths[0] == ''
+          - _remove_paths_check.application.command_line is not defined
+          - _remove_paths_check.application.working_directory is not defined
+          - _remove_paths_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with removed path
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Remove Paths
+        paths:
+          remove:
+            - Subdirectory
+        short_name: Remove Paths
+        state: present
+      register: _remove_paths
+
+    - name: Verify Remove Paths previous output # noqa no-handler
+      when:
+        - _remove_paths is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_paths.diff.before is defined
+          - _remove_paths.diff.before.type == 'bundle'
+          - _remove_paths.diff.before.name == 'Remove Paths'
+          - _remove_paths.diff.before.publisher == ''
+          - _remove_paths.diff.before.short_name == 'Remove Paths'
+          - _remove_paths.diff.before.version == ''
+          - _remove_paths.diff.before.language == ''
+          - _remove_paths.diff.before.comments == ''
+          - _remove_paths.diff.before.enabled
+          - not _remove_paths.diff.before.hidden
+          - not _remove_paths.diff.before.reboot
+          - _remove_paths.diff.before.paths is defined
+          - _remove_paths.diff.before.paths | length == 2
+          - ('' in _remove_paths.diff.before.paths)
+          - ('Subdirectory' in _remove_paths.diff.before.paths)
+          - _remove_paths.diff.before.command_line is not defined
+          - _remove_paths.diff.before.working_directory is not defined
+          - _remove_paths.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Remove Paths output
+      ansible.builtin.assert:
+        that:
+          - _remove_paths.application is defined
+          - _remove_paths.application.type == 'bundle'
+          - _remove_paths.application.name == 'Remove Paths'
+          - _remove_paths.application.publisher == ''
+          - _remove_paths.application.short_name == 'Remove Paths'
+          - _remove_paths.application.version == ''
+          - _remove_paths.application.language == ''
+          - _remove_paths.application.comments == ''
+          - _remove_paths.application.enabled
+          - not _remove_paths.application.hidden
+          - not _remove_paths.application.reboot
+          - _remove_paths.application.paths is defined
+          - _remove_paths.application.paths | length == 1
+          - _remove_paths.application.paths[0] == ''
+          - _remove_paths.application.command_line is not defined
+          - _remove_paths.application.working_directory is not defined
+          - _remove_paths.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _remove_paths_check.changed == _remove_paths.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+    
+    - name: Create MDT application with added and removed paths (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Add And Remove Paths
+        paths:
+          add:
+            - Subdirectory
+          remove:
+            - ''
+        short_name: Add And Remove Paths
+        state: present
+      register: _add_and_remove_paths_check
+
+    - name: Verify Add And Remove Paths previous output # noqa no-handler
+      when:
+        - _add_and_remove_paths_check is changed
+      ansible.builtin.assert:
+        that:
+          - _add_and_remove_paths_check.diff.before is defined
+          - _add_and_remove_paths_check.diff.before.type == 'bundle'
+          - _add_and_remove_paths_check.diff.before.name == 'Add And Remove Paths'
+          - _add_and_remove_paths_check.diff.before.publisher == ''
+          - _add_and_remove_paths_check.diff.before.short_name == 'Add And Remove Paths'
+          - _add_and_remove_paths_check.diff.before.version == ''
+          - _add_and_remove_paths_check.diff.before.language == ''
+          - _add_and_remove_paths_check.diff.before.comments == ''
+          - _add_and_remove_paths_check.diff.before.enabled
+          - not _add_and_remove_paths_check.diff.before.hidden
+          - not _add_and_remove_paths_check.diff.before.reboot
+          - _add_and_remove_paths_check.diff.before.paths is defined
+          - _add_and_remove_paths_check.diff.before.paths | length == 1
+          - _add_and_remove_paths_check.diff.before.paths[0] == ''
+          - _add_and_remove_paths_check.diff.before.command_line is not defined
+          - _add_and_remove_paths_check.diff.before.working_directory is not defined
+          - _add_and_remove_paths_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Add And Remove Paths output
+      ansible.builtin.assert:
+        that:
+          - _add_and_remove_paths_check.application is defined
+          - _add_and_remove_paths_check.application.type == 'bundle'
+          - _add_and_remove_paths_check.application.name == 'Add And Remove Paths'
+          - _add_and_remove_paths_check.application.publisher == ''
+          - _add_and_remove_paths_check.application.short_name == 'Add And Remove Paths'
+          - _add_and_remove_paths_check.application.version == ''
+          - _add_and_remove_paths_check.application.language == ''
+          - _add_and_remove_paths_check.application.comments == ''
+          - _add_and_remove_paths_check.application.enabled
+          - not _add_and_remove_paths_check.application.hidden
+          - not _add_and_remove_paths_check.application.reboot
+          - _add_and_remove_paths_check.application.paths is defined
+          - _add_and_remove_paths_check.application.paths | length == 1
+          - _add_and_remove_paths_check.application.paths[0] == 'Subdirectory'
+          - _add_and_remove_paths_check.application.command_line is not defined
+          - _add_and_remove_paths_check.application.working_directory is not defined
+          - _add_and_remove_paths_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with added and removed paths
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Add And Remove Paths
+        paths:
+          add:
+            - Subdirectory
+          remove:
+            - ''
+        short_name: Add And Remove Paths
+        state: present
+      register: _add_and_remove_paths
+
+    - name: Verify Add And Remove Paths previous output # noqa no-handler
+      when:
+        - _add_and_remove_paths is changed
+      ansible.builtin.assert:
+        that:
+          - _add_and_remove_paths.diff.before is defined
+          - _add_and_remove_paths.diff.before.type == 'bundle'
+          - _add_and_remove_paths.diff.before.name == 'Add And Remove Paths'
+          - _add_and_remove_paths.diff.before.publisher == ''
+          - _add_and_remove_paths.diff.before.short_name == 'Add And Remove Paths'
+          - _add_and_remove_paths.diff.before.version == ''
+          - _add_and_remove_paths.diff.before.language == ''
+          - _add_and_remove_paths.diff.before.comments == ''
+          - _add_and_remove_paths.diff.before.enabled
+          - not _add_and_remove_paths.diff.before.hidden
+          - not _add_and_remove_paths.diff.before.reboot
+          - _add_and_remove_paths.diff.before.paths is defined
+          - _add_and_remove_paths.diff.before.paths | length == 1
+          - _add_and_remove_paths.diff.before.paths[0] == ''
+          - _add_and_remove_paths.diff.before.command_line is not defined
+          - _add_and_remove_paths.diff.before.working_directory is not defined
+          - _add_and_remove_paths.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Add And Remove Paths output
+      ansible.builtin.assert:
+        that:
+          - _add_and_remove_paths.application is defined
+          - _add_and_remove_paths.application.type == 'bundle'
+          - _add_and_remove_paths.application.name == 'Add And Remove Paths'
+          - _add_and_remove_paths.application.publisher == ''
+          - _add_and_remove_paths.application.short_name == 'Add And Remove Paths'
+          - _add_and_remove_paths.application.version == ''
+          - _add_and_remove_paths.application.language == ''
+          - _add_and_remove_paths.application.comments == ''
+          - _add_and_remove_paths.application.enabled
+          - not _add_and_remove_paths.application.hidden
+          - not _add_and_remove_paths.application.reboot
+          - _add_and_remove_paths.application.paths is defined
+          - _add_and_remove_paths.application.paths | length == 1
+          - _add_and_remove_paths.application.paths[0] == 'Subdirectory'
+          - _add_and_remove_paths.application.command_line is not defined
+          - _add_and_remove_paths.application.working_directory is not defined
+          - _add_and_remove_paths.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _add_and_remove_paths_check.changed == _add_and_remove_paths.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Create MDT application with set paths (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Set Paths
+        paths:
+          set:
+            - Subdirectory
+        short_name: Set Paths
+        state: present
+      register: _set_paths_check
+
+    - name: Verify Set Paths previous output # noqa no-handler
+      when:
+        - _set_paths_check is changed
+      ansible.builtin.assert:
+        that:
+          - _set_paths_check.diff.before is defined
+          - _set_paths_check.diff.before.type == 'bundle'
+          - _set_paths_check.diff.before.name == 'Set Paths'
+          - _set_paths_check.diff.before.publisher == ''
+          - _set_paths_check.diff.before.short_name == 'Set Paths'
+          - _set_paths_check.diff.before.version == ''
+          - _set_paths_check.diff.before.language == ''
+          - _set_paths_check.diff.before.comments == ''
+          - _set_paths_check.diff.before.enabled
+          - not _set_paths_check.diff.before.hidden
+          - not _set_paths_check.diff.before.reboot
+          - _set_paths_check.diff.before.paths is defined
+          - _set_paths_check.diff.before.paths | length == 1
+          - _set_paths_check.diff.before.paths[0] == ''
+          - _set_paths_check.diff.before.command_line is not defined
+          - _set_paths_check.diff.before.working_directory is not defined
+          - _set_paths_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Set Paths output
+      ansible.builtin.assert:
+        that:
+          - _set_paths_check.application is defined
+          - _set_paths_check.application.type == 'bundle'
+          - _set_paths_check.application.name == 'Set Paths'
+          - _set_paths_check.application.publisher == ''
+          - _set_paths_check.application.short_name == 'Set Paths'
+          - _set_paths_check.application.version == ''
+          - _set_paths_check.application.language == ''
+          - _set_paths_check.application.comments == ''
+          - _set_paths_check.application.enabled
+          - not _set_paths_check.application.hidden
+          - not _set_paths_check.application.reboot
+          - _set_paths_check.application.paths is defined
+          - _set_paths_check.application.paths | length == 1
+          - _set_paths_check.application.paths[0] == 'Subdirectory'
+          - _set_paths_check.application.command_line is not defined
+          - _set_paths_check.application.working_directory is not defined
+          - _set_paths_check.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Create MDT application with set paths
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        type: bundle
+        name: Set Paths
+        paths:
+          set:
+            - Subdirectory
+        short_name: Set Paths
+        state: present
+      register: _set_paths
+
+    - name: Verify Set Paths previous output # noqa no-handler
+      when:
+        - _set_paths is changed
+      ansible.builtin.assert:
+        that:
+          - _set_paths.diff.before is defined
+          - _set_paths.diff.before.type == 'bundle'
+          - _set_paths.diff.before.name == 'Set Paths'
+          - _set_paths.diff.before.publisher == ''
+          - _set_paths.diff.before.short_name == 'Set Paths'
+          - _set_paths.diff.before.version == ''
+          - _set_paths.diff.before.language == ''
+          - _set_paths.diff.before.comments == ''
+          - _set_paths.diff.before.enabled
+          - not _set_paths.diff.before.hidden
+          - not _set_paths.diff.before.reboot
+          - _set_paths.diff.before.paths is defined
+          - _set_paths.diff.before.paths | length == 1
+          - _set_paths.diff.before.paths[0] == ''
+          - _set_paths.diff.before.command_line is not defined
+          - _set_paths.diff.before.working_directory is not defined
+          - _set_paths.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Set Paths output
+      ansible.builtin.assert:
+        that:
+          - _set_paths.application is defined
+          - _set_paths.application.type == 'bundle'
+          - _set_paths.application.name == 'Set Paths'
+          - _set_paths.application.publisher == ''
+          - _set_paths.application.short_name == 'Set Paths'
+          - _set_paths.application.version == ''
+          - _set_paths.application.language == ''
+          - _set_paths.application.comments == ''
+          - _set_paths.application.enabled
+          - not _set_paths.application.hidden
+          - not _set_paths.application.reboot
+          - _set_paths.application.paths is defined
+          - _set_paths.application.paths | length == 1
+          - _set_paths.application.paths[0] == 'Subdirectory'
+          - _set_paths.application.command_line is not defined
+          - _set_paths.application.working_directory is not defined
+          - _set_paths.application.files_path is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _set_paths_check.changed == _set_paths.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Remove source application (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        name: Remove Source
+        state: absent
+      register: _remove_source_check
+
+    - name: Verify Remove Source previous output # noqa no-handler
+      when:
+        - _remove_source_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_source_check.diff.before is defined
+          - _remove_source_check.diff.before.type == 'source'
+          - _remove_source_check.diff.before.name == 'Remove Source'
+          - _remove_source_check.diff.before.publisher == ''
+          - _remove_source_check.diff.before.short_name == 'Remove Source'
+          - _remove_source_check.diff.before.version == ''
+          - _remove_source_check.diff.before.language == ''
+          - _remove_source_check.diff.before.command_line == 'echo "Remove Source"'
+          - _remove_source_check.diff.before.working_directory == '.\Applications\Remove Source'
+          - _remove_source_check.diff.before.comments == ''
+          - _remove_source_check.diff.before.enabled
+          - not _remove_source_check.diff.before.hidden
+          - not _remove_source_check.diff.before.reboot
+          - _remove_source_check.diff.before.paths is defined
+          - _remove_source_check.diff.before.paths | length == 1
+          - _remove_source_check.diff.before.paths[0] == ''
+          - _remove_source_check.diff.before.files_path == 'C:\MDTShare\Applications\Remove Source'
+        fail_msg: Application did not exist.
+        success_msg: Application removed.
+
+    - name: Verify Remove Source output
+      ansible.builtin.assert:
+        that:
+          - _remove_source_check.application is not defined
+        fail_msg: Application still exists.
+        success_msg: Application removed.
+
+    - name: Remove source from MDT application
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        name: Remove Source
+        state: absent
+      register: _remove_source
+
+    - name: Verify Remove Source previous output # noqa no-handler
+      when:
+        - _remove_source is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_source.diff.before is defined
+          - _remove_source.diff.before.type == 'source'
+          - _remove_source.diff.before.name == 'Remove Source'
+          - _remove_source.diff.before.publisher == ''
+          - _remove_source.diff.before.short_name == 'Remove Source'
+          - _remove_source.diff.before.version == ''
+          - _remove_source.diff.before.language == ''
+          - _remove_source.diff.before.command_line == 'echo "Remove Source"'
+          - _remove_source.diff.before.working_directory == '.\Applications\Remove Source'
+          - _remove_source.diff.before.comments == ''
+          - _remove_source.diff.before.enabled
+          - not _remove_source.diff.before.hidden
+          - not _remove_source.diff.before.reboot
+          - _remove_source.diff.before.paths is defined
+          - _remove_source.diff.before.paths | length == 1
+          - _remove_source.diff.before.paths[0] == ''
+          - _remove_source.diff.before.files_path == 'C:\MDTShare\Applications\Remove Source'
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _remove_source_check.changed == _remove_source.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Remove no source from MDT application (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        name: Remove No Source
+        state: absent
+      register: _remove_no_source_check
+
+    - name: Verify Remove No Source previous output # noqa no-handler
+      when:
+        - _remove_no_source_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_no_source_check.diff.before is defined
+          - _remove_no_source_check.diff.before.type == 'no_source'
+          - _remove_no_source_check.diff.before.name == 'Remove No Source'
+          - _remove_no_source_check.diff.before.publisher == ''
+          - _remove_no_source_check.diff.before.short_name == 'Remove No Source'
+          - _remove_no_source_check.diff.before.version == ''
+          - _remove_no_source_check.diff.before.language == ''
+          - _remove_no_source_check.diff.before.command_line == 'echo "Remove No Source"'
+          - _remove_no_source_check.diff.before.working_directory == ''
+          - _remove_no_source_check.diff.before.comments == ''
+          - _remove_no_source_check.diff.before.enabled
+          - not _remove_no_source_check.diff.before.hidden
+          - not _remove_no_source_check.diff.before.reboot
+          - _remove_no_source_check.diff.before.paths is defined
+          - _remove_no_source_check.diff.before.paths | length == 1
+          - _remove_no_source_check.diff.before.paths[0] == ''
+          - _remove_no_source_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Remove No Source output
+      ansible.builtin.assert:
+        that:
+          - _remove_no_source_check.application is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Remove no source from MDT application
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        name: Remove No Source
+        state: absent
+      register: _remove_no_source
+
+    - name: Verify Remove No Source previous output # noqa no-handler
+      when:
+        - _remove_no_source is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_no_source.diff.before is defined
+          - _remove_no_source.diff.before.type == 'no_source'
+          - _remove_no_source.diff.before.name == 'Remove No Source'
+          - _remove_no_source.diff.before.publisher == ''
+          - _remove_no_source.diff.before.short_name == 'Remove No Source'
+          - _remove_no_source.diff.before.version == ''
+          - _remove_no_source.diff.before.language == ''
+          - _remove_no_source.diff.before.command_line == 'echo "Remove No Source"'
+          - _remove_no_source.diff.before.working_directory == ''
+          - _remove_no_source.diff.before.comments == ''
+          - _remove_no_source.diff.before.enabled
+          - not _remove_no_source.diff.before.hidden
+          - not _remove_no_source.diff.before.reboot
+          - _remove_no_source.diff.before.paths is defined
+          - _remove_no_source.diff.before.paths | length == 1
+          - _remove_no_source.diff.before.paths[0] == ''
+          - _remove_no_source.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Remove No Source output
+      ansible.builtin.assert:
+        that:
+          - _remove_no_source.application is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _remove_no_source_check.changed == _remove_no_source.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Remove bundle from MDT application (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        name: Remove Bundle
+        state: absent
+      register: _remove_bundle_check
+
+    - name: Verify Remove Bundle previous output # noqa no-handler
+      when:
+        - _remove_bundle_check is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_bundle_check.diff.before is defined
+          - _remove_bundle_check.diff.before.type == 'bundle'
+          - _remove_bundle_check.diff.before.name == 'Remove Bundle'
+          - _remove_bundle_check.diff.before.publisher == ''
+          - _remove_bundle_check.diff.before.short_name == 'Remove Bundle'
+          - _remove_bundle_check.diff.before.version == ''
+          - _remove_bundle_check.diff.before.language == ''
+          - _remove_bundle_check.diff.before.comments == ''
+          - _remove_bundle_check.diff.before.enabled
+          - not _remove_bundle_check.diff.before.hidden
+          - not _remove_bundle_check.diff.before.reboot
+          - _remove_bundle_check.diff.before.paths is defined
+          - _remove_bundle_check.diff.before.paths | length == 1
+          - _remove_bundle_check.diff.before.paths[0] == ''
+          - _remove_bundle_check.diff.before.command_line is not defined
+          - _remove_bundle_check.diff.before.working_directory is not defined
+          - _remove_bundle_check.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Remove Bundle output
+      ansible.builtin.assert:
+        that:
+          - _remove_bundle_check.application is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Remove bundle from MDT application
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        name: Remove Bundle
+        state: absent
+      register: _remove_bundle
+
+    - name: Verify Remove Bundle previous output # noqa no-handler
+      when:
+        - _remove_bundle is changed
+      ansible.builtin.assert:
+        that:
+          - _remove_bundle.diff.before is defined
+          - _remove_bundle.diff.before.type == 'bundle'
+          - _remove_bundle.diff.before.name == 'Remove Bundle'
+          - _remove_bundle.diff.before.publisher == ''
+          - _remove_bundle.diff.before.short_name == 'Remove Bundle'
+          - _remove_bundle.diff.before.version == ''
+          - _remove_bundle.diff.before.language == ''
+          - _remove_bundle.diff.before.comments == ''
+          - _remove_bundle.diff.before.enabled
+          - not _remove_bundle.diff.before.hidden
+          - not _remove_bundle.diff.before.reboot
+          - _remove_bundle.diff.before.paths is defined
+          - _remove_bundle.diff.before.paths | length == 1
+          - _remove_bundle.diff.before.paths[0] == ''
+          - _remove_bundle.diff.before.command_line is not defined
+          - _remove_bundle.diff.before.working_directory is not defined
+          - _remove_bundle.diff.before.files_path is not defined
+        fail_msg: Task output did not include expected previous value.
+        success_msg: Task output included expected previous value.
+
+    - name: Verify Remove Bundle output
+      ansible.builtin.assert:
+        that:
+          - _remove_bundle.application is not defined
+        fail_msg: Task did not include expected output.
+        success_msg: Task included expected output.
+
+    - name: Verify check mode did not make changes
+      ansible.builtin.assert:
+        that:
+          - _remove_bundle_check.changed == _remove_bundle.changed
+        fail_msg: Check mode made changes.
+        success_msg: Check mode did not make changes.
+
+    - name: Remove non-existent MDT application (check)
+      check_mode: true
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        name: Non-Existent Application
+        state: absent
+      register: _non_existent_check
+
+    - name: Verify that previous task failed
+      ansible.builtin.assert:
+        that:
+          - _non_existent_check is not changed
+        fail_msg: Task removed something unexpectedly.
+        success_msg: Task did not remove anything, as expected.
+
+    - name: Remove non-existent MDT application
+      diff: true
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        name: Non-Existent Application
+        state: absent
+      register: _non_existent
+
+    - name: Verify that previous task failed
+      ansible.builtin.assert:
+        that:
+          - _non_existent is not changed
+        fail_msg: Task removed something unexpectedly.
+        success_msg: Task did not remove anything, as expected.

@@ -1,121 +1,294 @@
 #!powershell
 
 #AnsibleRequires -CSharpUtil Ansible.Basic
-#AnsibleRequires -PowerShell ansible_collections.trippsc2.mdt.plugins.module_utils.SharedFunctions
+#AnsibleRequires -PowerShell ansible_collections.trippsc2.mdt.plugins.module_utils.Common
+#AnsibleRequires -PowerShell ansible_collections.trippsc2.mdt.plugins.module_utils.DeploymentShare
 
-function Get-MatchingPersistentDriveByPath {
-    [CmdletBinding()]
+function Get-ExistingDeploymentShare {
+    <#
+    .SYNOPSIS
+    Gets an existing MDT deployment share.
+
+    .DESCRIPTION
+    This function gets an existing MDT deployment share.
+
+    .PARAMETER Module
+    The Ansible module.
+
+    .EXAMPLE
+    Get-ExistingDeploymentShare -Module $module
+
+    .OUTPUTS
+    System.Collections.Hashtable
+    #>
+
+    [OutputType([System.Collections.Hashtable])]
     param (
         [Parameter(Mandatory = $true)]
-        [string]$Path
+        [Ansible.Basic.AnsibleModule]$Module
     )
 
-    $persistentDrives = [Array](Get-MDTPersistentDrive)
-    $matchingDrive = $null
+    $mdtDrive = Get-MDTDeploymentShareDrive -Module $Module
+    $rootFolder = $mdtDrive | Get-MDTDeploymentShareRootFolder -Module $Module
 
-    if ($null -ne $persistentDrives)
-    {
-        foreach ($persistentDrive in $persistentDrives)
-        {
-            if ($persistentDrive.Path -ieq $Path)
-            {
-                $matchingDrive = $persistentDrive
+    if ($null -eq $mdtDrive -or $null -eq $rootFolder) {
+        return $null
+    }
+
+    return @{
+        name = $mdtDrive.Name
+        path = $mdtDrive.Path
+        description = $rootFolder.Item("Description")
+        unc_path = $rootFolder.Item("UNCPath")
+    }
+}
+
+function Get-ExpectedDeploymentShare {
+    <#
+    .SYNOPSIS
+    Gets an expected MDT deployment share.
+
+    .DESCRIPTION
+    This function gets an expected MDT deployment share.
+
+    .PARAMETER Module
+    The Ansible module.
+
+    .PARAMETER Existing
+    The existing deployment share configuration.
+
+
+    .EXAMPLE
+    Get-ExpectedDeploymentShare -Module $module -Existing $existing
+
+    .OUTPUTS
+    System.Collections.Hashtable
+    #>
+
+    [OutputType([System.Collections.Hashtable])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [Ansible.Basic.AnsibleModule]$Module,
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [System.Collections.Hashtable]$Existing
+    )
+
+    $path = $Module.Params.mdt_share_path
+    $description = $Module.Params.description
+    $uncPath = $Module.Params.unc_path
+
+    if ($null -eq $Existing) {
+
+        for ($i = 1; $i -lt 1000; $i++) {
+
+            $name = "DS$($i.ToString().PadLeft(3, '0'))"
+            $matchingDrive = Get-MDTPersistentDrive | Where-Object { $_.Name -ieq $name }
+
+            if ($null -eq $matchingDrive) {
                 break
             }
         }
-    }
 
-    return $matchingDrive
+        return @{
+            name = $name
+            path = $path
+            description = $description
+            unc_path = $uncPath
+        }
+    }
+    else {
+        return @{
+            name = $Existing.name
+            path = $path
+            description = $description
+            unc_path = $uncPath
+        }
+    }
 }
 
-function Get-MatchingPersistentDriveByName {
-    [CmdletBinding()]
+function Compare-ExpectedDeploymentShareToExisting {
+    <#
+    .SYNOPSIS
+    Compares an expected MDT deployment share to an existing deployment share.
+
+    .DESCRIPTION
+    This function compares an expected MDT deployment share to an existing deployment share.
+
+    .PARAMETER Expected
+    The expected deployment share configuration.
+
+    .PARAMETER Existing
+    The existing deployment share configuration.
+
+    .EXAMPLE
+    Compare-ExpectedDeploymentShareToExisting -Expected $expected -Existing $existing
+
+    .OUTPUTS
+    System.Collections.Hashtable
+    #>
+
+    [OutputType([System.Collections.Hashtable])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Collections.Hashtable]$Expected,
+        [Parameter(Mandatory = $true)]
+        [System.Collections.Hashtable]$Existing
+    )
+
+    $propertyChanges = @{}
+
+    if ($Expected.description -ne $Existing.description) {
+        $propertyChanges.Description = $Expected.description
+    }
+
+    if ($Expected.unc_path -ne $Existing.unc_path) {
+        $propertyChanges.UNCPath = $Expected.unc_path
+    }
+
+    return $propertyChanges
+}
+
+function Set-DeploymentShare {
+    <#
+    .SYNOPSIS
+    Sets a deployment share.
+
+    .DESCRIPTION
+    This function sets a deployment share.
+
+    .PARAMETER Name
+    The name of the deployment share.
+
+    .PARAMETER Description
+    The description of the deployment share.
+
+    .PARAMETER UNCPath
+    The UNC share path of the deployment share.
+
+    .EXAMPLE
+    Set-DeploymentShare -Name $name -Description $description -UNCPath $uncPath
+    #>
+
+    [OutputType([System.Void])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [Ansible.Basic.AnsibleModule]$Module,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $false)]
+        [string]$Description,
+        [Parameter(Mandatory = $false)]
+        [string]$UNCPath
+    )
+
+    $Module.Result.changed = $true
+
+    if ($Module.CheckMode) {
+        return
+    }
+
+    $rootFolder = Get-Item -LiteralPath "$($Name):\"
+
+    if (-not [string]::IsNullOrEmpty($Description)) {
+        $rootFolder.Item("Description") = $Description
+    }
+
+    if (-not [string]::IsNullOrEmpty($UNCPath)) {
+        $rootFolder.Item("UNCPath") = $UNCPath
+    }
+
+    $rootFolder = Get-Item -LiteralPath "$($Name):\"
+
+    $Module.Result.description = $rootFolder.Item("Description")
+    $Module.Result.unc_path = $rootFolder.Item("UNCPath")
+
+    $Module.Diff.after.description = $rootFolder.Item("Description")
+    $Module.Diff.after.unc_path = $rootFolder.Item("UNCPath")
+}
+
+function Add-DeploymentShare {
+    <#
+    .SYNOPSIS
+    Adds a deployment share.
+
+    .DESCRIPTION
+    This function adds a deployment share.
+
+    .PARAMETER Module
+    The Ansible module.
+
+    .PARAMETER Expected
+    The expected deployment share configuration.
+
+    .EXAMPLE
+    Add-DeploymentShare -Module $module -Expected $expected
+    #>
+
+    [OutputType([System.Void])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [Ansible.Basic.AnsibleModule]$Module,
+        [Parameter(Mandatory = $true)]
+        [System.Collections.Hashtable]$Expected
+    )
+
+    $Module.Result.changed = $true
+
+    if ($Module.CheckMode) {
+        return
+    }
+
+    $name = $Expected.name
+    $path = $Expected.path
+    $description = $Expected.description
+    $uncPath = $Expected.unc_path
+
+    if (-not (Test-Path -LiteralPath $path)) {
+        New-Item -Path $path -ItemType Directory -Force | Out-Null
+    }
+
+    New-PSDrive -Name $name -PSProvider MDTProvider -Root $path -Scope Global -Description $description -NetworkPath $uncPath |
+        Add-MDTPersistentDrive |
+        Out-Null
+
+    $rootFolder = Get-Item -LiteralPath "$($name):\"
+
+    $Module.Result.description = $rootFolder.Item("Description")
+    $Module.Result.unc_path = $rootFolder.Item("UNCPath")
+
+    $Module.Diff.after.description = $rootFolder.Item("Description")
+    $Module.Diff.after.unc_path = $rootFolder.Item("UNCPath")
+}
+
+function Remove-DeploymentShare {
+    <#
+    .SYNOPSIS
+    Removes a deployment share.
+
+    .DESCRIPTION
+    This function removes a deployment share.
+
+    .PARAMETER Name
+    The name of the deployment share.
+
+    .EXAMPLE
+    Remove-DeploymentShare -Name $name
+    #>
+
+    [OutputType([System.Void])]
     param (
         [Parameter(Mandatory = $true)]
         [string]$Name
     )
-    
-    $persistentDrives = [Array](Get-MDTPersistentDrive)
-    $matchingDrive = $null
 
-    if ($null -ne $persistentDrives)
-    {
-        foreach ($persistentDrive in $persistentDrives)
-        {
-            if ($persistentDrive.Name -eq $Name)
-            {
-                $matchingDrive = $persistentDrive
-                break
-            }
-        }
+    $Module.Result.changed = $true
+
+    if ($Module.CheckMode) {
+        return
     }
 
-    return $matchingDrive
-}
-
-function Add-DeploymentShare {
-    param (
-        [Ansible.Basic.AnsibleModule]$Module
-    )
-
-    $path = $Module.Params.path
-    $description = $Module.Params.description
-    $shareName = $Module.Params.share_name
-    
-    $Module.Result['changed'] = $true
-    $Module.Result['path'] = $path
-
-    $directoryCreated = $false
-
-    if (-not (Test-Path -Path $path))
-    {
-        $directoryCreated = $true
-
-        if (-not $Module.CheckMode)
-        {
-            New-Item -Path $path -ItemType Directory -Force | Out-Null
-        }
-    }
-    
-    $Module.Result['directory_created'] = $directoryCreated
-
-    for ($i = 1; $i -lt 1000; $i++)
-    {
-        $name = "DS$($i.ToString().PadLeft(3, '0'))"
-        $matchingDrive = Get-MatchingPersistentDriveByName -Name $name
-
-        if ($null -eq $matchingDrive)
-        {
-            break
-        }
-    }
-
-    $Module.Result['name'] = $name
-
-    if (-not $Module.CheckMode)
-    {
-        $networkPath = "\\$($env:COMPUTERNAME)\$($shareName)"
-        New-PSDrive -Name $name -PSProvider MDTProvider -Root $path -Scope Global -Description $description -NetworkPath $networkPath | Add-MDTPersistentDrive | Out-Null
-    }
-}
-
-function Remove-DeploymentShare {
-    param (
-        [Ansible.Basic.AnsibleModule]$Module,
-        [System.Object]$ExistingDrive
-    )
-   
-    $Module.Result['changed'] = $true
-    $Module.Result['previous'] = @{
-        name = $matchingDrive.Name
-        path = $matchingDrive.Path
-        description = $matchingDrive.Description
-    }
-
-    if (-not $Module.CheckMode)
-    {
-        Remove-MDTPersistentDrive -Name $matchingDrive.Name | Out-Null
-    }
+    Remove-MDTPersistentDrive -Name $Name | Out-Null
 }
 
 $spec = @{
@@ -125,19 +298,15 @@ $spec = @{
             required = $false
             default = 'C:\Program Files\Microsoft Deployment Toolkit'
         }
-        name = @{
-            type = 'str'
-            required = $false
-        }
-        path = @{
+        mdt_share_path = @{
             type = 'path'
-            required = $false
+            required = $true
         }
         description = @{
             type = 'str'
             required = $false
         }
-        share_name = @{
+        unc_path = @{
             type = 'str'
             required = $false
         }
@@ -151,58 +320,52 @@ $spec = @{
             )
         }
     }
-    mutually_exclusive = @(
-        , @('name', 'path')
-    )
     required_if = @(
-        @('state', 'present', @('path', 'description', 'share_name'), $false),
-        @('state', 'absent', @('path', 'name'), $true)
+        , @('state', 'present', @('description', 'unc_path'))
     )
     supports_check_mode = $true
 }
 
 $module = [Ansible.Basic.AnsibleModule]::Create($args, $spec)
 
-Import-MDTModule -InstallationPath $module.Params.installation_path
+Import-MDTModule -Module $module | Out-Null
 
-$name = $module.Params.name
-$path = $module.Params.path
 $state = $module.Params.state
 
-if ($state -eq 'present')
-{
-    $matchingDrive = Get-MatchingPersistentDriveByPath -Path $path
+$existing = Get-ExistingDeploymentShare -Module $module
 
-    if ($null -eq $matchingDrive)
-    {
-        Add-DeploymentShare -Module $module
+$module.Diff.before = $existing
+$module.Result.changed = $false
+
+if ($state -eq 'present') {
+
+    $expected = Get-ExpectedDeploymentShare -Module $module -Existing $existing
+
+    $module.Diff.after = $expected
+
+    $module.Result.name = $expected.name
+    $module.Result.path = $expected.path
+    $module.Result.description = $expected.description
+    $module.Result.unc_path = $expected.unc_path
+
+    if ($null -ne $existing) {
+
+        $propertyChanges = Compare-ExpectedDeploymentShareToExisting -Expected $expected -Existing $existing
+
+        if ($propertyChanges.Count -gt 0) {
+            Set-DeploymentShare -Module $module -Name $expected.name @propertyChanges | Out-Null
+        }
     }
-    else
-    {
-        $module.Result['changed'] = $false
-        $module.Result['name'] = $matchingDrive.Name
-        $module.Result['path'] = $matchingDrive.Path
-        $module.Result['directory_created'] = $false
+    else {
+        Add-DeploymentShare -Module $module -Expected $expected | Out-Null
     }
 }
-elseif ($state -eq 'absent')
-{
-    if ($null -ne $name)
-    {
-        $matchingDrive = Get-MatchingPersistentDriveByName -Name $name
-    }
-    elseif ($null -ne $path)
-    {
-        $matchingDrive = Get-MatchingPersistentDriveByPath -Path $path
-    }
-    
-    if ($null -ne $matchingDrive)
-    {
-        Remove-DeploymentShare -Module $module -ExistingDrive $matchingDrive
-    }
-    else
-    {
-        $module.Result['changed'] = $false
+elseif ($state -eq 'absent') {
+
+    $module.Diff.after = $null
+
+    if ($null -ne $existing) {
+        Remove-DeploymentShare -Name $existing.Name | Out-Null
     }
 }
 

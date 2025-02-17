@@ -1,0 +1,439 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks:
+    - name: Get non-existent MDT application info
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Non-Existent Application
+      register: _non_existent_application
+
+    - name: Verify that application does not exist
+      ansible.builtin.assert:
+        that:
+          - not _non_existent_application.exists
+          - _non_existent_application.application is not defined
+        fail_msg: The application exists when it should not.
+        success_msg: The application does not exist, as expected.
+
+    - name: Get non-existent MDT application info by GUID
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ '{' + ansible_date_time.iso8601_micro | to_uuid + '}' }}"
+      register: _non_existent_application_by_guid
+
+    - name: Verify that application does not exist
+      ansible.builtin.assert:
+        that:
+          - not _non_existent_application_by_guid.exists
+          - _non_existent_application_by_guid.application is not defined
+        fail_msg: The application exists when it should not.
+        success_msg: The application does not exist, as expected.
+
+    - name: Get Dependency MDT Application Info
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Dependency
+      register: _dependency
+
+    - name: Verify Dependency application info
+      ansible.builtin.assert:
+        that:
+          - _dependency.exists
+          - _dependency.application is defined
+          - _dependency.application.name == 'Dependency'
+          - _dependency.application.guid is match('^{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}$')
+          - _dependency.application.type == 'bundle'
+          - _dependency.application.publisher == ''
+          - _dependency.application.short_name == 'Dependency'
+          - _dependency.application.version == ''
+          - _dependency.application.language == ''
+          - _dependency.application.comments == ''
+          - _dependency.application.enabled
+          - not _dependency.application.hidden
+          - not _dependency.application.reboot
+          - _dependency.application.paths is defined
+          - _dependency.application.paths | length == 1
+          - _dependency.application.paths[0] == ''
+          - _dependency.application.dependencies is defined
+          - _dependency.application.dependencies | length == 0
+          - _dependency.application.command_line is not defined
+          - _dependency.application.working_directory is not defined
+          - _dependency.application.files_path is not defined
+        fail_msg: The application info is not as expected.
+        success_msg: The application info is as expected.
+
+    - name: Get Source Application MDT Application Info
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Source Application
+      register: _source_application
+
+    - name: Verify Source Application application info
+      ansible.builtin.assert:
+        that:
+          - _source_application.exists
+          - _source_application.application is defined
+          - _source_application.application.guid is match('^{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}$')
+          - _source_application.application.name == 'Source Application'
+          - _source_application.application.type == 'source'
+          - _source_application.application.publisher == ''
+          - _source_application.application.short_name == 'Source Application'
+          - _source_application.application.version == ''
+          - _source_application.application.language == ''
+          - _source_application.application.comments == ''
+          - _source_application.application.command_line == 'echo "Source Application"'
+          - "_source_application.application.working_directory == '.\\Applications\\Source Application'"
+          - "_source_application.application.files_path == 'C:\\MDTShare\\Applications\\Source Application'"
+          - _source_application.application.enabled
+          - not _source_application.application.hidden
+          - not _source_application.application.reboot
+          - _source_application.application.paths is defined
+          - _source_application.application.paths | length == 1
+          - _source_application.application.paths[0] == ''
+          - _source_application.application.dependencies is defined
+          - _source_application.application.dependencies | length == 0
+        fail_msg: The application info is not as expected.
+        success_msg: The application info is as expected.
+
+    - name: Get No Source Application MDT Application Info
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: No Source Application
+      register: _no_source_application
+
+    - name: Verify No Source Application application info
+      ansible.builtin.assert:
+        that:
+          - _no_source_application.exists
+          - _no_source_application.application is defined
+          - _no_source_application.application.guid is match('^{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}$')
+          - _no_source_application.application.name == 'No Source Application'
+          - _no_source_application.application.type == 'no_source'
+          - _no_source_application.application.publisher == ''
+          - _no_source_application.application.short_name == 'No Source Application'
+          - _no_source_application.application.version == ''
+          - _no_source_application.application.language == ''
+          - _no_source_application.application.comments == ''
+          - _no_source_application.application.command_line == 'echo "No Source Application"'
+          - _no_source_application.application.working_directory == ''
+          - _no_source_application.application.enabled
+          - not _no_source_application.application.hidden
+          - not _no_source_application.application.reboot
+          - _no_source_application.application.paths is defined
+          - _no_source_application.application.paths | length == 1
+          - _no_source_application.application.paths[0] == ''
+          - _no_source_application.application.dependencies is defined
+          - _no_source_application.application.dependencies | length == 0
+          - _no_source_application.application.files_path is not defined
+        fail_msg: The application info is not as expected.
+        success_msg: The application info is as expected.
+
+    - name: Get Application Bundle MDT Application Info
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Application Bundle
+      register: _application_bundle
+
+    - name: Verify Application Bundle application info
+      ansible.builtin.assert:
+        that:
+          - _application_bundle.exists
+          - _application_bundle.application is defined
+          - _application_bundle.application.guid is match('^{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}$')
+          - _application_bundle.application.name == 'Application Bundle'
+          - _application_bundle.application.type == 'bundle'
+          - _application_bundle.application.publisher == ''
+          - _application_bundle.application.short_name == 'Application Bundle'
+          - _application_bundle.application.version == ''
+          - _application_bundle.application.language == ''
+          - _application_bundle.application.comments == ''
+          - _application_bundle.application.enabled
+          - not _application_bundle.application.hidden
+          - not _application_bundle.application.reboot
+          - _application_bundle.application.paths is defined
+          - _application_bundle.application.paths | length == 1
+          - _application_bundle.application.paths[0] == ''
+          - _application_bundle.application.dependencies | length == 1
+          - _application_bundle.application.dependencies[0].name == 'Dependency'
+          - _application_bundle.application.dependencies[0].guid == _dependency.application.guid
+          - _application_bundle.application.command_line is not defined
+          - _application_bundle.application.working_directory is not defined
+          - _application_bundle.application.files_path is not defined
+        fail_msg: The application info is not as expected.
+        success_msg: The application info is as expected.
+
+    - name: Get Nested Source Application MDT Application Info
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Nested Source Application
+      register: _nested_source_application
+
+    - name: Verify Nested Source Application application info
+      ansible.builtin.assert:
+        that:
+          - _nested_source_application.exists
+          - _nested_source_application.application is defined
+          - _nested_source_application.application.guid is match('^{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}$')
+          - _nested_source_application.application.name == 'Nested Source Application'
+          - _nested_source_application.application.type == 'source'
+          - _nested_source_application.application.publisher == ''
+          - _nested_source_application.application.short_name == 'Nested Source Application'
+          - _nested_source_application.application.version == ''
+          - _nested_source_application.application.language == ''
+          - _nested_source_application.application.comments == ''
+          - _nested_source_application.application.command_line == 'echo "Nested Source Application"'
+          - "_nested_source_application.application.working_directory == '.\\Applications\\\\Nested Source Application'"
+          - "_nested_source_application.application.files_path == 'C:\\MDTShare\\Applications\\\\Nested Source Application'"
+          - _nested_source_application.application.enabled
+          - not _nested_source_application.application.hidden
+          - not _nested_source_application.application.reboot
+          - _nested_source_application.application.paths is defined
+          - _nested_source_application.application.paths | length == 1
+          - _nested_source_application.application.paths[0] == 'Subdirectory'
+          - _nested_source_application.application.dependencies is defined
+          - _nested_source_application.application.dependencies | length == 0
+        fail_msg: The application info is not as expected.
+        success_msg: The application info is as expected.
+
+    - name: Get Nested No Source Application MDT Application Info
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Nested No Source Application
+      register: _nested_no_source_application
+
+    - name: Verify Nested No Source Application application info
+      ansible.builtin.assert:
+        that:
+          - _nested_no_source_application.exists
+          - _nested_no_source_application.application is defined
+          - _nested_no_source_application.application.guid is match('^{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}$')
+          - _nested_no_source_application.application.name == 'Nested No Source Application'
+          - _nested_no_source_application.application.type == 'no_source'
+          - _nested_no_source_application.application.publisher == ''
+          - _nested_no_source_application.application.short_name == 'Nested No Source Application'
+          - _nested_no_source_application.application.version == ''
+          - _nested_no_source_application.application.language == ''
+          - _nested_no_source_application.application.comments == ''
+          - _nested_no_source_application.application.command_line == 'echo "Nested No Source Application"'
+          - _nested_no_source_application.application.working_directory == ''
+          - _nested_no_source_application.application.enabled
+          - not _nested_no_source_application.application.hidden
+          - not _nested_no_source_application.application.reboot
+          - _nested_no_source_application.application.paths is defined
+          - _nested_no_source_application.application.paths | length == 1
+          - _nested_no_source_application.application.paths[0] == ''
+          - _nested_no_source_application.application.dependencies is defined
+          - _nested_no_source_application.application.dependencies | length == 0
+          - _nested_no_source_application.application.files_path is not defined
+        fail_msg: The application info is not as expected.
+        success_msg: The application info is as expected.
+
+    - name: Get Nested Application Bundle MDT Application Info
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        name: Nested Application Bundle
+      register: _nested_application_bundle
+
+    - name: Verify Nested Application Bundle application info
+      ansible.builtin.assert:
+        that:
+          - _nested_application_bundle.exists
+          - _nested_application_bundle.application is defined
+          - _nested_application_bundle.application.guid is match('^{[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}$')
+          - _nested_application_bundle.application.name == 'Nested Application Bundle'
+          - _nested_application_bundle.application.type == 'bundle'
+          - _nested_application_bundle.application.publisher == ''
+          - _nested_application_bundle.application.short_name == 'Nested Application Bundle'
+          - _nested_application_bundle.application.version == ''
+          - _nested_application_bundle.application.language == ''
+          - _nested_application_bundle.application.comments == ''
+          - _nested_application_bundle.application.enabled
+          - not _nested_application_bundle.application.hidden
+          - not _nested_application_bundle.application.reboot
+          - _nested_application_bundle.application.paths is defined
+          - _nested_application_bundle.application.paths | length == 1
+          - _nested_application_bundle.application.paths[0] == ''
+          - _nested_application_bundle.application.dependencies is defined
+          - _nested_application_bundle.application.dependencies | length == 0
+          - _nested_application_bundle.application.command_line is not defined
+          - _nested_application_bundle.application.working_directory is not defined
+          - _nested_application_bundle.application.files_path is not defined
+        fail_msg: The application info is not as expected.
+        success_msg: The application info is as expected.
+
+    - name: Get Source Application MDT Application info by GUID
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ _source_application.application.guid }}"
+      register: _source_application_by_guid
+
+    - name: Verify Source Application by GUID matches
+      ansible.builtin.assert:
+        that:
+          - _source_application_by_guid.exists
+          - _source_application_by_guid.application is defined
+          - _source_application_by_guid.application.guid == _source_application.application.guid
+          - _source_application_by_guid.application.name == _source_application.application.name
+          - _source_application_by_guid.application.type == _source_application.application.type
+          - _source_application_by_guid.application.publisher == _source_application.application.publisher
+          - _source_application_by_guid.application.short_name == _source_application.application.short_name
+          - _source_application_by_guid.application.version == _source_application.application.version
+          - _source_application_by_guid.application.language == _source_application.application.language
+          - _source_application_by_guid.application.comments == _source_application.application.comments
+          - _source_application_by_guid.application.command_line == _source_application.application.command_line
+          - _source_application_by_guid.application.working_directory == _source_application.application.working_directory
+          - _source_application_by_guid.application.files_path == _source_application.application.files_path
+          - _source_application_by_guid.application.enabled == _source_application.application.enabled
+          - _source_application_by_guid.application.hidden == _source_application.application.hidden
+          - _source_application_by_guid.application.reboot == _source_application.application.reboot
+          - _source_application_by_guid.application.paths == _source_application.application.paths
+          - _source_application_by_guid.application.dependencies== _source_application.application.dependencies
+        fail_msg: The application info does not match by GUID.
+        success_msg: The application info matches by GUID.
+
+    - name: Get No Source Application MDT Application info by GUID
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ _no_source_application.application.guid }}"
+      register: _no_source_application_by_guid
+
+    - name: Verify No Source Application by GUID matches
+      ansible.builtin.assert:
+        that:
+          - _no_source_application_by_guid.exists
+          - _no_source_application_by_guid.application is defined
+          - _no_source_application_by_guid.application.name == _no_source_application.application.name
+          - _no_source_application_by_guid.application.type == _no_source_application.application.type
+          - _no_source_application_by_guid.application.publisher == _no_source_application.application.publisher
+          - _no_source_application_by_guid.application.short_name == _no_source_application.application.short_name
+          - _no_source_application_by_guid.application.version == _no_source_application.application.version
+          - _no_source_application_by_guid.application.language == _no_source_application.application.language
+          - _no_source_application_by_guid.application.comments == _no_source_application.application.comments
+          - _no_source_application_by_guid.application.enabled == _no_source_application.application.enabled
+          - _no_source_application_by_guid.application.hidden == _no_source_application.application.hidden
+          - _no_source_application_by_guid.application.reboot == _no_source_application.application.reboot
+          - _no_source_application_by_guid.application.command_line == _no_source_application.application.command_line
+          - _no_source_application_by_guid.application.working_directory == _no_source_application.application.working_directory
+          - _no_source_application_by_guid.application.paths == _no_source_application.application.paths
+          - _no_source_application_by_guid.application.dependencies == _no_source_application.application.dependencies
+          - _no_source_application_by_guid.application.files_path is not defined
+        fail_msg: The application info does not match by GUID.
+        success_msg: The application info matches by GUID.
+
+    - name: Get Application Bundle MDT Application info by GUID
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ _application_bundle.application.guid }}"
+      register: _application_bundle_by_guid
+
+    - name: Verify Application Bundle by GUID matches
+      ansible.builtin.assert:
+        that:
+          - _application_bundle_by_guid.exists
+          - _application_bundle_by_guid.application is defined
+          - _application_bundle_by_guid.application.name == _application_bundle.application.name
+          - _application_bundle_by_guid.application.type == _application_bundle.application.type
+          - _application_bundle_by_guid.application.publisher == _application_bundle.application.publisher
+          - _application_bundle_by_guid.application.short_name == _application_bundle.application.short_name
+          - _application_bundle_by_guid.application.version == _application_bundle.application.version
+          - _application_bundle_by_guid.application.language == _application_bundle.application.language
+          - _application_bundle_by_guid.application.comments == _application_bundle.application.comments
+          - _application_bundle_by_guid.application.enabled == _application_bundle.application.enabled
+          - _application_bundle_by_guid.application.hidden == _application_bundle.application.hidden
+          - _application_bundle_by_guid.application.reboot == _application_bundle.application.reboot
+          - _application_bundle_by_guid.application.paths == _application_bundle.application.paths
+          - _application_bundle_by_guid.application.dependencies == _application_bundle.application.dependencies
+          - _application_bundle_by_guid.application.command_line is not defined
+          - _application_bundle_by_guid.application.working_directory is not defined
+          - _application_bundle_by_guid.application.files_path is not defined
+        fail_msg: The application info does not match by GUID.
+        success_msg: The application info matches by GUID.
+
+    - name: Get Nested Source Application MDT Application info by GUID
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ _nested_source_application.application.guid }}"
+      register: _nested_source_application_by_guid
+
+    - name: Verify Nested Source Application by GUID matches
+      ansible.builtin.assert:
+        that:
+          - _nested_source_application_by_guid.exists
+          - _nested_source_application_by_guid.application is defined
+          - _nested_source_application_by_guid.application.name == _nested_source_application.application.name
+          - _nested_source_application_by_guid.application.type == _nested_source_application.application.type
+          - _nested_source_application_by_guid.application.publisher == _nested_source_application.application.publisher
+          - _nested_source_application_by_guid.application.short_name == _nested_source_application.application.short_name
+          - _nested_source_application_by_guid.application.version == _nested_source_application.application.version
+          - _nested_source_application_by_guid.application.language == _nested_source_application.application.language
+          - _nested_source_application_by_guid.application.comments == _nested_source_application.application.comments
+          - _nested_source_application_by_guid.application.enabled == _nested_source_application.application.enabled
+          - _nested_source_application_by_guid.application.hidden == _nested_source_application.application.hidden
+          - _nested_source_application_by_guid.application.reboot == _nested_source_application.application.reboot
+          - _nested_source_application_by_guid.application.command_line == _nested_source_application.application.command_line
+          - _nested_source_application_by_guid.application.working_directory == _nested_source_application.application.working_directory
+          - _nested_source_application_by_guid.application.files_path == _nested_source_application.application.files_path
+          - _nested_source_application_by_guid.application.paths == _nested_source_application.application.paths
+          - _nested_source_application_by_guid.application.dependencies == _nested_source_application.application.dependencies
+        fail_msg: The application info does not match by GUID.
+        success_msg: The application info matches by GUID.
+
+    - name: Get Nested No Source Application MDT Application info by GUID
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ _nested_no_source_application.application.guid }}"
+      register: _nested_no_source_application_by_guid
+
+    - name: Verify Nested No Source Application by GUID matches
+      ansible.builtin.assert:
+        that:
+          - _nested_no_source_application_by_guid.exists
+          - _nested_no_source_application_by_guid.application is defined
+          - _nested_no_source_application_by_guid.application.name == _nested_no_source_application.application.name
+          - _nested_no_source_application_by_guid.application.type == _nested_no_source_application.application.type
+          - _nested_no_source_application_by_guid.application.publisher == _nested_no_source_application.application.publisher
+          - _nested_no_source_application_by_guid.application.short_name == _nested_no_source_application.application.short_name
+          - _nested_no_source_application_by_guid.application.version == _nested_no_source_application.application.version
+          - _nested_no_source_application_by_guid.application.language == _nested_no_source_application.application.language
+          - _nested_no_source_application_by_guid.application.comments == _nested_no_source_application.application.comments
+          - _nested_no_source_application_by_guid.application.enabled == _nested_no_source_application.application.enabled
+          - _nested_no_source_application_by_guid.application.hidden == _nested_no_source_application.application.hidden
+          - _nested_no_source_application_by_guid.application.reboot == _nested_no_source_application.application.reboot
+          - _nested_no_source_application_by_guid.application.command_line == _nested_no_source_application.application.command_line
+          - _nested_no_source_application_by_guid.application.working_directory == _nested_no_source_application.application.working_directory
+          - _nested_no_source_application_by_guid.application.paths == _nested_no_source_application.application.paths
+          - _nested_no_source_application_by_guid.application.dependencies == _nested_no_source_application.application.dependencies
+          - _nested_no_source_application_by_guid.application.files_path is not defined
+        fail_msg: The application info does not match by GUID.
+        success_msg: The application info matches by GUID.
+
+    - name: Get Nested Application Bundle MDT Application info by GUID
+      trippsc2.mdt.application_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ _nested_application_bundle.application.guid }}"
+      register: _nested_application_bundle_by_guid
+
+    - name: Verify Nested Application Bundle by GUID matches
+      ansible.builtin.assert:
+        that:
+          - _nested_application_bundle_by_guid.exists
+          - _nested_application_bundle_by_guid.application is defined
+          - _nested_application_bundle_by_guid.application.name == _nested_application_bundle.application.name
+          - _nested_application_bundle_by_guid.application.type == _nested_application_bundle.application.type
+          - _nested_application_bundle_by_guid.application.publisher == _nested_application_bundle.application.publisher
+          - _nested_application_bundle_by_guid.application.short_name == _nested_application_bundle.application.short_name
+          - _nested_application_bundle_by_guid.application.version == _nested_application_bundle.application.version
+          - _nested_application_bundle_by_guid.application.language == _nested_application_bundle.application.language
+          - _nested_application_bundle_by_guid.application.comments == _nested_application_bundle.application.comments
+          - _nested_application_bundle_by_guid.application.enabled == _nested_application_bundle.application.enabled
+          - _nested_application_bundle_by_guid.application.hidden == _nested_application_bundle.application.hidden
+          - _nested_application_bundle_by_guid.application.reboot == _nested_application_bundle.application.reboot
+          - _nested_application_bundle_by_guid.application.paths == _nested_application_bundle.application.paths
+          - _nested_application_bundle_by_guid.application.dependencies == _nested_application_bundle.application.dependencies
+          - _nested_application_bundle_by_guid.application.command_line is not defined
+          - _nested_application_bundle_by_guid.application.working_directory is not defined
+          - _nested_application_bundle_by_guid.application.files_path is not defined
+        fail_msg: The application info does not match by GUID.
+        success_msg: The application info matches by GUID.

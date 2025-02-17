@@ -1,0 +1,78 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks:
+    - name: Get driver directory info
+      trippsc2.mdt.directory_info:
+        mdt_share_path: C:\MDTShare
+        path: Out-of-Box Drivers\WinPE
+      register: _winpe_directory_info
+
+    - name: Get list of drivers in directory
+      ansible.builtin.set_fact:
+        _winpe_drivers: >-
+          {{ _winpe_directory_info.directory.contents |
+              selectattr('type', 'equalto', 'driver') }}
+
+    - name: Get driver info by name
+      trippsc2.mdt.driver_info:
+        mdt_share_path: C:\MDTShare
+        name: "{{ _winpe_drivers[0].name }}"
+      register: _winpe_driver_info
+
+    - name: Verify driver info
+      ansible.builtin.assert:
+        that:
+          - _winpe_driver_info.exists
+          - _winpe_driver_info.driver is defined
+          - _winpe_driver_info.driver.paths is defined
+          - _winpe_driver_info.driver.paths | length == 2
+          - ('Windows 10' in _winpe_driver_info.driver.paths)
+          - ('WinPE' in _winpe_driver_info.driver.paths)
+          - _winpe_driver_info.driver.name == _winpe_drivers[0].name
+          - _winpe_driver_info.driver.guid == _winpe_drivers[0].guid
+          - _winpe_driver_info.driver.class == _winpe_drivers[0].class
+          - _winpe_driver_info.driver.comments == _winpe_drivers[0].comments
+          - _winpe_driver_info.driver.enabled == _winpe_drivers[0].enabled
+          - _winpe_driver_info.driver.hash == _winpe_drivers[0].hash
+          - _winpe_driver_info.driver.hidden == _winpe_drivers[0].hidden
+          - _winpe_driver_info.driver.manufacturer == _winpe_drivers[0].manufacturer
+          - _winpe_driver_info.driver.os_version == _winpe_drivers[0].os_version
+          - _winpe_driver_info.driver.platform == _winpe_drivers[0].platform
+          - _winpe_driver_info.driver.pnp_ids == _winpe_drivers[0].pnp_ids
+          - _winpe_driver_info.driver.version == _winpe_drivers[0].version
+          - _winpe_driver_info.driver.whql_signed == _winpe_drivers[0].whql_signed
+        fail_msg: Driver info does not match expected values.
+        success_msg: Driver info matches expected values.
+
+    - name: Get driver info by guid
+      trippsc2.mdt.driver_info:
+        mdt_share_path: C:\MDTShare
+        guid: "{{ _winpe_drivers[0].guid }}"
+      register: _winpe_driver_info_by_guid
+
+    - name: Verify driver info by guid
+      ansible.builtin.assert:
+        that:
+          - _winpe_driver_info_by_guid.exists
+          - _winpe_driver_info_by_guid.driver is defined
+          - _winpe_driver_info_by_guid.driver.paths is defined
+          - _winpe_driver_info_by_guid.driver.paths | length == 2
+          - ('Windows 10' in _winpe_driver_info_by_guid.driver.paths)
+          - ('WinPE' in _winpe_driver_info_by_guid.driver.paths)
+          - _winpe_driver_info_by_guid.driver.name == _winpe_drivers[0].name
+          - _winpe_driver_info_by_guid.driver.guid == _winpe_drivers[0].guid
+          - _winpe_driver_info_by_guid.driver.class == _winpe_drivers[0].class
+          - _winpe_driver_info_by_guid.driver.comments == _winpe_drivers[0].comments
+          - _winpe_driver_info_by_guid.driver.enabled == _winpe_drivers[0].enabled
+          - _winpe_driver_info_by_guid.driver.hash == _winpe_drivers[0].hash
+          - _winpe_driver_info_by_guid.driver.hidden == _winpe_drivers[0].hidden
+          - _winpe_driver_info_by_guid.driver.manufacturer == _winpe_drivers[0].manufacturer
+          - _winpe_driver_info_by_guid.driver.os_version == _winpe_drivers[0].os_version
+          - _winpe_driver_info_by_guid.driver.platform == _winpe_drivers[0].platform
+          - _winpe_driver_info_by_guid.driver.pnp_ids == _winpe_drivers[0].pnp_ids
+          - _winpe_driver_info_by_guid.driver.version == _winpe_drivers[0].version
+          - _winpe_driver_info_by_guid.driver.whql_signed == _winpe_drivers[0].whql_signed
+        fail_msg: Driver info does not match expected values.
+        success_msg: Driver info matches expected values.

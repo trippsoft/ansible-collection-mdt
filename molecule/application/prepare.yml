@@ -1,0 +1,196 @@
+---
+- name: Prepare
+  hosts:
+    - subjects
+  tasks:
+    - name: Install MDT
+      chocolatey.chocolatey.win_chocolatey:
+        name:
+          - windows-adk-all
+          - mdt
+        state: present
+
+    - name: Create MDT Deployment Share
+      trippsc2.mdt.deployment_share:
+        mdt_share_path: C:\MDTShare
+        description: MDT Deployment Share
+        unc_path: "\\\\{{ inventory_hostname | upper }}\\MDTShare$"
+        state: present
+
+    - name: Create SMB share
+      ansible.windows.win_share:
+        name: MDTShare$
+        path: C:\MDTShare
+        full: Everyone
+        caching_mode: None
+
+    - name: Add permissions to MDT Deployment Share
+      ansible.windows.win_acl:
+        path: C:\MDTShare
+        user: vagrant
+        rights: FullControl
+        type: allow
+
+    - name: Create application folders
+      loop:
+        - C:\temp\source
+        - C:\temp\extra_files\nested
+        - C:\temp\different_files
+        - C:\temp\missing_files
+      ansible.windows.win_file:
+        path: "{{ item }}"
+        state: directory
+
+    - name: Create application files
+      loop:
+        - content: '1'
+          path: C:\temp\source\file.txt
+        - content: '1'
+          path: C:\temp\extra_files\file.txt
+        - content: '2'
+          path: C:\temp\different_files\file.txt
+        - content: '2'
+          path: C:\temp\extra_files\nested\file2.txt
+      ansible.windows.win_copy:
+        content: "{{ item.content }}"
+        dest: "{{ item.path }}"
+
+    - name: Create MDT directory
+      trippsc2.mdt.directory:
+        mdt_share_path: C:\MDTShare
+        path: Applications\Subdirectory
+        state: present
+
+    - name: Pre-create MDT applications
+      loop:
+        - type: source
+          name: Source To No Source
+          short_name: Source To No Source
+          command_line: 'echo "Source To No Source"'
+          source_path: C:\temp\source
+        - type: source
+          name: Source To Bundle
+          short_name: Source To Bundle
+          command_line: 'echo "Source To Bundle"'
+          source_path: C:\temp\source
+        - type: no_source
+          name: No Source To Source
+          short_name: No Source To Source
+          command_line: 'echo "No Source To Source"'
+        - type: no_source
+          name: No Source To Bundle
+          short_name: No Source To Bundle
+          command_line: 'echo "No Source To Bundle"'
+        - type: bundle
+          name: Bundle To Source
+          short_name: Bundle To Source
+        - type: bundle
+          name: Bundle To No Source
+          short_name: Bundle To No Source
+        - type: source
+          name: Add Files
+          short_name: Add Files
+          command_line: 'echo "Add Files"'
+          source_path: C:\temp\source
+        - type: source
+          name: Change Files
+          short_name: Change Files
+          command_line: 'echo "Change Files"'
+          source_path: C:\temp\source
+        - type: source
+          name: Remove Files
+          short_name: Remove Files
+          command_line: 'echo "Remove Files"'
+          source_path: C:\temp\source
+        - type: bundle
+          name: Change Name
+          short_name: Change Name
+        - type: bundle
+          name: Change Publisher
+          short_name: Change Publisher
+          publisher: Old Publisher
+        - type: bundle
+          name: Change Short Name
+          short_name: Change Short Name
+        - type: bundle
+          name: Change Version
+          short_name: Change Version
+          version: OldVersion
+        - type: bundle
+          name: Change Language
+          short_name: Change Language
+          language: OldLanguage
+        - type: no_source
+          name: Change Command Line
+          short_name: Change Command Line
+          command_line: 'echo "Change Command Line"'
+        - type: no_source
+          name: Change Working Directory
+          short_name: Change Working Directory
+          command_line: 'echo "Change Working Directory"'
+        - type: bundle
+          name: Change Comments
+          short_name: Change Comments
+          comments: Old Comments
+        - type: bundle
+          name: Change Enabled
+          short_name: Change Enabled
+          enabled: false
+        - type: bundle
+          name: Change Hidden
+          short_name: Change Hidden
+          hidden: true
+        - type: bundle
+          name: Change Reboot
+          short_name: Change Reboot
+          reboot: true
+        - type: source
+          name: Change Files Path
+          short_name: Change Files Path
+          command_line: 'echo "Change Files Path"'
+          source_path: C:\temp\source
+        - type: bundle
+          name: Add Paths
+          short_name: Add Paths
+        - type: bundle
+          name: Remove Paths
+          short_name: Remove Paths
+          paths:
+            add:
+              - Subdirectory
+        - type: bundle
+          name: Add And Remove Paths
+          short_name: Add And Remove Paths
+        - type: bundle
+          name: Set Paths
+          short_name: Set Paths
+        - type: source
+          name: Remove Source
+          short_name: Remove Source
+          command_line: 'echo "Remove Source"'
+          source_path: C:\temp\source
+        - type: no_source
+          name: Remove No Source
+          short_name: Remove No Source
+          command_line: 'echo "Remove No Source"'
+        - type: bundle
+          name: Remove Bundle
+          short_name: Remove Bundle
+      trippsc2.mdt.application:
+        mdt_share_path: C:\MDTShare
+        name: "{{ item.name }}"
+        type: "{{ item.type }}"
+        publisher: "{{ item.publisher | default(omit) }}"
+        short_name: "{{ item.short_name }}"
+        version: "{{ item.version | default(omit) }}"
+        language: "{{ item.language | default(omit) }}"
+        paths: "{{ item.paths | default(omit) }}"
+        command_line: "{{ item.command_line | default(omit) }}"
+        working_directory: "{{ item.working_directory | default(omit) }}"
+        comments: "{{ item.comments | default(omit) }}"
+        source_path: "{{ item.source_path | default(omit) }}"
+        destination_folder: "{{ item.destination_path | default(omit) }}"
+        enabled: "{{ item.enabled | default(omit) }}"
+        hidden: "{{ item.hidden | default(omit) }}"
+        reboot: "{{ item.reboot | default(omit) }}"
+        state: present
