@@ -20,7 +20,7 @@ All notable changes to this project will be documented in this file.
 - *task_sequence_info* module plugin added.
 - Added action group for all module plugins.
 
-### *deployment_share* module plugin
+### Module Plugin - *deployment_share*
 
 - Replaced `share_name` options with `unc_path` option that includes the entire UNC path.  This was done to allow DFS namespace usage.
 - Renamed `path` option to `mdt_share_path` to match other module plugins.
@@ -33,12 +33,12 @@ All notable changes to this project will be documented in this file.
 - *boot_image* module plugin added.
 - *directory_info* module plugin added.
 
-### *directory* module plugin
+### Module Plugin - *directory*
 
 - Replaced `name` and `parent_directory` options with `path` option.
 - Renamed `mdt_directory_path` option to `mdt_share_path`.
 
-### *import_drivers* module plugin
+### Module Plugin - *import_drivers*
 
 - Renamed `mdt_directory_path` option to `mdt_share_path`.
 
