@@ -2,4 +2,5 @@
 collections:
   - ansible.windows
   - chocolatey.chocolatey
+  - trippsc2.dell
   - trippsc2.windows
