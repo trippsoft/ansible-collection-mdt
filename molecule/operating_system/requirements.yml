@@ -2,3 +2,4 @@
 collections:
   - ansible.windows
   - chocolatey.chocolatey
+  - community.windows
