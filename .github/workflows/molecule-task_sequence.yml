@@ -47,6 +47,7 @@ jobs:
         run: |
           source ~/venv/ansible-2.16/bin/activate
           rm -rf ~/.ansible/collections/ansible_collections/*
+          ln -s ~/files/ansible-collection-mdt ./molecule/files
           molecule test -s task_sequence
           rm -rf ~/.ansible/collections/ansible_collections/*
           deactivate
