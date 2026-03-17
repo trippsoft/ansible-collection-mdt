@@ -2,6 +2,8 @@
 - name: Prepare
   hosts:
     - subjects
+  roles:
+    - role: trippsc2.windows.testing_chocolatey
   tasks:
     - name: Install MDT
       chocolatey.chocolatey.win_chocolatey:

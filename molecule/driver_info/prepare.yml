@@ -4,6 +4,7 @@
     - subjects
   roles:
     - role: trippsc2.windows.install_psgallery
+    - role: trippsc2.windows.testing_chocolatey
   tasks:
     - name: Install MDT
       chocolatey.chocolatey.win_chocolatey:
@@ -73,14 +74,14 @@
         download_path: C:\Drivers
         os: winpe_11
 
-    - name: Import MDT drivers
+    - name: Import MDT WinPE drivers
       trippsc2.mdt.import_drivers:
         source_paths:
           - C:\Drivers
         path: Out-of-Box Drivers\WinPE
         mdt_share_path: C:\MDTShare
 
-    - name: Import MDT drivers
+    - name: Import MDT Windows 10 drivers
       trippsc2.mdt.import_drivers:
         source_paths:
           - C:\Drivers
