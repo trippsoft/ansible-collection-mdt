@@ -21,6 +21,10 @@ provisioner:
   name: ansible
   inventory:
     group_vars:
+      subjects:
+        choco_configure_testing_repo: ${MOLECULE_CONFIGURE_TESTING_REPO:-true}
+        choco_testing_repo_name: Testing
+        choco_testing_repo_url: ${MOLECULE_TESTING_REPO_URL:-http://192.168.81.5:8081/repository/chocolatey-proxy/}
       windows:
         ansible_shell_type: powershell
         ansible_become_method: runas
