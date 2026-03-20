@@ -1,5 +1,5 @@
 ---
-- name: Converge # noqa complexity[play]
+- name: Converge
   hosts:
     - subjects
   tasks:

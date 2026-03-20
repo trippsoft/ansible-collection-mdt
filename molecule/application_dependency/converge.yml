@@ -1,5 +1,5 @@
 ---
-- name: Converge # noqa complexity[play]
+- name: Converge
   hosts:
     - subjects
   tasks:
@@ -43,7 +43,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
       when:
-        - _add_by_guid_no_existing_check.changed
+        - _add_by_guid_no_existing_check is changed
       ansible.builtin.assert:
         that:
           - _add_by_guid_no_existing_check.diff.before.dependencies is defined
@@ -72,7 +72,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
       when:
-        - _add_by_guid_no_existing.changed
+        - _add_by_guid_no_existing is changed
       ansible.builtin.assert:
         that:
           - _add_by_guid_no_existing.diff.before.dependencies is defined
@@ -109,7 +109,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
       when:
-        - _add_by_guid_existing_check.changed
+        - _add_by_guid_existing_check is changed
       ansible.builtin.assert:
         that:
           - _add_by_guid_existing_check.diff.before.dependencies is defined
@@ -146,7 +146,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
       when:
-        - _add_by_guid_existing.changed
+        - _add_by_guid_existing is changed
       ansible.builtin.assert:
         that:
           - _add_by_guid_existing.diff.before.dependencies is defined
@@ -191,7 +191,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
       when:
-        - _add_by_guid_in_folder_no_existing_check.changed
+        - _add_by_guid_in_folder_no_existing_check is changed
       ansible.builtin.assert:
         that:
           - _add_by_guid_in_folder_no_existing_check.diff.before.dependencies is defined
@@ -220,7 +220,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
       when:
-        - _add_by_guid_in_folder_no_existing.changed
+        - _add_by_guid_in_folder_no_existing is changed
       ansible.builtin.assert:
         that:
           - _add_by_guid_in_folder_no_existing.diff.before.dependencies is defined
@@ -257,7 +257,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
       when:
-        - _add_by_guid_in_folder_existing_check.changed
+        - _add_by_guid_in_folder_existing_check is changed
       ansible.builtin.assert:
         that:
           - _add_by_guid_in_folder_existing_check.diff.before.dependencies is defined
@@ -294,7 +294,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by GUID # noqa no-handler
       when:
-        - _add_by_guid_in_folder_existing.changed
+        - _add_by_guid_in_folder_existing is changed
       ansible.builtin.assert:
         that:
           - _add_by_guid_in_folder_existing.diff.before.dependencies is defined
@@ -339,7 +339,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by name # noqa no-handler
       when:
-        - _add_by_name_no_existing_check.changed
+        - _add_by_name_no_existing_check is changed
       ansible.builtin.assert:
         that:
           - _add_by_name_no_existing_check.diff.before.dependencies is defined
@@ -368,7 +368,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by name # noqa no-handler
       when:
-        - _add_by_name_no_existing.changed
+        - _add_by_name_no_existing is changed
       ansible.builtin.assert:
         that:
           - _add_by_name_no_existing.diff.before.dependencies is defined
@@ -405,7 +405,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by name # noqa no-handler
       when:
-        - _add_by_name_existing_check.changed
+        - _add_by_name_existing_check is changed
       ansible.builtin.assert:
         that:
           - _add_by_name_existing_check.diff.before.dependencies is defined
@@ -442,7 +442,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by name # noqa no-handler
       when:
-        - _add_by_name_existing.changed
+        - _add_by_name_existing is changed
       ansible.builtin.assert:
         that:
           - _add_by_name_existing.diff.before.dependencies is defined
@@ -487,7 +487,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by name in folder # noqa no-handler
       when:
-        - _add_by_name_in_folder_no_existing_check.changed
+        - _add_by_name_in_folder_no_existing_check is changed
       ansible.builtin.assert:
         that:
           - _add_by_name_in_folder_no_existing_check.diff.before.dependencies is defined
@@ -516,7 +516,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by name in folder # noqa no-handler
       when:
-        - _add_by_name_in_folder_no_existing.changed
+        - _add_by_name_in_folder_no_existing is changed
       ansible.builtin.assert:
         that:
           - _add_by_name_in_folder_no_existing.diff.before.dependencies is defined
@@ -553,7 +553,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by name in folder # noqa no-handler
       when:
-        - _add_by_name_in_folder_existing_check.changed
+        - _add_by_name_in_folder_existing_check is changed
       ansible.builtin.assert:
         that:
           - _add_by_name_in_folder_existing_check.diff.before.dependencies is defined
@@ -590,7 +590,7 @@
 
     - name: Verify previous dependencies for Add MDT dependency by name in folder # noqa no-handler
       when:
-        - _add_by_name_in_folder_existing.changed
+        - _add_by_name_in_folder_existing is changed
       ansible.builtin.assert:
         that:
           - _add_by_name_in_folder_existing.diff.before.dependencies is defined
@@ -628,7 +628,7 @@
 
     - name: Verify previous dependencies for Remove MDT dependency by GUID # noqa no-handler
       when:
-        - _remove_by_guid_check.changed
+        - _remove_by_guid_check is changed
       ansible.builtin.assert:
         that:
           - _remove_by_guid_check.diff.before.dependencies is defined
@@ -657,7 +657,7 @@
 
     - name: Verify previous dependencies for Remove MDT dependency by GUID # noqa no-handler
       when:
-        - _remove_by_guid.changed
+        - _remove_by_guid is changed
       ansible.builtin.assert:
         that:
           - _remove_by_guid.diff.before.dependencies is defined
@@ -694,7 +694,7 @@
 
     - name: Verify previous dependencies for Remove MDT dependency by GUID # noqa no-handler
       when:
-        - _remove_by_guid_in_folder_check.changed
+        - _remove_by_guid_in_folder_check is changed
       ansible.builtin.assert:
         that:
           - _remove_by_guid_in_folder_check.diff.before.dependencies is defined
@@ -723,7 +723,7 @@
 
     - name: Verify previous dependencies for Remove MDT dependency by GUID # noqa no-handler
       when:
-        - _remove_by_guid_in_folder.changed
+        - _remove_by_guid_in_folder is changed
       ansible.builtin.assert:
         that:
           - _remove_by_guid_in_folder.diff.before.dependencies is defined
@@ -760,7 +760,7 @@
 
     - name: Verify previous dependencies for Remove MDT dependency by name # noqa no-handler
       when:
-        - _remove_by_name_check.changed
+        - _remove_by_name_check is changed
       ansible.builtin.assert:
         that:
           - _remove_by_name_check.diff.before.dependencies is defined
@@ -789,7 +789,7 @@
 
     - name: Verify previous dependencies for Remove MDT dependency by name # noqa no-handler
       when:
-        - _remove_by_name.changed
+        - _remove_by_name is changed
       ansible.builtin.assert:
         that:
           - _remove_by_name.diff.before.dependencies is defined
@@ -826,7 +826,7 @@
 
     - name: Verify previous dependencies for Remove MDT dependency by name in folder # noqa no-handler
       when:
-        - _remove_by_name_and_path_check.changed
+        - _remove_by_name_and_path_check is changed
       ansible.builtin.assert:
         that:
           - _remove_by_name_and_path_check.diff.before.dependencies is defined
@@ -855,7 +855,7 @@
 
     - name: Verify previous dependencies for Remove MDT dependency by name in folder # noqa no-handler
       when:
-        - _remove_by_name_and_path.changed
+        - _remove_by_name_and_path is changed
       ansible.builtin.assert:
         that:
           - _remove_by_name_and_path.diff.before.dependencies is defined
@@ -892,7 +892,7 @@
 
     - name: Verify previous dependencies for Remove non-existant MDT dependency by name in folder # noqa no-handler
       when:
-        - _remove_by_name_and_path_no_existing_check.changed
+        - _remove_by_name_and_path_no_existing_check is changed
       ansible.builtin.assert:
         that:
           - _remove_by_name_and_path_no_existing_check.diff.before.dependencies is defined
@@ -919,7 +919,7 @@
 
     - name: Verify previous dependencies for Remove non-existant MDT dependency by name in folder # noqa no-handler
       when:
-        - _remove_by_name_and_path_no_existing.changed
+        - _remove_by_name_and_path_no_existing is changed
       ansible.builtin.assert:
         that:
           - _remove_by_name_and_path_no_existing.diff.before.dependencies is defined
@@ -953,7 +953,7 @@
 
     - name: Verify previous dependencies for Set MDT dependency to empty # noqa no-handler
       when:
-        - _set_to_empty_check.changed
+        - _set_to_empty_check is changed
       ansible.builtin.assert:
         that:
           - _set_to_empty_check.diff.before.dependencies is defined
@@ -983,7 +983,7 @@
 
     - name: Verify previous dependencies for Set MDT dependency to empty # noqa no-handler
       when:
-        - _set_to_empty.changed
+        - _set_to_empty is changed
       ansible.builtin.assert:
         that:
           - _set_to_empty.diff.before.dependencies is defined
@@ -1022,7 +1022,7 @@
 
     - name: Verify previous dependencies for Set MDT dependency to GUID # noqa no-handler
       when:
-        - _set_to_guid_check.changed
+        - _set_to_guid_check is changed
       ansible.builtin.assert:
         that:
           - _set_to_guid_check.diff.before.dependencies is defined
@@ -1055,7 +1055,7 @@
 
     - name: Verify previous dependencies for Set MDT dependency to GUID # noqa no-handler
       when:
-        - _set_to_guid.changed
+        - _set_to_guid is changed
       ansible.builtin.assert:
         that:
           - _set_to_guid.diff.before.dependencies is defined
@@ -1096,7 +1096,7 @@
 
     - name: Verify previous dependencies for Set MDT dependency to GUID # noqa no-handler
       when:
-        - _set_to_guid_in_folder_check.changed
+        - _set_to_guid_in_folder_check is changed
       ansible.builtin.assert:
         that:
           - _set_to_guid_in_folder_check.diff.before.dependencies is defined
@@ -1129,7 +1129,7 @@
 
     - name: Verify previous dependencies for Set MDT dependency to GUID # noqa no-handler
       when:
-        - _set_to_guid_in_folder.changed
+        - _set_to_guid_in_folder is changed
       ansible.builtin.assert:
         that:
           - _set_to_guid_in_folder.diff.before.dependencies is defined
@@ -1163,7 +1163,7 @@
 
     - name: Verify previous dependencies for Set MDT dependency to name # noqa no-handler
       when:
-        - _set_to_name_check.changed
+        - _set_to_name_check is changed
       ansible.builtin.assert:
         that:
           - _set_to_name_check.diff.before.dependencies is defined
@@ -1194,7 +1194,7 @@
 
     - name: Verify previous dependencies for Set MDT dependency to name # noqa no-handler
       when:
-        - _set_to_name.changed
+        - _set_to_name is changed
       ansible.builtin.assert:
         that:
           - _set_to_name.diff.before.dependencies is defined
@@ -1233,7 +1233,7 @@
 
     - name: Verify previous dependencies for Set MDT dependency to name in folder # noqa no-handler
       when:
-        - _set_to_name_and_path_check.changed
+        - _set_to_name_and_path_check is changed
       ansible.builtin.assert:
         that:
           - _set_to_name_and_path_check.diff.before.dependencies is defined
@@ -1264,7 +1264,7 @@
 
     - name: Verify previous dependencies for Set MDT dependency to name in folder # noqa no-handler
       when:
-        - _set_to_name_and_path.changed
+        - _set_to_name_and_path is changed
       ansible.builtin.assert:
         that:
           - _set_to_name_and_path.diff.before.dependencies is defined

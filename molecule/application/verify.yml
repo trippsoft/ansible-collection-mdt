@@ -315,7 +315,7 @@
           - '_enabled.msg == "The following parameters are invalid when state is absent: enabled"'
         fail_msg: Enabled cannot be supplied when state is absent.
         success_msg: Enabled cannot be supplied when state is absent.
-    
+
     - name: Attempt to supply hidden when state is absent
       trippsc2.mdt.application:
         mdt_share_path: C:\MDTShare
@@ -518,7 +518,7 @@
           - '_set_nonexistent_path.msg == "The directory ''Applications\\Test'' does not exist in the MDT share."'
         fail_msg: Add nonexistent path fails.
         success_msg: Add nonexistent path fails.
-        
+
     - name: Attempt to supply same path as add path and remove path
       trippsc2.mdt.application:
         mdt_share_path: C:\MDTShare

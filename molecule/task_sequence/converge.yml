@@ -4117,7 +4117,7 @@
           - not _add_remove_paths_check.task_sequence.hidden
           - _add_remove_paths_check.task_sequence.paths is defined
           - _add_remove_paths_check.task_sequence.paths | length == 1
-          - _add_remove_paths_check.task_sequence.paths[0] == "Subdirectory" 
+          - _add_remove_paths_check.task_sequence.paths[0] == "Subdirectory"
         fail_msg: The Add And Remove Paths output is not as expected.
         success_msg: The Add And Remove Paths output is as expected.
 
@@ -4185,7 +4185,7 @@
           - not _add_remove_paths.task_sequence.hidden
           - _add_remove_paths.task_sequence.paths is defined
           - _add_remove_paths.task_sequence.paths | length == 1
-          - _add_remove_paths.task_sequence.paths[0] == "Subdirectory" 
+          - _add_remove_paths.task_sequence.paths[0] == "Subdirectory"
         fail_msg: The Add And Remove Paths output is not as expected.
         success_msg: The Add And Remove Paths output is as expected.
 
@@ -4259,7 +4259,7 @@
           - not _set_paths_check.task_sequence.hidden
           - _set_paths_check.task_sequence.paths is defined
           - _set_paths_check.task_sequence.paths | length == 1
-          - _set_paths_check.task_sequence.paths[0] == "Subdirectory" 
+          - _set_paths_check.task_sequence.paths[0] == "Subdirectory"
         fail_msg: The Set Paths output is not as expected.
         success_msg: The Set Paths output is as expected.
 
@@ -4325,7 +4325,7 @@
           - not _set_paths.task_sequence.hidden
           - _set_paths.task_sequence.paths is defined
           - _set_paths.task_sequence.paths | length == 1
-          - _set_paths.task_sequence.paths[0] == "Subdirectory" 
+          - _set_paths.task_sequence.paths[0] == "Subdirectory"
         fail_msg: The Set Paths output is not as expected.
         success_msg: The Set Paths output is as expected.
 

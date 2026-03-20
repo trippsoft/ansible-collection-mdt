@@ -20,7 +20,7 @@
 
     - name: Attempt to supply non-existent MDT share path
       trippsc2.mdt.directory:
-        mdt_share_path: C:\Test 
+        mdt_share_path: C:\Test
         path: Operating Systems\Windows 10
       register: _nonexistent_mdt_share_path
       ignore_errors: true

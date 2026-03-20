@@ -490,7 +490,7 @@
           - '_set_nonexistent_path.msg == "The directory ''Operating Systems\Test'' does not exist in the MDT share."'
         fail_msg: Add nonexistent path fails.
         success_msg: Add nonexistent path fails.
-        
+
     - name: Attempt to supply same path as add path and remove path
       trippsc2.mdt.operating_system:
         mdt_share_path: D:\MDTShare

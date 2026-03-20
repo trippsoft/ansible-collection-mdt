@@ -11,9 +11,7 @@
 
     - name: Get list of drivers in directory
       ansible.builtin.set_fact:
-        _winpe_drivers: >-
-          {{ _winpe_directory_info.directory.contents |
-              selectattr('type', 'equalto', 'driver') }}
+        _winpe_drivers: "{{ _winpe_directory_info.directory.contents | selectattr('type', 'equalto', 'driver') }}"
 
     - name: Get driver info by name
       trippsc2.mdt.driver_info:

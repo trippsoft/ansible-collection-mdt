@@ -1,6 +1,6 @@
 ---
 collections:
-  - ansible.windows
-  - chocolatey.chocolatey
-  - community.windows
-  - trippsc2.windows
+  - name: ansible.windows
+  - name: chocolatey.chocolatey
+  - name: community.windows
+  - name: trippsc2.windows

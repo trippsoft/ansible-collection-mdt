@@ -1,5 +1,5 @@
 ---
-- name: Converge # noqa complexity[play]
+- name: Converge
   hosts:
     - subjects
   tasks:
@@ -3328,7 +3328,7 @@
           - _remove_paths_check.changed == _remove_paths.changed
         fail_msg: Check mode made changes.
         success_msg: Check mode did not make changes.
-    
+
     - name: Create MDT application with added and removed paths (check)
       check_mode: true
       diff: true

@@ -55,7 +55,7 @@
           {{ _drivers_directory.directory.contents |
               selectattr('type', 'equalto', 'driver') |
               list }}
-    
+
     - name: Verify Out-of-Box Drivers contents
       ansible.builtin.assert:
         that:

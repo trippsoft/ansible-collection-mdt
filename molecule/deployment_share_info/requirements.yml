@@ -1,5 +1,5 @@
 ---
 collections:
-  - ansible.windows
-  - chocolatey.chocolatey
-  - trippsc2.windows
+  - name: ansible.windows
+  - name: chocolatey.chocolatey
+  - name: trippsc2.windows

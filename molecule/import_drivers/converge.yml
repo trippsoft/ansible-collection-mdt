@@ -9,7 +9,7 @@
         source_paths:
           - C:\Drivers
         path: Out-of-Box Drivers\WinPE
- 
+
     - name: Import MDT drivers
       trippsc2.mdt.import_drivers:
         mdt_share_path: C:\MDTShare
